@@ -2274,6 +2274,125 @@ body.intro-active {
   animation: introCrack 4.8s ease-out forwards;
 }
 
+.intro-fist {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 48%;
+  width: clamp(11rem, 24vw, 24rem);
+  aspect-ratio: 1.05;
+  transform: translate(-50%, -50%) scale(0.08);
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 1.8rem rgba(255, 90, 0, 0.88))
+    drop-shadow(0 2rem 3rem rgba(0, 0, 0, 0.95));
+  animation: introFistStrike 4.8s cubic-bezier(0.16, 0.96, 0.2, 1) forwards;
+}
+
+.intro-fist::before {
+  content: "";
+  position: absolute;
+  left: 11%;
+  top: 24%;
+  width: 77%;
+  height: 54%;
+  border-radius: 35% 35% 46% 46%;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,0.22), transparent 24%),
+    linear-gradient(145deg, #0b0b0b 0%, #292929 38%, #050505 75%);
+  border: 2px solid rgba(245,241,232,0.18);
+  box-shadow:
+    inset 0 0.6rem 1.1rem rgba(255,255,255,0.1),
+    inset 0 -1rem 1.8rem rgba(0,0,0,0.9);
+}
+
+.intro-fist::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  top: 17%;
+  width: 64%;
+  height: 14%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,90,0,0.95), rgba(255,255,255,0.6), transparent);
+  transform: rotate(-8deg);
+  mix-blend-mode: screen;
+}
+
+.fist-knuckle {
+  position: absolute;
+  z-index: 2;
+  top: 18%;
+  width: 18%;
+  height: 34%;
+  border-radius: 42% 42% 28% 28%;
+  background: linear-gradient(155deg, #242424, #090909 68%);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: inset 0 0.45rem 0.55rem rgba(255,255,255,0.12);
+}
+
+.fist-k1 { left: 18%; transform: rotate(-10deg); }
+.fist-k2 { left: 34%; transform: translateY(-0.35rem) rotate(-4deg); }
+.fist-k3 { left: 50%; transform: translateY(-0.2rem) rotate(4deg); }
+.fist-k4 { left: 65%; transform: rotate(10deg); }
+
+.fist-thumb {
+  position: absolute;
+  z-index: 3;
+  right: 12%;
+  top: 47%;
+  width: 30%;
+  height: 20%;
+  border-radius: 999px 45% 45% 999px;
+  background: linear-gradient(160deg, #2b2b2b, #070707 70%);
+  border: 1px solid rgba(255,255,255,0.18);
+  transform: rotate(-23deg);
+}
+
+.fist-wrist {
+  position: absolute;
+  z-index: 1;
+  left: 32%;
+  bottom: 4%;
+  width: 36%;
+  height: 34%;
+  border-radius: 0 0 32% 32%;
+  background: linear-gradient(180deg, #171717, #030303);
+  border-inline: 1px solid rgba(255,255,255,0.12);
+}
+
+.intro-shards {
+  position: absolute;
+  z-index: 9;
+  inset: 0;
+  pointer-events: none;
+}
+
+.intro-shards span {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  width: clamp(2.4rem, 5vw, 5.4rem);
+  height: clamp(1.5rem, 3vw, 3.6rem);
+  opacity: 0;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,90,0,0.35) 38%, rgba(0,0,0,0.84));
+  clip-path: polygon(12% 0, 100% 18%, 72% 100%, 0 62%);
+  filter: drop-shadow(0 0 0.8rem rgba(255,90,0,0.9));
+  animation: introShardFly 4.8s ease-out forwards;
+}
+
+.intro-shards span:nth-child(1) { --tx: -46vw; --ty: -32vh; --rot: -760deg; }
+.intro-shards span:nth-child(2) { --tx: -24vw; --ty: -46vh; --rot: 520deg; }
+.intro-shards span:nth-child(3) { --tx: 12vw; --ty: -42vh; --rot: -620deg; }
+.intro-shards span:nth-child(4) { --tx: 43vw; --ty: -25vh; --rot: 710deg; }
+.intro-shards span:nth-child(5) { --tx: 52vw; --ty: 8vh; --rot: -480deg; }
+.intro-shards span:nth-child(6) { --tx: 28vw; --ty: 40vh; --rot: 650deg; }
+.intro-shards span:nth-child(7) { --tx: -10vw; --ty: 46vh; --rot: -560deg; }
+.intro-shards span:nth-child(8) { --tx: -44vw; --ty: 28vh; --rot: 430deg; }
+.intro-shards span:nth-child(9) { --tx: -56vw; --ty: 2vh; --rot: -690deg; }
+.intro-shards span:nth-child(10) { --tx: 4vw; --ty: 54vh; --rot: 780deg; }
+
 .intro-smoke-cloud {
   position: absolute;
   z-index: 1;
@@ -2375,6 +2494,8 @@ body.intro-active {
 .tmrr-intro-demo.replay .intro-shockwave,
 .tmrr-intro-demo.replay .intro-blast,
 .tmrr-intro-demo.replay .intro-cracks,
+.tmrr-intro-demo.replay .intro-fist,
+.tmrr-intro-demo.replay .intro-shards span,
 .tmrr-intro-demo.replay .intro-smoke-cloud,
 .tmrr-intro-demo.replay .intro-firefield span {
   animation-name: none;
@@ -2392,6 +2513,8 @@ body.intro-active {
 .tmrr-intro-demo.replay .intro-shockwave { animation: introShockwave 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-blast { animation: introBlast 4.8s cubic-bezier(0.2, 0.9, 0.2, 1) forwards; }
 .tmrr-intro-demo.replay .intro-cracks { animation: introCrack 4.8s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-fist { animation: introFistStrike 4.8s cubic-bezier(0.16, 0.96, 0.2, 1) forwards; }
+.tmrr-intro-demo.replay .intro-shards span { animation: introShardFly 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-smoke-cloud { animation: introSmoke 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-firefield span { animation: introSpark 4.8s linear forwards; }
 
@@ -2455,6 +2578,60 @@ body.intro-active {
   0%, 17% { opacity: 0; transform: scale(0.98); }
   19%, 36% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.1); }
+}
+
+@keyframes introFistStrike {
+  0%, 9% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.04) rotate(-16deg);
+    filter: blur(1.2rem) drop-shadow(0 0 0 rgba(255,90,0,0));
+  }
+  14% {
+    opacity: 0.98;
+    transform: translate(-50%, -50%) scale(0.44) rotate(-10deg);
+    filter: blur(0.45rem) drop-shadow(0 0 2rem rgba(255,90,0,0.75));
+  }
+  19% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(2.35) rotate(3deg);
+    filter: blur(0) drop-shadow(0 0 4rem rgba(255,90,0,1)) drop-shadow(0 2rem 5rem rgba(0,0,0,1));
+  }
+  21% {
+    opacity: 1;
+    transform: translate(calc(-50% + 1rem), calc(-50% - 0.7rem)) scale(2.65) rotate(-2deg);
+  }
+  24% {
+    opacity: 0.92;
+    transform: translate(-50%, -50%) scale(2.2) rotate(1deg);
+  }
+  34% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.5) rotate(8deg);
+    filter: blur(1.1rem) drop-shadow(0 0 5rem rgba(255,90,0,0.9));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.5) rotate(8deg);
+  }
+}
+
+@keyframes introShardFly {
+  0%, 18% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05) rotate(12deg);
+  }
+  52% {
+    opacity: 0.05;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.3) rotate(var(--rot));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(var(--rot));
+  }
 }
 
 @keyframes introSmoke {
