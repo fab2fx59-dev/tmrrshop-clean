@@ -2393,6 +2393,71 @@ body.intro-active {
 .intro-shards span:nth-child(9) { --tx: -56vw; --ty: 2vh; --rot: -690deg; }
 .intro-shards span:nth-child(10) { --tx: 4vw; --ty: 54vh; --rot: 780deg; }
 
+.intro-fist {
+  width: clamp(18rem, 38vw, 42rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #050505;
+  box-shadow:
+    0 0 5rem rgba(255, 90, 0, 0.7),
+    0 3rem 7rem rgba(0, 0, 0, 0.95);
+  animation: introRealFistStrike 4.8s cubic-bezier(0.15, 1, 0.2, 1) forwards;
+}
+
+.intro-fist > span {
+  display: none;
+}
+
+.intro-fist img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 42%;
+  filter: contrast(1.32) saturate(0.9) brightness(0.72);
+  transform: scale(1.4);
+}
+
+.intro-glass {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255,255,255,0.95) 0 0.35rem, transparent 0.45rem),
+    radial-gradient(circle at 50% 48%, transparent 0 7rem, rgba(255,255,255,0.24) 7.2rem 7.35rem, transparent 7.5rem),
+    linear-gradient(27deg, transparent 49.7%, rgba(255,255,255,0.88) 50%, transparent 50.3%) 49% 50% / 62% 2px no-repeat,
+    linear-gradient(94deg, transparent 49.7%, rgba(255,90,0,0.74) 50%, transparent 50.3%) 47% 49% / 44% 2px no-repeat,
+    linear-gradient(146deg, transparent 49.7%, rgba(255,255,255,0.8) 50%, transparent 50.3%) 51% 47% / 58% 2px no-repeat,
+    linear-gradient(9deg, transparent 49.7%, rgba(255,255,255,0.65) 50%, transparent 50.3%) 52% 55% / 38% 2px no-repeat,
+    linear-gradient(116deg, transparent 49.7%, rgba(255,90,0,0.6) 50%, transparent 50.3%) 42% 57% / 36% 2px no-repeat;
+  filter: drop-shadow(0 0 1rem rgba(255,255,255,0.75)) drop-shadow(0 0 2rem rgba(255,90,0,0.8));
+  animation: introGlassBreak 4.8s ease-out forwards;
+}
+
+.intro-glass span {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: clamp(5rem, 12vw, 12rem);
+  height: 2px;
+  opacity: 0;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,90,0,0.82), transparent);
+  animation: introGlassCrackLine 4.8s ease-out forwards;
+}
+
+.intro-glass span:nth-child(1) { --angle: -154deg; --len: 1.1; }
+.intro-glass span:nth-child(2) { --angle: -112deg; --len: 0.9; }
+.intro-glass span:nth-child(3) { --angle: -62deg; --len: 1.05; }
+.intro-glass span:nth-child(4) { --angle: -18deg; --len: 1.2; }
+.intro-glass span:nth-child(5) { --angle: 28deg; --len: 1.1; }
+.intro-glass span:nth-child(6) { --angle: 74deg; --len: 0.95; }
+.intro-glass span:nth-child(7) { --angle: 128deg; --len: 1.2; }
+.intro-glass span:nth-child(8) { --angle: 166deg; --len: 1; }
+
 .intro-smoke-cloud {
   position: absolute;
   z-index: 1;
@@ -2495,6 +2560,8 @@ body.intro-active {
 .tmrr-intro-demo.replay .intro-blast,
 .tmrr-intro-demo.replay .intro-cracks,
 .tmrr-intro-demo.replay .intro-fist,
+.tmrr-intro-demo.replay .intro-glass,
+.tmrr-intro-demo.replay .intro-glass span,
 .tmrr-intro-demo.replay .intro-shards span,
 .tmrr-intro-demo.replay .intro-smoke-cloud,
 .tmrr-intro-demo.replay .intro-firefield span {
@@ -2513,7 +2580,9 @@ body.intro-active {
 .tmrr-intro-demo.replay .intro-shockwave { animation: introShockwave 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-blast { animation: introBlast 4.8s cubic-bezier(0.2, 0.9, 0.2, 1) forwards; }
 .tmrr-intro-demo.replay .intro-cracks { animation: introCrack 4.8s ease-out forwards; }
-.tmrr-intro-demo.replay .intro-fist { animation: introFistStrike 4.8s cubic-bezier(0.16, 0.96, 0.2, 1) forwards; }
+.tmrr-intro-demo.replay .intro-fist { animation: introRealFistStrike 4.8s cubic-bezier(0.15, 1, 0.2, 1) forwards; }
+.tmrr-intro-demo.replay .intro-glass { animation: introGlassBreak 4.8s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-glass span { animation: introGlassCrackLine 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-shards span { animation: introShardFly 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-smoke-cloud { animation: introSmoke 4.8s ease-out forwards; }
 .tmrr-intro-demo.replay .intro-firefield span { animation: introSpark 4.8s linear forwards; }
@@ -2612,6 +2681,84 @@ body.intro-active {
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(3.5) rotate(8deg);
+  }
+}
+
+@keyframes introRealFistStrike {
+  0%, 8% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.12) rotate(-8deg);
+    filter: blur(1.4rem) saturate(0.75) brightness(0.42);
+  }
+  13% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(0.55) rotate(-4deg);
+    filter: blur(0.55rem) saturate(1.05) brightness(0.72);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.62) rotate(1deg);
+    filter: blur(0.08rem) saturate(1.2) brightness(0.88);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(calc(-50% + 1.2rem), calc(-50% - 0.7rem)) scale(1.88) rotate(-1deg);
+    filter: blur(0) saturate(1.45) brightness(1.08);
+  }
+  23% {
+    opacity: 0.88;
+    transform: translate(calc(-50% - 0.5rem), calc(-50% + 0.4rem)) scale(1.56) rotate(1.5deg);
+  }
+  36% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.4) rotate(7deg);
+    filter: blur(1.2rem) saturate(1.4) brightness(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.4) rotate(7deg);
+  }
+}
+
+@keyframes introGlassBreak {
+  0%, 16% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  19% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  28% {
+    opacity: 0.92;
+    transform: scale(1.015);
+  }
+  56% {
+    opacity: 0.28;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes introGlassCrackLine {
+  0%, 17% {
+    opacity: 0;
+    transform: rotate(var(--angle)) scaleX(0);
+  }
+  20% {
+    opacity: 1;
+    transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1));
+  }
+  54% {
+    opacity: 0.42;
+    transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.35));
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.5));
   }
 }
 
