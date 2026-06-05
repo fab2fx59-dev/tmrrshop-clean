@@ -1,0 +1,11 @@
+.env.local
+.env*.local
+node_modules/
+.next/
+out/
+.npm-cache/
+edge-profile/
+chrome-profile/
+github-upload*/
+_render_reglement/
+tmrr-preview.png

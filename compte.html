@@ -1,0 +1,126 @@
+﻿<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Compte client TMRR</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <canvas class="spark-canvas" aria-hidden="true"></canvas>
+    <div class="site-noise" aria-hidden="true"></div>
+    <div class="top-strip"><div class="ticker"><span>Compte client</span><span>Suivi commandes</span><span>Accès TMRR</span></div></div>
+    <header class="site-header">
+      <video class="nav-video" src="assets/nav/nav-bg.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      <a class="brand" href="index.html"><img src="assets/brand/logo-dragon-white.png" alt="TMRR"></a>
+      <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html">Accueil</a><a href="index.html#concours">Jeu concours TMRR</a><a href="casquettes.html">Casquettes</a><a href="tshirts.html">T-shirts</a><a href="hoodies.html">Sweats à capuches</a><a href="bandanas.html">Bandanas</a><a href="club.html">Club TMRR</a><a href="carte-kdo.html">Carte KDO</a><a href="faq.html">FAQ</a><a href="compte.html">Compte</a>
+      </nav>
+      <a class="cart-pill" href="panier.html"><span>Panier</span><strong>0</strong></a>
+    </header>
+    <main>
+      <section class="page-hero">
+        <p class="eyebrow">Espace client</p>
+        <h1>Ton accès TMRR.</h1>
+        <p class="hero-lead">Crée ton compte, connecte-toi avec tes identifiants et retrouve tes commandes TMRR au même endroit.</p>
+      </section>
+      <section class="category-products section-dark">
+        <div class="account-shell">
+          <div class="account-forms" data-auth-forms>
+            <form class="gift-form account-card" data-login-form>
+              <h2>Se connecter</h2>
+              <p>Utilise l'e-mail et le mot de passe créés sur le site pour accéder à ton espace client.</p>
+              <label>E-mail<input type="email" name="email" autocomplete="email" placeholder="email@exemple.fr" required></label>
+              <label>Mot de passe<input type="password" name="password" autocomplete="current-password" placeholder="Ton mot de passe" required></label>
+              <button class="btn btn-primary magnetic" type="submit">Se connecter</button>
+              <p class="form-message" data-login-message></p>
+            </form>
+            <form class="gift-form account-card" data-register-form>
+              <h2>Créer un compte</h2>
+              <p>Ton compte servira à retrouver tes commandes, tes informations et tes participations au concours.</p>
+              <label>Nom complet<input type="text" name="name" autocomplete="name" placeholder="Ton nom" required></label>
+              <label>E-mail<input type="email" name="email" autocomplete="email" placeholder="email@exemple.fr" required></label>
+              <label>Téléphone<input type="tel" name="phone" autocomplete="tel" placeholder="06 00 00 00 00"></label>
+              <label>Mot de passe<input type="password" name="password" autocomplete="new-password" placeholder="Minimum 6 caractères" required minlength="6"></label>
+              <button class="btn btn-primary magnetic" type="submit">Créer mon compte</button>
+              <p class="form-message" data-register-message></p>
+            </form>
+          </div>
+          <div class="account-dashboard" data-account-dashboard hidden>
+            <div class="account-welcome">
+              <div>
+                <p class="eyebrow">Espace client</p>
+                <h2>Bienvenue, <span data-account-name></span>.</h2>
+                <p>Depuis cet espace, tu peux suivre tes commandes enregistrées sur ce navigateur et retrouver tes informations client.</p>
+              </div>
+              <button class="btn btn-ghost magnetic" type="button" data-logout>Se déconnecter</button>
+            </div>
+            <div class="account-grid">
+              <article class="account-card">
+                <h3>Mes informations</h3>
+                <p><strong>E-mail :</strong> <span data-account-email></span></p>
+                <p><strong>Téléphone :</strong> <span data-account-phone></span></p>
+              </article>
+              <article class="account-card">
+                <h3>Participation concours</h3>
+                <p data-account-contest>Les participations liées aux achats concours apparaîtront avec les commandes validées.</p>
+              </article>
+            </div>
+            <div class="account-card">
+              <h3>Mes commandes</h3>
+              <div class="account-orders" data-account-orders></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <img src="assets/brand/logo-dragon-white.png" alt="TMRR">
+        <p>No rules. Just ride.</p>
+        <span>Boutique officielle TMRR - collection noire, esprit libre, concours Honda Rebel.</span>
+      </div>
+      <div class="footer-grid">
+        <div>
+          <h2>Boutique</h2>
+          <a href="tshirts.html">T-shirts</a>
+          <a href="casquettes.html">Casquettes</a>
+          <a href="hoodies.html">Sweats à capuches</a>
+          <a href="bandanas.html">Bandanas</a>
+          <a href="carte-kdo.html">Carte KDO</a>
+        </div>
+        <div>
+          <h2>Concours</h2>
+          <a href="index.html#concours">Honda Rebel à gagner</a>
+          <a href="index.html#panier">Pack Ticket Rebel</a>
+          <a href="reglement-concours.html">Règlement concours</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+        <div>
+          <h2>Client</h2>
+          <a href="compte.html">Mon compte</a>
+          <a href="panier.html">Panier</a>
+          <a href="paiement.html">Paiement sécurisé</a>
+          <a href="livraison-retours.html">Livraison & retours</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>TMRR</h2>
+          <a href="club.html">Club TMRR</a>
+          <a href="mentions-legales.html">Mentions légales</a>
+          <a href="confidentialite.html">Confidentialité</a>
+          <a class="facebook-button" href="https://www.facebook.com/TMRRofficiel" target="_blank" rel="noopener">Facebook TMRRofficiel</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 TMRR. Tous droits réservés.</span>
+        <span>Paiement sécurisé par carte bancaire.</span>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+

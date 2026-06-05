@@ -1,0 +1,107 @@
+﻿<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Paiement TMRR</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <canvas class="spark-canvas" aria-hidden="true"></canvas>
+    <div class="site-noise" aria-hidden="true"></div>
+    <div class="top-strip"><div class="ticker"><span>Paiement sécurisé</span><span>Stripe</span><span>Carte bancaire</span></div></div>
+    <header class="site-header">
+      <video class="nav-video" src="assets/nav/nav-bg.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      <a class="brand" href="index.html"><img src="assets/brand/logo-dragon-white.png" alt="TMRR"></a>
+      <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html">Accueil</a><a href="panier.html">Panier</a><a href="compte.html">Compte</a>
+      </nav>
+      <a class="cart-pill" href="panier.html"><span>Panier</span><strong>0</strong></a>
+    </header>
+    <main>
+      <section class="page-hero">
+        <p class="eyebrow">Paiement</p>
+        <h1>Paiement sécurisé par carte.</h1>
+        <p class="hero-lead">Au moment de payer, tu es dirigé vers une page bancaire sécurisée. Tes articles sont vérifiés, ton paiement est protégé, puis ta commande est enregistrée dans ton espace client.</p>
+      </section>
+      <section class="category-products section-dark">
+        <div class="payment-layout">
+          <div class="payment-panel">
+            <h2>Comment ça se passe ?</h2>
+            <div class="payment-steps">
+              <article><span>01</span><h3>Vérification</h3><p>Tu vérifies ton panier, tes tailles, ton modèle et ton total avant de continuer.</p></article>
+              <article><span>02</span><h3>Paiement sécurisé</h3><p>Le paiement par carte est traité par un prestataire spécialisé. Les données de carte ne sont pas stockées sur TMRR.</p></article>
+              <article><span>03</span><h3>Commande suivie</h3><p>Après validation, ta commande apparaît dans ton espace client avec son statut de suivi.</p></article>
+            </div>
+            <p>Le cadenas du navigateur, la page de paiement sécurisée et le traitement par prestataire bancaire protègent la transaction. TMRR reçoit uniquement les informations utiles à la commande, pas le numéro complet de ta carte.</p>
+          </div>
+          <aside class="cart-summary payment-summary">
+            <h2>Résumé</h2>
+            <div data-payment-items></div>
+            <div class="cart-total cart-subtotal"><span>Articles</span><strong data-payment-subtotal>0,00 EUR</strong></div>
+            <div class="cart-total cart-shipping"><span>Frais de port</span><strong data-payment-shipping>0,00 EUR</strong></div>
+            <label class="promo-field">Code promo
+              <span>
+                <input type="text" data-promo-code placeholder="TMRR-XXXXXXX">
+                <button class="btn btn-ghost magnetic" type="button" data-apply-promo>Appliquer</button>
+              </span>
+            </label>
+            <div class="cart-total cart-discount" hidden><span>Remise fidélité</span><strong data-payment-discount>-0,00 EUR</strong></div>
+            <div class="cart-total"><span>Total</span><strong data-payment-total>0,00 EUR</strong></div>
+            <button class="btn btn-primary magnetic" type="button" data-confirm-order>Valider ma commande</button>
+            <a class="btn btn-ghost magnetic" href="panier.html">Retour au panier</a>
+            <p class="form-message" data-payment-message></p>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <img src="assets/brand/logo-dragon-white.png" alt="TMRR">
+        <p>No rules. Just ride.</p>
+        <span>Boutique officielle TMRR - collection noire, esprit libre, concours Honda Rebel.</span>
+      </div>
+      <div class="footer-grid">
+        <div>
+          <h2>Boutique</h2>
+          <a href="tshirts.html">T-shirts</a>
+          <a href="casquettes.html">Casquettes</a>
+          <a href="hoodies.html">Sweats à capuches</a>
+          <a href="bandanas.html">Bandanas</a>
+          <a href="carte-kdo.html">Carte KDO</a>
+        </div>
+        <div>
+          <h2>Concours</h2>
+          <a href="index.html#concours">Honda Rebel à gagner</a>
+          <a href="index.html#panier">Pack Ticket Rebel</a>
+          <a href="reglement-concours.html">Règlement concours</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+        <div>
+          <h2>Client</h2>
+          <a href="compte.html">Mon compte</a>
+          <a href="panier.html">Panier</a>
+          <a href="paiement.html">Paiement sécurisé</a>
+          <a href="livraison-retours.html">Livraison & retours</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>TMRR</h2>
+          <a href="club.html">Club TMRR</a>
+          <a href="mentions-legales.html">Mentions légales</a>
+          <a href="confidentialite.html">Confidentialité</a>
+          <a class="facebook-button" href="https://www.facebook.com/TMRRofficiel" target="_blank" rel="noopener">Facebook TMRRofficiel</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 TMRR. Tous droits réservés.</span>
+        <span>Paiement sécurisé par carte bancaire.</span>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+

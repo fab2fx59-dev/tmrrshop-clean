@@ -1,0 +1,373 @@
+﻿<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#050505">
+    <title>TMRR - No Rules. Just Ride.</title>
+    <meta
+      name="description"
+      content="Boutique officielle TMRR. T-shirts noirs, esprit rebel, collection limitée et grand concours Honda Rebel."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <section class="tmrr-intro-demo site-intro" aria-label="Intro TMRR">
+      <div class="intro-firefield" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="intro-shockwave" aria-hidden="true"></div>
+      <div class="intro-blast" aria-hidden="true"></div>
+      <div class="intro-cracks" aria-hidden="true"></div>
+      <div class="intro-smoke-cloud intro-smoke-a" aria-hidden="true"></div>
+      <div class="intro-smoke-cloud intro-smoke-b" aria-hidden="true"></div>
+
+      <div class="intro-logo-stack">
+        <img class="intro-logo intro-logo-shadow" src="assets/brand/logo-dragon-white.png" alt="">
+        <img class="intro-logo intro-logo-main" src="assets/brand/logo-dragon-white.png" alt="TMRR">
+      </div>
+
+      <div class="intro-copy">
+        <p class="intro-kicker">NO RULES</p>
+        <h1>JUST RIDE</h1>
+        <p class="intro-line">Brise tes chaines, libere-toi !</p>
+      </div>
+
+      <div class="intro-impact-word" aria-hidden="true">TMRR</div>
+    </section>
+
+    <canvas class="spark-canvas" aria-hidden="true"></canvas>
+    <div class="site-noise" aria-hidden="true"></div>
+
+    <div class="top-strip">
+      <div class="ticker" aria-label="Informations importantes">
+        <span>1 t-shirt acheté = 1 chance de gagner</span>
+        <span>Honda Rebel à gagner</span>
+        <span>Édition limitée</span>
+        <span>Seulement 2500 exemplaires</span>
+        <span>Livraison suivie</span>
+      </div>
+    </div>
+
+    <header class="site-header" id="top">
+      <video class="nav-video" src="assets/nav/nav-bg.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      <a class="brand" href="#top" aria-label="Accueil TMRR">
+        <img src="assets/brand/logo-dragon-white.png" alt="TMRR">
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#concours">Jeu concours TMRR</a>
+        <a href="casquettes.html">Casquettes</a>
+        <a href="tshirts.html">T-shirts</a>
+        <a href="hoodies.html">Sweats à capuches</a>
+        <a href="bandanas.html">Bandanas</a>
+        <a href="club.html">Club TMRR</a>
+        <a href="carte-kdo.html">Carte KDO</a>
+        <a href="faq.html">FAQ</a><a href="compte.html">Compte</a>
+      </nav>
+      <a class="cart-pill" href="panier.html" aria-label="Voir le panier">
+        <span>Panier</span>
+        <strong>2</strong>
+      </a>
+    </header>
+
+    <main>
+      <section class="hero section-dark" aria-label="Accueil TMRR">
+        <div class="hero-art reveal">
+          <img class="hero-base" src="assets/campaign/home-rebel-hero.png" alt="TMRR - Ne rentre plus dans leurs cases, Honda Rebel à gagner">
+          <div class="text-flash text-flash-title" aria-hidden="true"></div>
+          <div class="spark-rain" aria-hidden="true"></div>
+          <a class="hero-hotspot hero-hotspot-ticket" href="#concours" aria-label="Je prends mon ticket"></a>
+          <a class="hero-hotspot hero-hotspot-collection" href="#collection" aria-label="Voir la collection"></a>
+        </div>
+      </section>
+
+      <section class="contest" id="concours" aria-label="Grand jeu concours">
+        <div class="contest-card reveal">
+          <div class="bike-viewer" aria-label="Vue rotative de la Honda Rebel">
+            <div class="viewer-stage">
+              <button class="viewer-control prev" type="button" aria-label="Vue précédente">‹</button>
+              <img src="assets/bike/rebel-1.png" alt="Honda Rebel vue rotative" data-bike-frame>
+              <button class="viewer-control next" type="button" aria-label="Vue suivante">›</button>
+              <div class="viewer-glow" aria-hidden="true"></div>
+            </div>
+            <div class="viewer-bar">
+              <span>Vue 360 rotative</span>
+              <input type="range" min="0" max="4" value="0" aria-label="Faire tourner la moto" data-bike-slider>
+              <button type="button" data-bike-play>Pause auto</button>
+            </div>
+          </div>
+          <div class="contest-content">
+            <p class="eyebrow">Grand jeu TMRR</p>
+            <h2>Le lot est clair. Le geste est simple.</h2>
+            <p>
+              Fais tourner la Rebel, choisis ton t-shirt concours, puis valide
+              ta participation. Le lot est réel, le drop est limité, la route
+              peut bientôt être à toi.
+            </p>
+            <div class="countdown" data-deadline="2026-08-31T23:59:59+02:00" aria-label="Temps restant">
+              <div><strong data-days>00</strong><span>jours</span></div>
+              <div><strong data-hours>00</strong><span>heures</span></div>
+              <div><strong data-minutes>00</strong><span>min</span></div>
+              <div><strong data-seconds>00</strong><span>sec</span></div>
+            </div>
+            <a class="btn btn-primary magnetic" href="#panier">Je prends mon ticket</a>
+          </div>
+        </div>
+
+        <div class="steps reveal" aria-label="Comment participer">
+          <article>
+            <span>01</span>
+            <h3>La commande</h3>
+            <p>Achète le t-shirt concours TMRR en édition limitée.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>La validation</h3>
+            <p>Ta participation au tirage officiel est confirmée automatiquement après achat.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Le tirage</h3>
+            <p>Attends d'être contacté si tu es l'heureux gagnant.</p>
+          </article>
+        </div>
+        <div class="contest-progress reveal" aria-label="Progression du tirage limité" data-drop-progress data-drop-start="629" data-drop-total="2500" data-drop-daily="21" data-drop-date="2026-06-02">
+          <div class="progress-copy">
+            <span>Progression du drop</span>
+            <strong><b data-drop-current>629</b>/2500 t-shirts déjà vendus</strong>
+          </div>
+          <div class="progress-track">
+            <i data-drop-bar></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="poster-insert section-dark" aria-label="Bande annonce concours TMRR">
+        <div class="band-video-wrap">
+          <video src="assets/campaign/tmrr-contest-band.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+      </section>
+
+      <section class="collection section-dark" id="collection" aria-label="T-shirt concours TMRR">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Le t-shirt concours</p>
+          <h2>Ton entrée pour le tirage.</h2>
+          <p>
+            Le modèle mis en avant pendant l'opération Honda Rebel. Édition
+            limitée, visuel signature, participation au concours après achat.
+          </p>
+        </div>
+
+        <div class="product-grid home-product-grid">
+          <article class="product-card featured reveal">
+            <a href="#panier" class="product-media">
+              <img src="assets/campaign/contest-shirt.png" alt="T-shirt concours No Rules Just Ride">
+            </a>
+            <div class="product-info">
+              <p class="product-label">Édition concours</p>
+              <h3>No Rules. Just Ride.</h3>
+              <p>
+                Le modèle spécial concours. Ton achat valide automatiquement
+                ta participation au tirage au sort pour tenter de gagner la
+                Honda Rebel.
+              </p>
+              <div class="product-options">
+                <label>
+                  Modèle
+                  <select data-option="model">
+                    <option>Homme</option>
+                    <option>Femme</option>
+                  </select>
+                </label>
+                <label>
+                  Taille
+                  <select data-option="size">
+                    <option>S</option>
+                    <option selected>M</option>
+                    <option>L</option>
+                    <option>XL</option>
+                    <option>XXL</option>
+                    <option>3XL</option>
+                  </select>
+                </label>
+                <label>
+                  Quantité
+                  <input type="number" data-option="quantity" min="1" value="1">
+                </label>
+              </div>
+              <div class="buy-row">
+                <strong>25,90 EUR</strong>
+                <a class="btn btn-small magnetic" href="#panier">Ajouter</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="category-strip" aria-label="Catégories boutique">
+        <a href="casquettes.html">Casquettes</a>
+        <a href="tshirts.html">T-shirts</a>
+        <a href="hoodies.html">Sweats à capuches</a>
+        <a href="bandanas.html">Bandanas</a>
+        <a href="club.html">Club TMRR</a>
+        <a href="carte-kdo.html">Carte KDO</a>
+      </section>
+
+      <section class="split-story" id="histoire">
+        <div class="story-image reveal">
+          <div class="smoke-layer" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <img src="assets/bike/rebel-3.png" alt="Honda Rebel dans un garage fumé">
+        </div>
+        <div class="story-copy reveal">
+          <p class="eyebrow">Esprit TMRR</p>
+          <h2>Pas une marque sage. Une posture.</h2>
+          <p>
+            TMRR, c'est du noir, du caractère et des pièces faites pour ceux
+            qui assument leur route. Des t-shirts, casquettes, bandanas et
+            hoodies qui ne demandent pas la permission.
+          </p>
+          <div class="values">
+            <span>Liberté</span>
+            <span>Indépendance</span>
+            <span>Route</span>
+            <span>Rebellion</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="cart-section section-dark" id="panier">
+        <div class="checkout-panel reveal">
+          <div>
+            <p class="eyebrow">Pack recommandé</p>
+            <h2>Ticket Rebel</h2>
+            <p>
+              Le pack concours qui envoie fort : le t-shirt édition limitée
+              + la casquette TMRR. Prix pack : 39,90 EUR. Deux articles,
+              deux participations au tirage au sort Honda Rebel.
+            </p>
+            <div class="pack-preview">
+              <video src="assets/campaign/tmrr-contest-band.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Pack Ticket Rebel t-shirt concours et casquette"></video>
+            </div>
+          </div>
+          <form class="order-box" aria-label="Sélection pack Ticket Rebel" data-pack-form>
+            <label>
+              Modèle du t-shirt
+              <select data-order-model>
+                <option>Homme</option>
+                <option>Femme</option>
+              </select>
+            </label>
+            <label>
+              Taille
+              <select data-order-size>
+                <option>S</option>
+                <option selected>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>3XL</option>
+              </select>
+            </label>
+            <label>
+              Quantité
+              <input type="number" min="1" value="1">
+            </label>
+            <button class="btn btn-primary magnetic" type="button">Ajouter le pack au panier - 39,90 EUR</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="faq faq-split" id="faq">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Achat serein</p>
+          <h2>Tu commandes. On s'occupe du reste.</h2>
+        </div>
+        <div class="faq-list reveal">
+          <details open>
+            <summary>Participation automatique</summary>
+            <p>Achète le t-shirt concours TMRR en édition limitée. Ta participation est automatiquement prise en compte après achat.</p>
+          </details>
+          <details>
+            <summary>Pack Ticket Rebel = 2 chances</summary>
+            <p>Avec le pack t-shirt concours + casquette TMRR, tu obtiens deux participations au tirage au sort Honda Rebel.</p>
+          </details>
+          <details>
+            <summary>Paiement sécurisé</summary>
+            <p>Le paiement par carte sera sécurisé via Stripe lors de la mise en ligne de la boutique.</p>
+          </details>
+          <details>
+            <summary>Suivi de commande</summary>
+            <p>Après achat, tu reçois ta confirmation de commande et les informations liées au concours.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <img src="assets/brand/logo-dragon-white.png" alt="TMRR">
+        <p>No rules. Just ride.</p>
+        <span>Boutique officielle TMRR - collection noire, esprit libre, concours Honda Rebel.</span>
+      </div>
+      <div class="footer-grid">
+        <div>
+          <h2>Boutique</h2>
+          <a href="tshirts.html">T-shirts</a>
+          <a href="casquettes.html">Casquettes</a>
+          <a href="hoodies.html">Sweats à capuches</a>
+          <a href="bandanas.html">Bandanas</a>
+          <a href="carte-kdo.html">Carte KDO</a>
+        </div>
+        <div>
+          <h2>Concours</h2>
+          <a href="index.html#concours">Honda Rebel à gagner</a>
+          <a href="index.html#panier">Pack Ticket Rebel</a>
+          <a href="reglement-concours.html">Règlement concours</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+        <div>
+          <h2>Client</h2>
+          <a href="compte.html">Mon compte</a>
+          <a href="panier.html">Panier</a>
+          <a href="paiement.html">Paiement sécurisé</a>
+          <a href="livraison-retours.html">Livraison & retours</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>TMRR</h2>
+          <a href="club.html">Club TMRR</a>
+          <a href="mentions-legales.html">Mentions légales</a>
+          <a href="confidentialite.html">Confidentialité</a>
+          <a class="facebook-button" href="https://www.facebook.com/TMRRofficiel" target="_blank" rel="noopener">Facebook TMRRofficiel</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 TMRR. Tous droits réservés.</span>
+        <span>Paiement sécurisé par carte bancaire.</span>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Preview intro TMRR</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="intro-preview-page">
+      <section class="tmrr-intro-demo" aria-label="Preview animation intro TMRR">
+        <div class="intro-firefield" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="intro-shockwave" aria-hidden="true"></div>
+        <div class="intro-blast" aria-hidden="true"></div>
+        <div class="intro-cracks" aria-hidden="true"></div>
+        <div class="intro-smoke-cloud intro-smoke-a" aria-hidden="true"></div>
+        <div class="intro-smoke-cloud intro-smoke-b" aria-hidden="true"></div>
+
+        <div class="intro-logo-stack">
+          <img class="intro-logo intro-logo-shadow" src="/assets/brand/logo-dragon-white.png" alt="">
+          <img class="intro-logo intro-logo-main" src="/assets/brand/logo-dragon-white.png" alt="TMRR">
+        </div>
+
+        <div class="intro-copy">
+          <p class="intro-kicker">NO RULES</p>
+          <h1>JUST RIDE</h1>
+          <p class="intro-line">Brise tes chaines, libere-toi !</p>
+        </div>
+
+        <div class="intro-impact-word" aria-hidden="true">TMRR</div>
+      </section>
+
+      <section class="intro-after">
+        <p>Preview intro seulement</p>
+        <h2>L'accueil apparaitrait ici</h2>
+        <button class="btn btn-primary magnetic" type="button" onclick="document.querySelector('.tmrr-intro-demo').classList.remove('replay'); void document.querySelector('.tmrr-intro-demo').offsetWidth; document.querySelector('.tmrr-intro-demo').classList.add('replay');">
+          Rejouer l'intro
+        </button>
+      </section>
+    </main>
+  </body>
+</html>
