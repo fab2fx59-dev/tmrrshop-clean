@@ -713,8 +713,8 @@ h3 {
 
 .band-video-wrap {
   width: calc(100% - clamp(1rem, 3vw, 2.5rem));
-  min-height: clamp(520px, 48vw, 760px);
-  max-height: 760px;
+  min-height: clamp(220px, 26vw, 360px);
+  max-height: 380px;
   margin: 0 auto;
   background: #050505;
   border-block: 1px solid rgba(255, 90, 0, 0.32);
@@ -916,9 +916,7 @@ h3 {
 
 .contest-progress {
   margin-top: 1rem;
-  width: min(100%, 980px);
-  margin-inline: auto;
-  padding: clamp(0.85rem, 1.8vw, 1.25rem);
+  padding: clamp(1rem, 2.2vw, 1.5rem);
   background:
     linear-gradient(90deg, rgba(255,90,0,0.16), transparent 58%),
     #090909;
@@ -944,9 +942,8 @@ h3 {
 .progress-copy strong {
   color: var(--white);
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.45vw, 2.35rem);
-  line-height: 1;
-  text-align: right;
+  font-size: clamp(1.6rem, 3.2vw, 3.2rem);
+  line-height: 0.9;
 }
 
 .progress-copy b {
@@ -955,7 +952,7 @@ h3 {
 }
 
 .progress-track {
-  height: 14px;
+  height: 18px;
   overflow: hidden;
   background: rgba(255,255,255,0.08);
   border: 1px solid var(--line);
@@ -3003,8 +3000,8 @@ body.intro-active {
 
   .band-video-wrap {
     width: calc(100% - 1rem);
-    min-height: clamp(360px, 100vw, 520px);
-    max-height: 520px;
+    min-height: clamp(180px, 54vw, 300px);
+    max-height: 320px;
   }
 
   .bike-viewer,
