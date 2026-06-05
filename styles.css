@@ -713,8 +713,8 @@ h3 {
 
 .band-video-wrap {
   width: calc(100% - clamp(1rem, 3vw, 2.5rem));
-  min-height: clamp(220px, 26vw, 360px);
-  max-height: 380px;
+  min-height: clamp(300px, 36vw, 520px);
+  max-height: 540px;
   margin: 0 auto;
   background: #050505;
   border-block: 1px solid rgba(255, 90, 0, 0.32);
@@ -3000,8 +3000,8 @@ body.intro-active {
 
   .band-video-wrap {
     width: calc(100% - 1rem);
-    min-height: clamp(180px, 54vw, 300px);
-    max-height: 320px;
+    min-height: clamp(240px, 72vw, 420px);
+    max-height: 440px;
   }
 
   .bike-viewer,
