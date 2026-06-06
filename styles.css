@@ -2829,6 +2829,271 @@ body.intro-active {
   }
 }
 
+/* Nouvelle intro TMRR : dark, rapide, impact verre casse. */
+.tmrr-intro-demo {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 90, 0, 0.09), transparent 15rem),
+    radial-gradient(circle at 18% 84%, rgba(255, 255, 255, 0.035), transparent 20rem),
+    linear-gradient(180deg, #000 0%, #030303 48%, #000 100%);
+  animation: cinematicIntroExit 4.2s cubic-bezier(0.82, 0, 0.18, 1) forwards;
+}
+
+.tmrr-intro-demo::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 16% 58%, rgba(255,255,255,0.18), transparent 18%),
+    radial-gradient(ellipse at 36% 42%, rgba(120,120,120,0.26), transparent 22%),
+    radial-gradient(ellipse at 58% 60%, rgba(255,255,255,0.12), transparent 20%),
+    radial-gradient(ellipse at 78% 38%, rgba(90,90,90,0.32), transparent 24%),
+    radial-gradient(ellipse at 88% 72%, rgba(255,90,0,0.1), transparent 20%),
+    linear-gradient(108deg, transparent 18%, rgba(255,255,255,0.06) 36%, transparent 56%),
+    linear-gradient(76deg, transparent 30%, rgba(255,90,0,0.055) 52%, transparent 72%);
+  filter: blur(1.9rem) contrast(1.42) saturate(0.62);
+  mix-blend-mode: screen;
+  transform: translate3d(0, 3rem, 0) scale(0.98);
+  animation: cinematicSmoke 4.2s ease-out forwards;
+}
+
+.tmrr-intro-demo::after {
+  z-index: 15;
+  background:
+    radial-gradient(circle at 50% 49%, transparent 0 26%, rgba(0,0,0,0.56) 62%, rgba(0,0,0,0.96) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 20%, transparent 78%, rgba(255,90,0,0.055)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 5px);
+}
+
+.intro-shockwave,
+.intro-blast,
+.intro-cracks,
+.intro-impact-word,
+.intro-smoke-cloud {
+  display: none;
+}
+
+.intro-firefield {
+  z-index: 2;
+}
+
+.intro-firefield span {
+  width: 0.18rem;
+  height: 4.5rem;
+  opacity: 0;
+  background: linear-gradient(180deg, transparent, rgba(255, 90, 0, 0.85), rgba(255,255,255,0.7), transparent);
+  filter: drop-shadow(0 0 0.55rem rgba(255, 90, 0, 0.72));
+  animation: cinematicSpark 4.2s linear forwards;
+}
+
+.intro-fist {
+  z-index: 8;
+  left: 50%;
+  top: 49%;
+  width: clamp(21rem, 46vw, 48rem);
+  aspect-ratio: 1.15;
+  opacity: 0;
+  overflow: visible;
+  filter: none;
+  animation: cinematicFist 4.2s cubic-bezier(0.07, 0.9, 0.02, 1) forwards;
+}
+
+.intro-fist img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  filter: none;
+}
+
+.intro-fist::before,
+.intro-fist::after,
+.intro-fist > span {
+  display: none;
+}
+
+.intro-glass {
+  z-index: 12;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    url("/assets/intro/broken-glass.svg") center / cover no-repeat,
+    radial-gradient(circle at 50% 49%, rgba(255,255,255,0.94) 0 0.16rem, transparent 0.3rem),
+    linear-gradient(37deg, transparent 49.8%, rgba(255,255,255,0.72) 50%, transparent 50.24%) 46% 48% / 56% 1px no-repeat,
+    linear-gradient(112deg, transparent 49.8%, rgba(255,255,255,0.66) 50%, transparent 50.24%) 52% 50% / 62% 1px no-repeat,
+    linear-gradient(158deg, transparent 49.8%, rgba(255,90,0,0.36) 50%, transparent 50.24%) 48% 54% / 46% 1px no-repeat;
+  filter: drop-shadow(0 0 0.32rem rgba(255,255,255,0.74)) drop-shadow(0 0 1rem rgba(255,90,0,0.42));
+  animation: cinematicGlass 4.2s ease-out forwards;
+}
+
+.intro-glass span {
+  left: 50%;
+  top: 49%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.92), rgba(255,90,0,0.45), transparent);
+  animation: cinematicCrackLine 4.2s ease-out forwards;
+}
+
+.intro-shards {
+  z-index: 14;
+}
+
+.intro-shards span {
+  width: clamp(2.1rem, 4.8vw, 5rem);
+  height: clamp(1.2rem, 3vw, 3.3rem);
+  background:
+    linear-gradient(130deg, rgba(255,255,255,0.72), rgba(180,220,255,0.25) 34%, rgba(255,90,0,0.16) 58%, rgba(0,0,0,0.62));
+  border: 1px solid rgba(255,255,255,0.18);
+  filter: drop-shadow(0 0 0.35rem rgba(255,255,255,0.28));
+  backdrop-filter: blur(0.04rem);
+  animation: cinematicShard 4.2s cubic-bezier(0.18, 0.86, 0.18, 1) forwards;
+}
+
+.intro-logo-stack {
+  z-index: 16;
+  width: min(72vw, 920px);
+  opacity: 0;
+  animation: cinematicLogo 4.2s cubic-bezier(0.16, 1, 0.18, 1) forwards;
+}
+
+.intro-logo-main {
+  filter:
+    drop-shadow(0 0 0.7rem rgba(255,255,255,0.74))
+    drop-shadow(0 0 2rem rgba(255,90,0,0.72));
+  animation: cinematicLogoGlitch 4.2s steps(1, end) forwards;
+}
+
+.intro-logo-shadow {
+  opacity: 0.42;
+  filter: blur(0.18rem) drop-shadow(0 0 3.2rem rgba(255,90,0,0.5));
+}
+
+.intro-copy {
+  z-index: 16;
+  left: clamp(1.1rem, 5.5vw, 5.5rem);
+  bottom: clamp(2.4rem, 7vh, 5rem);
+  opacity: 0;
+  animation: cinematicText 4.2s ease-out forwards;
+}
+
+.intro-copy h1 {
+  text-shadow: 0 0 0.75rem rgba(255,90,0,0.56);
+}
+
+.tmrr-intro-demo.replay,
+.tmrr-intro-demo.replay::before,
+.tmrr-intro-demo.replay .intro-logo-stack,
+.tmrr-intro-demo.replay .intro-logo-main,
+.tmrr-intro-demo.replay .intro-copy,
+.tmrr-intro-demo.replay .intro-fist,
+.tmrr-intro-demo.replay .intro-glass,
+.tmrr-intro-demo.replay .intro-glass span,
+.tmrr-intro-demo.replay .intro-shards span,
+.tmrr-intro-demo.replay .intro-firefield span {
+  animation-name: none;
+}
+
+.tmrr-intro-demo.replay { animation: cinematicIntroExit 4.2s cubic-bezier(0.82, 0, 0.18, 1) forwards; }
+.tmrr-intro-demo.replay::before { animation: cinematicSmoke 4.2s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-fist { animation: cinematicFist 4.2s cubic-bezier(0.07, 0.9, 0.02, 1) forwards; }
+.tmrr-intro-demo.replay .intro-glass { animation: cinematicGlass 4.2s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-glass span { animation: cinematicCrackLine 4.2s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-shards span { animation: cinematicShard 4.2s cubic-bezier(0.18, 0.86, 0.18, 1) forwards; }
+.tmrr-intro-demo.replay .intro-logo-stack { animation: cinematicLogo 4.2s cubic-bezier(0.16, 1, 0.18, 1) forwards; }
+.tmrr-intro-demo.replay .intro-logo-main { animation: cinematicLogoGlitch 4.2s steps(1, end) forwards; }
+.tmrr-intro-demo.replay .intro-copy { animation: cinematicText 4.2s ease-out forwards; }
+.tmrr-intro-demo.replay .intro-firefield span { animation: cinematicSpark 4.2s linear forwards; }
+
+@keyframes cinematicSmoke {
+  0% { opacity: 0; transform: translate3d(0, 4rem, 0) scale(0.96); }
+  12% { opacity: 0.68; }
+  52% { opacity: 0.54; transform: translate3d(-1.5rem, -1.4rem, 0) scale(1.08); }
+  100% { opacity: 0; transform: translate3d(2rem, -5rem, 0) scale(1.18); }
+}
+
+@keyframes cinematicFist {
+  0%, 5% { opacity: 0; transform: translate(-50%, -50%) scale(0.08); }
+  9% { opacity: 1; transform: translate(-50%, -50%) scale(0.42); }
+  13% { opacity: 1; transform: translate(-50%, -50%) scale(2.25); }
+  20% { opacity: 1; transform: translate(calc(-50% + 0.22rem), calc(-50% - 0.1rem)) scale(2.38); }
+  25% { opacity: 0.34; transform: translate(-50%, -50%) scale(1.95); }
+  30%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.55); }
+}
+
+@keyframes cinematicGlass {
+  0%, 12% { opacity: 0; transform: scale(0.98); }
+  13% { opacity: 1; transform: scale(1); }
+  54% { opacity: 0.86; transform: scale(1.035); }
+  88% { opacity: 0.38; }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+@keyframes cinematicCrackLine {
+  0%, 12% { opacity: 0; transform: rotate(var(--angle)) scaleX(0); }
+  14% { opacity: 1; transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.15)); }
+  68% { opacity: 0.72; transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.55)); }
+  100% { opacity: 0; transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.7)); }
+}
+
+@keyframes cinematicShard {
+  0%, 12% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); }
+  14% { opacity: 0.92; transform: translate(-50%, -50%) scale(1.05) rotate(10deg); }
+  52% { opacity: 0.18; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.18) rotate(var(--rot)); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.32) rotate(var(--rot)); }
+}
+
+@keyframes cinematicLogo {
+  0%, 21% { opacity: 0; transform: translate3d(0, 12vh, 0) scale(0.74); }
+  25% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.97); }
+  28% { transform: translate3d(-0.9rem, 0.35rem, 0) rotate(-0.65deg) scale(1.02); }
+  31% { transform: translate3d(0.7rem, -0.24rem, 0) rotate(0.55deg) scale(0.99); }
+  35% { transform: translate3d(0, 0, 0) scale(1); }
+  72% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  88% { opacity: 1; transform: translate3d(0, 0, 0) scale(5); filter: brightness(1.8) contrast(1.45); }
+  100% { opacity: 0; transform: translate3d(0, 0, 0) scale(18); filter: brightness(3) contrast(1.8); }
+}
+
+@keyframes cinematicLogoGlitch {
+  0%, 26%, 34%, 100% { clip-path: inset(0); transform: translateX(0); }
+  28% { clip-path: inset(0 0 70% 0); transform: translateX(-0.65rem); }
+  30% { clip-path: inset(62% 0 20% 0); transform: translateX(0.48rem); }
+  32% { clip-path: inset(30% 0 48% 0); transform: translateX(-0.32rem); }
+}
+
+@keyframes cinematicText {
+  0%, 30% { opacity: 0; transform: translateY(1.4rem); }
+  38% { opacity: 1; transform: translateY(0); }
+  76% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-1.6rem); }
+}
+
+@keyframes cinematicSpark {
+  0%, 8% { opacity: 0; transform: translate3d(0, 0, 0) rotate(64deg) scaleY(0.25); }
+  14%, 48% { opacity: 0.82; }
+  100% { opacity: 0; transform: translate3d(22rem, -14rem, 0) rotate(64deg) scaleY(1.25); }
+}
+
+@keyframes cinematicIntroExit {
+  0%, 84% { opacity: 1; transform: scale(1); filter: brightness(0.78) contrast(1.22) saturate(0.98); }
+  94% { opacity: 1; transform: scale(1.025); filter: brightness(1.14) contrast(1.42) saturate(1.35); }
+  100% { opacity: 0; transform: scale(1.08); filter: brightness(1.6) contrast(1.6) saturate(1.7); pointer-events: none; }
+}
+
+@media (max-width: 760px) {
+  .intro-fist {
+    width: 92vw;
+  }
+
+  .intro-logo-stack {
+    width: 94vw;
+  }
+}
+
 .loyalty-page {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
