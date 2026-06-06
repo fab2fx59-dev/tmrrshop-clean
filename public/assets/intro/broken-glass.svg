@@ -45,6 +45,18 @@
     <path d="M858 402 L890 350 L946 330 L982 284" stroke="#fff" stroke-opacity="0.5" stroke-width="1.6"/>
     <path d="M850 486 L908 532 L920 606 L988 648" stroke="#fff" stroke-opacity="0.48" stroke-width="1.6"/>
     <path d="M765 506 L724 558 L648 572 L600 626" stroke="#fff" stroke-opacity="0.48" stroke-width="1.6"/>
+    <path d="M783 421 L746 392 L706 398 L676 370 L632 376" stroke="#fff" stroke-opacity="0.62" stroke-width="1.5"/>
+    <path d="M810 402 L835 360 L872 356 L900 318 L942 306" stroke="#fff" stroke-opacity="0.58" stroke-width="1.5"/>
+    <path d="M792 470 L752 492 L724 528 L680 536 L642 572" stroke="#fff" stroke-opacity="0.58" stroke-width="1.4"/>
+    <path d="M828 420 L866 462 L914 458 L960 498 L1018 506" stroke="#fff" stroke-opacity="0.56" stroke-width="1.5"/>
+    <path d="M816 498 L846 548 L840 606 L874 662 L868 728" stroke="#fff" stroke-opacity="0.5" stroke-width="1.4"/>
+    <path d="M742 433 L684 414 L628 428 L570 406 L512 420" stroke="#ff6a00" stroke-opacity="0.42" stroke-width="1.4"/>
+    <path d="M883 408 L934 382 L990 394 L1046 368 L1118 382" stroke="#fff" stroke-opacity="0.46" stroke-width="1.4"/>
+    <path d="M702 454 L650 488 L610 480 L556 520 L502 512" stroke="#fff" stroke-opacity="0.42" stroke-width="1.3"/>
+    <path d="M918 416 L972 436 L1030 422 L1084 452 L1146 442" stroke="#fff" stroke-opacity="0.4" stroke-width="1.3"/>
+    <path d="M802 532 L778 586 L790 632 L762 690 L774 744" stroke="#fff" stroke-opacity="0.4" stroke-width="1.3"/>
+    <path d="M804 339 L788 284 L810 244 L790 190 L812 142" stroke="#fff" stroke-opacity="0.38" stroke-width="1.2"/>
+    <path d="M824 566 L866 618 L920 638 L958 696 L1018 724" stroke="#ff6a00" stroke-opacity="0.34" stroke-width="1.2"/>
   </g>
   <g fill="#fff" opacity="0.55">
     <polygon points="805,438 868,386 886,454"/>
@@ -53,5 +65,10 @@
     <polygon points="628,590 574,632 604,548"/>
     <polygon points="1068,382 1128,350 1110,426"/>
     <polygon points="528,434 468,398 486,478"/>
+    <polygon points="783,421 742,392 768,454" opacity="0.4"/>
+    <polygon points="828,420 880,462 842,486" opacity="0.36"/>
+    <polygon points="792,470 752,528 820,512" opacity="0.34"/>
+    <polygon points="858,402 942,306 914,420" opacity="0.28"/>
+    <polygon points="765,506 642,572 738,548" opacity="0.26"/>
   </g>
 </svg>
