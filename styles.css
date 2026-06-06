@@ -2426,7 +2426,7 @@ body.intro-active {
   opacity: 0;
   pointer-events: none;
   background:
-    url("assets/intro/broken-glass.svg") center / cover no-repeat,
+    url("/assets/intro/broken-glass.svg") center / cover no-repeat,
     radial-gradient(circle at 50% 48%, rgba(255,255,255,0.95) 0 0.35rem, transparent 0.45rem),
     radial-gradient(circle at 50% 48%, transparent 0 7rem, rgba(255,255,255,0.24) 7.2rem 7.35rem, transparent 7.5rem),
     linear-gradient(27deg, transparent 49.7%, rgba(255,255,255,0.88) 50%, transparent 50.3%) 49% 50% / 62% 2px no-repeat,
