@@ -16,9 +16,10 @@
   </defs>
   <rect width="1600" height="900" fill="none"/>
   <g filter="url(#glow)" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="805" cy="438" r="50" stroke="#fff" stroke-opacity="0.92" stroke-width="3"/>
-    <circle cx="805" cy="438" r="118" stroke="#fff" stroke-opacity="0.36" stroke-width="2"/>
-    <circle cx="805" cy="438" r="220" stroke="#ff6a00" stroke-opacity="0.2" stroke-width="2"/>
+    <path d="M805 438 L783 421 L810 402 L792 383 L818 365 L804 339" stroke="#fff" stroke-opacity="0.88" stroke-width="3"/>
+    <path d="M805 438 L828 420 L856 430 L883 408 L918 416" stroke="#fff" stroke-opacity="0.78" stroke-width="3"/>
+    <path d="M805 438 L792 470 L816 498 L802 532 L824 566" stroke="#fff" stroke-opacity="0.74" stroke-width="3"/>
+    <path d="M805 438 L772 450 L742 433 L702 454 L664 444" stroke="#ff6a00" stroke-opacity="0.62" stroke-width="3"/>
     <path d="M805 438 L673 328 L541 210 L416 96" stroke="url(#whiteLine)" stroke-width="5"/>
     <path d="M805 438 L922 290 L1031 118 L1110 0" stroke="#fff" stroke-opacity="0.75" stroke-width="4"/>
     <path d="M805 438 L1068 382 L1304 310 L1600 252" stroke="#fff" stroke-opacity="0.78" stroke-width="4"/>
@@ -36,10 +37,14 @@
     <path d="M628 590 L558 544 L484 596 L392 566" stroke="#fff" stroke-opacity="0.5" stroke-width="2"/>
     <path d="M528 434 L448 492 L350 468 L248 532" stroke="#fff" stroke-opacity="0.44" stroke-width="2"/>
     <path d="M747 216 L826 172 L822 92 L910 44" stroke="#fff" stroke-opacity="0.45" stroke-width="2"/>
-    <path d="M805 438 L759 402 L698 406 L641 374" stroke="#fff" stroke-opacity="0.6" stroke-width="2"/>
-    <path d="M805 438 L858 402 L910 410 L974 370" stroke="#fff" stroke-opacity="0.58" stroke-width="2"/>
-    <path d="M805 438 L850 486 L938 494 L1004 546" stroke="#fff" stroke-opacity="0.56" stroke-width="2"/>
-    <path d="M805 438 L765 506 L666 518 L604 570" stroke="#fff" stroke-opacity="0.56" stroke-width="2"/>
+    <path d="M805 438 L759 402 L698 406 L641 374" stroke="#fff" stroke-opacity="0.7" stroke-width="2"/>
+    <path d="M805 438 L858 402 L910 410 L974 370" stroke="#fff" stroke-opacity="0.68" stroke-width="2"/>
+    <path d="M805 438 L850 486 L938 494 L1004 546" stroke="#fff" stroke-opacity="0.66" stroke-width="2"/>
+    <path d="M805 438 L765 506 L666 518 L604 570" stroke="#fff" stroke-opacity="0.66" stroke-width="2"/>
+    <path d="M760 402 L730 350 L742 304 L710 260" stroke="#fff" stroke-opacity="0.5" stroke-width="1.6"/>
+    <path d="M858 402 L890 350 L946 330 L982 284" stroke="#fff" stroke-opacity="0.5" stroke-width="1.6"/>
+    <path d="M850 486 L908 532 L920 606 L988 648" stroke="#fff" stroke-opacity="0.48" stroke-width="1.6"/>
+    <path d="M765 506 L724 558 L648 572 L600 626" stroke="#fff" stroke-opacity="0.48" stroke-width="1.6"/>
   </g>
   <g fill="#fff" opacity="0.55">
     <polygon points="805,438 868,386 886,454"/>

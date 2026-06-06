@@ -2154,8 +2154,8 @@ body.intro-active {
 }
 
 .intro-logo-stack {
-  position: relative;
-  z-index: 4;
+  position: absolute;
+  z-index: 11;
   width: min(74vw, 980px);
   aspect-ratio: 2.1;
   animation: introLogoHit 4.8s cubic-bezier(0.18, 1, 0.22, 1) forwards;
@@ -2260,6 +2260,11 @@ body.intro-active {
   animation: introBlast 4.8s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
 }
 
+.intro-shockwave,
+.intro-blast {
+  display: none;
+}
+
 .intro-cracks {
   position: absolute;
   z-index: 6;
@@ -2317,6 +2322,11 @@ body.intro-active {
   background: linear-gradient(90deg, transparent, rgba(255,90,0,0.95), rgba(255,255,255,0.6), transparent);
   transform: rotate(-8deg);
   mix-blend-mode: screen;
+}
+
+.intro-fist::before,
+.intro-fist::after {
+  display: none;
 }
 
 .fist-knuckle {
@@ -2397,7 +2407,8 @@ body.intro-active {
   width: clamp(18rem, 40vw, 45rem);
   aspect-ratio: 1.16;
   overflow: visible;
-  animation: introRealFistStrike 4.8s cubic-bezier(0.15, 1, 0.2, 1) forwards;
+  filter: none;
+  animation: introRealFistStrike 4.8s cubic-bezier(0.08, 0.95, 0.02, 1) forwards;
 }
 
 .intro-fist > span {
@@ -2410,12 +2421,7 @@ body.intro-active {
   display: block;
   object-fit: contain;
   object-position: center;
-  filter:
-    contrast(1.22)
-    saturate(0.95)
-    brightness(0.92)
-    drop-shadow(0 0 2.5rem rgba(255,90,0,0.75))
-    drop-shadow(0 2rem 4rem rgba(0,0,0,0.95));
+  filter: none;
   transform: scale(1);
 }
 
@@ -2427,8 +2433,7 @@ body.intro-active {
   pointer-events: none;
   background:
     url("/assets/intro/broken-glass.svg") center / cover no-repeat,
-    radial-gradient(circle at 50% 48%, rgba(255,255,255,0.95) 0 0.35rem, transparent 0.45rem),
-    radial-gradient(circle at 50% 48%, transparent 0 7rem, rgba(255,255,255,0.24) 7.2rem 7.35rem, transparent 7.5rem),
+    radial-gradient(circle at 50% 48%, rgba(255,255,255,0.88) 0 0.24rem, transparent 0.36rem),
     linear-gradient(27deg, transparent 49.7%, rgba(255,255,255,0.88) 50%, transparent 50.3%) 49% 50% / 62% 2px no-repeat,
     linear-gradient(94deg, transparent 49.7%, rgba(255,90,0,0.74) 50%, transparent 50.3%) 47% 49% / 44% 2px no-repeat,
     linear-gradient(146deg, transparent 49.7%, rgba(255,255,255,0.8) 50%, transparent 50.3%) 51% 47% / 58% 2px no-repeat,
@@ -2460,18 +2465,7 @@ body.intro-active {
 .intro-glass span:nth-child(8) { --angle: 166deg; --len: 1; }
 
 .intro-smoke-cloud {
-  position: absolute;
-  z-index: 1;
-  width: 42rem;
-  aspect-ratio: 1.7;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.24), transparent 28%),
-    radial-gradient(circle at 56% 62%, rgba(255,255,255,0.14), transparent 32%),
-    radial-gradient(circle at 80% 36%, rgba(255,90,0,0.18), transparent 30%);
-  filter: blur(2.2rem);
-  opacity: 0;
-  animation: introSmoke 4.8s ease-out forwards;
+  display: none;
 }
 
 .intro-smoke-a {
@@ -2589,22 +2583,22 @@ body.intro-active {
 .tmrr-intro-demo.replay .intro-firefield span { animation: introSpark 4.8s linear forwards; }
 
 @keyframes introLogoHit {
-  0% { opacity: 0; transform: translate3d(-120vw, -12vh, 0) rotate(-10deg) scale(0.35); }
-  16% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0) scale(1.14); }
-  18% { transform: translate3d(-1.2rem, 0.7rem, 0) rotate(-1deg) scale(0.94); }
-  20% { transform: translate3d(1rem, -0.5rem, 0) rotate(1deg) scale(1.08); }
-  22% { transform: translate3d(-0.7rem, 0.3rem, 0) scale(0.98); }
-  26% { transform: translate3d(0.45rem, -0.2rem, 0) scale(1.04); }
-  34% { transform: translate3d(0, 0, 0) scale(1); }
+  0%, 42% { opacity: 0; transform: translate3d(0, 28vh, 0) scale(0.62); }
+  48% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.94); }
+  51% { transform: translate3d(-1.2rem, 0.5rem, 0) rotate(-1.2deg) scale(1.02); }
+  53% { transform: translate3d(1rem, -0.35rem, 0) rotate(1deg) scale(0.98); }
+  55% { transform: translate3d(-0.55rem, 0.25rem, 0) rotate(-0.6deg) scale(1.01); }
+  58% { transform: translate3d(0, 0, 0) scale(1); }
   72% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  100% { opacity: 0; transform: translate3d(0, -8vh, 0) scale(1.18); }
+  86% { opacity: 1; transform: translate3d(0, 0, 0) scale(4.6); filter: brightness(1.8) contrast(1.45); }
+  100% { opacity: 0; transform: translate3d(0, 0, 0) scale(18); filter: brightness(3) contrast(1.8); }
 }
 
 @keyframes introLogoGlitch {
-  0%, 17%, 24%, 30%, 100% { clip-path: inset(0); transform: translateX(0); }
-  18% { clip-path: inset(0 0 72% 0); transform: translateX(-0.8rem); }
-  20% { clip-path: inset(62% 0 18% 0); transform: translateX(0.6rem); }
-  26% { clip-path: inset(28% 0 48% 0); transform: translateX(-0.4rem); }
+  0%, 49%, 57%, 100% { clip-path: inset(0); transform: translateX(0); }
+  51% { clip-path: inset(0 0 72% 0); transform: translateX(-0.8rem); }
+  53% { clip-path: inset(62% 0 18% 0); transform: translateX(0.6rem); }
+  55% { clip-path: inset(28% 0 48% 0); transform: translateX(-0.4rem); }
 }
 
 @keyframes introShockwave {
@@ -2631,9 +2625,9 @@ body.intro-active {
 }
 
 @keyframes introTextPunch {
-  0%, 30% { opacity: 0; transform: translateY(2rem); }
-  38% { opacity: 1; transform: translateY(0); }
-  62% { opacity: 1; transform: translateY(0); }
+  0%, 50% { opacity: 0; transform: translateY(2rem); }
+  58% { opacity: 1; transform: translateY(0); }
+  74% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-2rem); }
 }
 
@@ -2686,75 +2680,70 @@ body.intro-active {
 }
 
 @keyframes introRealFistStrike {
-  0%, 8% {
+  0%, 2.5% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.12) rotate(-8deg);
-    filter: blur(1.4rem) saturate(0.75) brightness(0.42);
+    transform: translate(-50%, -50%) scale(0.05) rotate(-3deg);
   }
-  13% {
+  4.5% {
     opacity: 0.85;
-    transform: translate(-50%, -50%) scale(0.55) rotate(-4deg);
-    filter: blur(0.55rem) saturate(1.05) brightness(0.72);
+    transform: translate(-50%, -50%) scale(0.32) rotate(-1deg);
   }
-  18% {
+  6.2% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.62) rotate(1deg);
-    filter: blur(0.08rem) saturate(1.2) brightness(0.88);
+    transform: translate(-50%, -50%) scale(2.12) rotate(0deg);
   }
-  20% {
+  7.4% {
     opacity: 1;
-    transform: translate(calc(-50% + 1.2rem), calc(-50% - 0.7rem)) scale(1.88) rotate(-1deg);
-    filter: blur(0) saturate(1.45) brightness(1.08);
+    transform: translate(calc(-50% + 0.38rem), calc(-50% - 0.18rem)) scale(2.34) rotate(-0.25deg);
   }
-  23% {
-    opacity: 0.88;
-    transform: translate(calc(-50% - 0.5rem), calc(-50% + 0.4rem)) scale(1.56) rotate(1.5deg);
+  10% {
+    opacity: 0.42;
+    transform: translate(calc(-50% - 0.18rem), calc(-50% + 0.08rem)) scale(1.82) rotate(0.55deg);
   }
-  36% {
+  13.5% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(2.4) rotate(7deg);
-    filter: blur(1.2rem) saturate(1.4) brightness(1.1);
+    transform: translate(-50%, -50%) scale(2.55) rotate(3deg);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(2.4) rotate(7deg);
+    transform: translate(-50%, -50%) scale(2.55) rotate(3deg);
   }
 }
 
 @keyframes introGlassBreak {
-  0%, 16% {
+  0%, 5.6% {
     opacity: 0;
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
-  19% {
+  6.4% {
     opacity: 1;
     transform: scale(1);
   }
-  28% {
-    opacity: 0.92;
-    transform: scale(1.015);
+  14% {
+    opacity: 0.96;
+    transform: scale(1.018);
   }
-  56% {
-    opacity: 0.28;
-    transform: scale(1.05);
+  78% {
+    opacity: 0.62;
+    transform: scale(1.055);
   }
   100% {
     opacity: 0;
-    transform: scale(1.12);
+    transform: scale(1.14);
   }
 }
 
 @keyframes introGlassCrackLine {
-  0%, 17% {
+  0%, 5.8% {
     opacity: 0;
     transform: rotate(var(--angle)) scaleX(0);
   }
-  20% {
+  6.6% {
     opacity: 1;
     transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1));
   }
-  54% {
-    opacity: 0.42;
+  72% {
+    opacity: 0.68;
     transform: rotate(var(--angle)) scaleX(calc(var(--len) * 1.35));
   }
   100% {
@@ -2764,15 +2753,15 @@ body.intro-active {
 }
 
 @keyframes introShardFly {
-  0%, 18% {
+  0%, 9% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
   }
-  20% {
+  11% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1.05) rotate(12deg);
   }
-  52% {
+  46% {
     opacity: 0.05;
     transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.3) rotate(var(--rot));
   }
@@ -2795,9 +2784,9 @@ body.intro-active {
 }
 
 @keyframes introSceneExit {
-  0%, 76% { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1.25) contrast(1.08); }
-  88% { opacity: 1; transform: translateY(0) scale(1.03); filter: saturate(1.8) contrast(1.4); }
-  100% { opacity: 0; transform: translateY(-8vh) scale(1.08); filter: saturate(2.2) contrast(1.6); pointer-events: none; }
+  0%, 86% { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1.25) contrast(1.08); }
+  94% { opacity: 1; transform: translateY(0) scale(1.02); filter: saturate(1.8) contrast(1.4); }
+  100% { opacity: 0; transform: translateY(0) scale(1.08); filter: saturate(2.2) contrast(1.6); pointer-events: none; }
 }
 
 @media (max-width: 760px) {
