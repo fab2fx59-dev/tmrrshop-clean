@@ -543,6 +543,300 @@ function bindDropProgress() {
   window.setInterval(update, 60000);
 }
 
+function bindCinematicIntroCanvas(intro) {
+  const canvas = intro.querySelector(".intro-canvas");
+  if (!canvas) return false;
+  const context = canvas.getContext("2d");
+  if (!context) return false;
+
+  const fist = new Image();
+  const logo = new Image();
+  fist.src = intro.querySelector(".intro-canvas-fist")?.getAttribute("src") || "assets/intro/fist-cinematic.png";
+  logo.src = intro.querySelector(".intro-canvas-logo")?.getAttribute("src") || "assets/brand/logo-dragon-white.png";
+
+  const duration = 4300;
+  const impactTime = 760;
+  const crackArms = Array.from({ length: 34 }, (_, index) => {
+    const angle = (index / 34) * Math.PI * 2 + Math.sin(index * 2.31) * 0.18;
+    return {
+      angle,
+      length: 0.22 + ((index * 37) % 68) / 100,
+      bend: (((index * 19) % 29) - 14) / 100,
+      split: index % 3 === 0
+    };
+  });
+  const shards = Array.from({ length: 86 }, (_, index) => {
+    const angle = (index / 86) * Math.PI * 2 + Math.sin(index * 1.73) * 0.42;
+    const speed = 0.26 + ((index * 23) % 94) / 100;
+    return {
+      angle,
+      speed,
+      size: 12 + ((index * 17) % 42),
+      spin: (((index * 31) % 90) - 45) / 28,
+      alpha: 0.22 + ((index * 11) % 64) / 100
+    };
+  });
+  const smoke = Array.from({ length: 42 }, (_, index) => ({
+    x: ((index * 29) % 100) / 100,
+    y: ((index * 47) % 100) / 100,
+    size: 90 + ((index * 71) % 220),
+    drift: (((index * 17) % 50) - 25) / 100,
+    alpha: 0.045 + ((index * 13) % 60) / 1000
+  }));
+  const sparksIntro = Array.from({ length: 56 }, (_, index) => ({
+    x: ((index * 53) % 100) / 100,
+    y: 0.1 + (((index * 37) % 80) / 100),
+    speed: 0.25 + ((index * 7) % 50) / 100,
+    delay: ((index * 11) % 90) / 100
+  }));
+
+  let width = 0;
+  let height = 0;
+  let ratio = 1;
+  let startedAt = 0;
+  let frameId = 0;
+
+  const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const easeOut = (value) => 1 - Math.pow(1 - clamp(value), 3);
+  const easeIn = (value) => Math.pow(clamp(value), 3);
+  const easeBoth = (value) => {
+    const v = clamp(value);
+    return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+  };
+
+  const resize = () => {
+    ratio = Math.min(window.devicePixelRatio || 1, 1.6);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  };
+
+  const drawSmoke = (time) => {
+    smoke.forEach((cloud, index) => {
+      const pulse = Math.sin(time * 0.0012 + index) * 0.5 + 0.5;
+      const x = cloud.x * width + Math.sin(time * 0.00055 + index) * cloud.size * cloud.drift;
+      const y = cloud.y * height + Math.cos(time * 0.00045 + index * 1.7) * cloud.size * 0.1;
+      const radius = cloud.size * (0.72 + pulse * 0.34);
+      const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, `rgba(190, 190, 190, ${cloud.alpha})`);
+      gradient.addColorStop(0.5, `rgba(92, 92, 92, ${cloud.alpha * 0.62})`);
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = gradient;
+      context.beginPath();
+      context.ellipse(x, y, radius * 1.6, radius * 0.7, Math.sin(index) * 0.6, 0, Math.PI * 2);
+      context.fill();
+    });
+  };
+
+  const drawSparksIntro = (time) => {
+    context.save();
+    context.globalCompositeOperation = "screen";
+    sparksIntro.forEach((spark, index) => {
+      const cycle = (time * 0.00032 * spark.speed + spark.delay) % 1;
+      const x = spark.x * width + cycle * width * 0.32;
+      const y = spark.y * height - cycle * height * 0.55;
+      context.globalAlpha = (1 - cycle) * 0.58;
+      context.strokeStyle = index % 4 === 0 ? "#ffffff" : "#ff5a00";
+      context.lineWidth = index % 4 === 0 ? 1 : 2;
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + 30 + cycle * 90, y - 18 - cycle * 48);
+      context.stroke();
+    });
+    context.restore();
+  };
+
+  const drawFist = (elapsed) => {
+    const arrive = easeOut(elapsed / impactTime);
+    const hold = elapsed > impactTime && elapsed < impactTime + 520;
+    const fade = clamp((elapsed - impactTime - 500) / 360);
+    if (elapsed > impactTime + 900 || !fist.complete) return;
+
+    const base = Math.min(width, height) * 0.74;
+    const scale = 0.12 + arrive * 1.72 + (hold ? Math.sin(elapsed * 0.08) * 0.012 : 0);
+    const fistWidth = base * scale;
+    const fistHeight = fistWidth * (fist.naturalHeight / fist.naturalWidth);
+    const x = width / 2 - fistWidth / 2;
+    const y = height / 2 - fistHeight / 2 + Math.min(height, width) * 0.015;
+    context.save();
+    context.globalAlpha = 1 - fade;
+    context.filter = elapsed < impactTime ? `blur(${(1 - arrive) * 5}px)` : "none";
+    context.drawImage(fist, x, y, fistWidth, fistHeight);
+    context.restore();
+  };
+
+  const drawImpact = (elapsed) => {
+    const hit = clamp((elapsed - impactTime) / 320);
+    if (hit <= 0) return;
+    const cx = width / 2;
+    const cy = height / 2;
+    const shock = easeOut(hit);
+    context.save();
+    context.globalCompositeOperation = "screen";
+    context.globalAlpha = (1 - hit) * 0.9;
+    context.strokeStyle = "rgba(255,255,255,0.9)";
+    context.lineWidth = 3;
+    context.beginPath();
+    context.arc(cx, cy, shock * Math.min(width, height) * 0.62, 0, Math.PI * 2);
+    context.stroke();
+    const glow = context.createRadialGradient(cx, cy, 0, cx, cy, Math.min(width, height) * 0.35);
+    glow.addColorStop(0, "rgba(255,255,255,0.42)");
+    glow.addColorStop(0.25, "rgba(255,90,0,0.18)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+    context.restore();
+  };
+
+  const drawCracks = (elapsed) => {
+    const crack = clamp((elapsed - impactTime + 40) / 980);
+    if (crack <= 0) return;
+    const cx = width / 2;
+    const cy = height / 2;
+    const maxRadius = Math.hypot(width, height) * 0.62;
+    context.save();
+    context.globalCompositeOperation = "screen";
+    context.lineCap = "round";
+    crackArms.forEach((arm, index) => {
+      const growth = easeOut(crack - (index % 5) * 0.035);
+      if (growth <= 0) return;
+      const segments = 4 + (index % 4);
+      context.beginPath();
+      context.moveTo(cx, cy);
+      for (let step = 1; step <= segments; step += 1) {
+        const progress = step / segments;
+        const distance = maxRadius * arm.length * progress * growth;
+        const jitter = Math.sin(index * 3.2 + step * 1.9) * 22 * progress + arm.bend * 110 * progress;
+        const angle = arm.angle + jitter / 260;
+        context.lineTo(cx + Math.cos(angle) * distance, cy + Math.sin(angle) * distance);
+      }
+      context.globalAlpha = 0.2 + 0.58 * (1 - clamp((elapsed - 2400) / 1900));
+      context.strokeStyle = index % 4 === 0 ? "rgba(255,120,30,0.65)" : "rgba(255,255,255,0.86)";
+      context.lineWidth = index % 5 === 0 ? 2.2 : 1.05;
+      context.stroke();
+      if (arm.split && growth > 0.55) {
+        context.lineWidth = 0.8;
+        context.globalAlpha *= 0.55;
+        context.beginPath();
+        const sx = cx + Math.cos(arm.angle) * maxRadius * arm.length * 0.34;
+        const sy = cy + Math.sin(arm.angle) * maxRadius * arm.length * 0.34;
+        context.moveTo(sx, sy);
+        context.lineTo(sx + Math.cos(arm.angle + 0.62) * maxRadius * 0.18, sy + Math.sin(arm.angle + 0.62) * maxRadius * 0.18);
+        context.stroke();
+      }
+    });
+    context.restore();
+  };
+
+  const drawShards = (elapsed) => {
+    const shatter = clamp((elapsed - impactTime - 30) / 1500);
+    if (shatter <= 0) return;
+    const cx = width / 2;
+    const cy = height / 2;
+    const travel = easeOut(shatter);
+    context.save();
+    context.globalCompositeOperation = "screen";
+    shards.forEach((shard, index) => {
+      const distance = Math.min(width, height) * (0.08 + shard.speed * 0.9) * travel;
+      const x = cx + Math.cos(shard.angle) * distance;
+      const y = cy + Math.sin(shard.angle) * distance + easeIn(shatter) * 130;
+      const size = shard.size * (1 + travel * 0.45);
+      context.save();
+      context.translate(x, y);
+      context.rotate(shard.angle + shard.spin * travel);
+      context.globalAlpha = shard.alpha * (1 - clamp((shatter - 0.48) / 0.52));
+      context.fillStyle = index % 3 === 0 ? "rgba(255,255,255,0.54)" : "rgba(160,205,255,0.22)";
+      context.strokeStyle = "rgba(255,255,255,0.38)";
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(-size * 0.5, -size * 0.25);
+      context.lineTo(size * 0.56, -size * 0.12);
+      context.lineTo(size * 0.06, size * 0.5);
+      context.closePath();
+      context.fill();
+      context.stroke();
+      context.restore();
+    });
+    context.restore();
+  };
+
+  const drawLogoAndText = (elapsed) => {
+    const appear = easeBoth((elapsed - impactTime - 620) / 420);
+    const exit = easeIn((elapsed - 3340) / 680);
+    if (appear <= 0 || !logo.complete) return;
+    const shake = elapsed < impactTime + 1320 ? Math.sin(elapsed * 0.1) * 10 : 0;
+    const logoWidth = Math.min(width * 0.68, 820) * (0.84 + appear * 0.16 + exit * 8);
+    const logoHeight = logoWidth * (logo.naturalHeight / logo.naturalWidth);
+    const x = width / 2 - logoWidth / 2 + shake * (1 - appear * 0.3);
+    const y = height / 2 - logoHeight / 2 - height * 0.06;
+    context.save();
+    context.globalAlpha = appear * (1 - exit);
+    context.filter = `drop-shadow(0 0 ${18 + appear * 26}px rgba(255,90,0,0.92))`;
+    context.drawImage(logo, x, y, logoWidth, logoHeight);
+    context.restore();
+
+    const textAlpha = clamp((elapsed - impactTime - 820) / 420) * (1 - exit);
+    if (textAlpha <= 0) return;
+    context.save();
+    context.globalAlpha = textAlpha;
+    context.textAlign = "center";
+    context.fillStyle = "#fff";
+    context.shadowColor = "rgba(255,90,0,0.95)";
+    context.shadowBlur = 18;
+    context.font = `900 ${Math.min(82, Math.max(40, width * 0.055))}px Impact, Arial Black, sans-serif`;
+    context.fillText("NO RULES. JUST RIDE.", width / 2, height * 0.68);
+    context.fillStyle = "#ff5a00";
+    context.font = `800 ${Math.min(44, Math.max(23, width * 0.031))}px Impact, Arial Black, sans-serif`;
+    context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.76);
+    context.restore();
+  };
+
+  const draw = (time) => {
+    if (!startedAt) startedAt = time;
+    const elapsed = time - startedAt;
+    const flash = clamp((elapsed - impactTime) / 100);
+    context.clearRect(0, 0, width, height);
+    context.fillStyle = "#000";
+    context.fillRect(0, 0, width, height);
+    const bg = context.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, Math.max(width, height) * 0.75);
+    bg.addColorStop(0, `rgba(18,18,18,${0.55 + (1 - flash) * 0.1})`);
+    bg.addColorStop(0.42, "rgba(6,6,6,0.96)");
+    bg.addColorStop(1, "#000");
+    context.fillStyle = bg;
+    context.fillRect(0, 0, width, height);
+    drawSmoke(elapsed);
+    drawSparksIntro(elapsed);
+    drawFist(elapsed);
+    drawImpact(elapsed);
+    drawCracks(elapsed);
+    drawShards(elapsed);
+    drawLogoAndText(elapsed);
+    if (elapsed < duration) {
+      frameId = requestAnimationFrame(draw);
+    }
+  };
+
+  resize();
+  window.addEventListener("resize", resize);
+  Promise.allSettled([
+    fist.decode?.().catch(() => {}) || Promise.resolve(),
+    logo.decode?.().catch(() => {}) || Promise.resolve()
+  ]).finally(() => {
+    frameId = requestAnimationFrame(draw);
+  });
+
+  intro.addEventListener("transitionend", () => {
+    cancelAnimationFrame(frameId);
+    window.removeEventListener("resize", resize);
+  }, { once: true });
+
+  return true;
+}
+
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
   if (!intro) return;
@@ -559,7 +853,8 @@ function bindSiteIntro() {
     return;
   }
 
-  window.setTimeout(finishIntro, 4850);
+  bindCinematicIntroCanvas(intro);
+  window.setTimeout(finishIntro, 4300);
 }
 
 menuButton?.addEventListener("click", () => {
