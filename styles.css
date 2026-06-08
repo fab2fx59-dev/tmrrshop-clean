@@ -4071,7 +4071,7 @@ body.intro-active {
     right: 0 !important;
     z-index: 29 !important;
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: 1fr !important;
     max-height: min(54vh, 430px) !important;
     overflow-y: auto !important;
     padding: 0.45rem !important;
