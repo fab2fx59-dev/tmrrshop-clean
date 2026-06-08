@@ -3580,7 +3580,7 @@ body.intro-active {
   }
 
   .site-header {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
     min-height: 0;
     padding: 0.45rem 0.7rem 0.35rem;
     gap: 0.65rem;
@@ -3591,6 +3591,8 @@ body.intro-active {
   }
 
   .cart-pill {
+    grid-column: 3;
+    justify-self: end;
     min-height: 36px;
     padding: 0 0.55rem;
   }
@@ -3601,7 +3603,11 @@ body.intro-active {
   }
 
   .menu-toggle {
-    display: none;
+    grid-column: 4;
+    display: block;
+    width: 38px;
+    height: 38px;
+    order: initial;
   }
 
   .cart-pill span {
@@ -3610,28 +3616,27 @@ body.intro-active {
 
   .nav {
     grid-column: 1 / -1;
-    position: static;
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.45rem;
-    width: calc(100vw - 1.4rem);
-    max-height: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0.18rem 0 0.1rem;
-    background: transparent;
-    border-bottom: 0;
-    transform: none;
-    transition: none;
-    scrollbar-width: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 88px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    max-height: min(52vh, 430px);
+    overflow-y: auto;
+    padding: 0.45rem;
+    background: rgba(5,5,5,0.97);
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-135%);
+    transition: transform 0.22s ease;
   }
 
-  .nav::-webkit-scrollbar {
-    display: none;
+  body.menu-open .nav {
+    transform: translateY(0);
   }
 
   .nav a {
-    flex: 0 0 auto;
     min-height: 30px;
     padding: 0.45rem 0.58rem;
     font-size: 0.68rem;
