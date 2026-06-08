@@ -3950,3 +3950,110 @@ body.intro-active {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (max-width: 780px) {
+  .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr auto auto !important;
+    grid-template-rows: 58px !important;
+    align-items: center !important;
+    min-height: 58px !important;
+    height: 58px !important;
+    max-height: 58px !important;
+    padding: 0 0.65rem !important;
+    gap: 0.45rem !important;
+    overflow: hidden !important;
+  }
+
+  .site-header .nav-video {
+    height: 58px !important;
+    max-height: 58px !important;
+    opacity: 0.72 !important;
+  }
+
+  .site-header::after {
+    height: 58px !important;
+    bottom: auto !important;
+  }
+
+  .brand {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  .brand img {
+    display: block !important;
+    width: 74px !important;
+    max-height: 46px !important;
+    object-fit: contain !important;
+  }
+
+  .cart-pill {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: end !important;
+    display: inline-flex !important;
+    min-height: 31px !important;
+    height: 31px !important;
+    margin: 0 !important;
+    padding: 0 0.44rem !important;
+    transform: none !important;
+  }
+
+  .cart-pill span {
+    display: none !important;
+  }
+
+  .cart-pill strong {
+    width: 21px !important;
+    height: 21px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .menu-toggle {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: end !important;
+    display: block !important;
+    width: 34px !important;
+    height: 34px !important;
+    margin: 0 !important;
+  }
+
+  .menu-toggle span {
+    width: 18px !important;
+    height: 2px !important;
+    margin: 5px auto !important;
+  }
+
+  .nav {
+    position: fixed !important;
+    top: 88px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 29 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    max-height: min(54vh, 430px) !important;
+    overflow-y: auto !important;
+    padding: 0.45rem !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-12px) !important;
+  }
+
+  body.menu-open .nav {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+  }
+}
