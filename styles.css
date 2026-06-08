@@ -3179,6 +3179,24 @@ body.intro-active {
   animation: introFallbackText 4s ease forwards;
 }
 
+.intro-fallback p span,
+.intro-line span {
+  display: inline;
+}
+
+@media (max-width: 780px) {
+  .intro-fallback p {
+    width: min(92vw, 28rem);
+    font: 900 clamp(2rem, 9.4vw, 3.15rem) / 0.96 Impact, "Arial Black", sans-serif;
+    white-space: normal;
+  }
+
+  .intro-fallback p span,
+  .intro-line span {
+    display: block;
+  }
+}
+
 .cinematic-video-intro .intro-copy {
   position: absolute;
   width: 1px;
