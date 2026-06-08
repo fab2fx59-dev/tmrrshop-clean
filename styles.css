@@ -3965,7 +3965,7 @@ body.intro-active {
     max-height: 58px !important;
     padding: 0 0.65rem !important;
     gap: 0.45rem !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   .site-header .nav-video {
@@ -4055,5 +4055,9 @@ body.intro-active {
     visibility: visible !important;
     pointer-events: auto !important;
     transform: translateY(0) !important;
+  }
+
+  .hero + .contest {
+    padding-top: 1.4rem !important;
   }
 }

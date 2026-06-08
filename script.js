@@ -697,7 +697,8 @@ function bindSiteIntro() {
   window.setTimeout(finishIntro, 3800);
 }
 
-menuButton?.addEventListener("click", () => {
+menuButton?.addEventListener("click", (event) => {
+  event.preventDefault();
   const open = document.body.classList.toggle("menu-open");
   menuButton.setAttribute("aria-expanded", String(open));
 });
