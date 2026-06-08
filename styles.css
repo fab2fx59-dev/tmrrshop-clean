@@ -3843,6 +3843,19 @@ body.intro-active {
     min-height: 420px;
   }
 
+  .contest-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contest-content {
+    order: 1;
+  }
+
+  .bike-viewer {
+    order: 2;
+  }
+
   .viewer-bar {
     grid-template-columns: 1fr;
   }
