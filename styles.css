@@ -4088,7 +4088,11 @@ body.intro-active {
     width: min(52vw, 260px) !important;
     max-height: min(54vh, 430px) !important;
     overflow-y: auto !important;
-    padding: 0.45rem !important;
+    gap: 0.55rem !important;
+    padding: 0.65rem !important;
+    background: var(--orange) !important;
+    border: 3px solid #050505 !important;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.82), 0 0 0 1px rgba(255, 255, 255, 0.18) inset !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -4105,9 +4109,18 @@ body.intro-active {
   .nav a {
     justify-content: center !important;
     text-align: center !important;
-    font-family: var(--font-display) !important;
-    font-size: 0.86rem !important;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif !important;
+    font-size: 0.96rem !important;
+    font-weight: 900 !important;
+    line-height: 1.05 !important;
+    text-transform: uppercase !important;
     letter-spacing: 0 !important;
+    min-height: 42px !important;
+    padding: 0.7rem 0.55rem !important;
+    color: #050505 !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 2px solid #050505 !important;
+    box-shadow: 3px 3px 0 #050505 !important;
   }
 
   .hero + .contest {
