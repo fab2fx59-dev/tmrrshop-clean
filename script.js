@@ -625,10 +625,17 @@ function bindCinematicIntroCanvas(intro) {
     context.fillStyle = "#fff";
     context.shadowColor = "rgba(255,90,0,0.95)";
     context.shadowBlur = 18;
-    context.font = `900 ${Math.min(82, Math.max(40, width * 0.055))}px Impact, Arial Black, sans-serif`;
+    const isMobileIntro = width < 620;
+    const mainTextSize = isMobileIntro
+      ? Math.min(34, Math.max(22, width * 0.062))
+      : Math.min(82, Math.max(40, width * 0.055));
+    const subTextSize = isMobileIntro
+      ? Math.min(18, Math.max(13, width * 0.032))
+      : Math.min(44, Math.max(23, width * 0.031));
+    context.font = `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
     context.fillText("NO RULES. JUST RIDE.", width / 2, height * 0.68);
     context.fillStyle = "#ff5a00";
-    context.font = `800 ${Math.min(44, Math.max(23, width * 0.031))}px Impact, Arial Black, sans-serif`;
+    context.font = `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
     context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.76);
     context.restore();
   };
@@ -863,6 +870,13 @@ bindDropProgress();
 bindSiteIntro();
 bindAccountPage();
 updateCartCount();
+
+document.querySelectorAll(".hero-hotspot-collection").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = "tshirts.html";
+  });
+});
 
 if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   resizeCanvas();
