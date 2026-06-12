@@ -83,7 +83,7 @@ async function markPromoCodeUsed({ supabase, session }) {
 async function createPurchasedGiftCards({ supabase, session }) {
   const orderId = session.metadata?.order_id;
   const buyerUserId = session.client_reference_id || session.metadata?.user_id;
-  if (!orderId || !buyerUserId) return;
+  if (!orderId) return;
 
   const { data: existing } = await supabase
     .from("gift_cards")
@@ -114,7 +114,7 @@ async function createPurchasedGiftCards({ supabase, session }) {
       const amount = Number(item.unit_price || 0);
       const payload = {
         order_id: orderId,
-        buyer_user_id: buyerUserId,
+        buyer_user_id: buyerUserId || null,
         buyer_email: buyerEmail,
         recipient_email: item.variant_model || buyerEmail,
         recipient_name: item.variant_size || "",

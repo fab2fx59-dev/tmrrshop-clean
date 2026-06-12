@@ -67,6 +67,17 @@ function createGiftCardClient(fallbackClient) {
   return fallbackClient;
 }
 
+function createOrderClient(fallbackClient) {
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+
+  return fallbackClient;
+}
+
 export async function POST(request) {
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
@@ -80,13 +91,6 @@ export async function POST(request) {
   const {
     data: { user }
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json(
-      { error: "Connecte-toi avant de passer au paiement." },
-      { status: 401 }
-    );
-  }
 
   const { items = [], customerEmail, promoCode = "", giftCardCode = "" } = await request.json();
 
@@ -106,6 +110,13 @@ export async function POST(request) {
   let giftCardDiscount = null;
 
   if (cleanPromoCode) {
+    if (!user) {
+      return NextResponse.json(
+        { error: "Connecte-toi pour utiliser ton code promo fidelite." },
+        { status: 401 }
+      );
+    }
+
     const { data: promo } = await supabase
       .from("promo_codes")
       .select("code, discount_percent, used_at")
@@ -160,12 +171,15 @@ export async function POST(request) {
     };
   }
 
-  const { data: order, error: orderError } = await supabase
+  const orderSupabase = createOrderClient(supabase);
+  const orderEmail = customerEmail || user?.email || "client-a-renseigner@tmrr.shop";
+
+  const { data: order, error: orderError } = await orderSupabase
     .from("orders")
     .insert({
-      user_id: user.id,
+      user_id: user?.id || null,
       order_number: orderNumber,
-      customer_email: user.email,
+      customer_email: orderEmail,
       status: "pending",
       total_amount: totals.total,
       currency: "EUR"
@@ -202,7 +216,7 @@ export async function POST(request) {
     });
   }
 
-  const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
+  const { error: itemsError } = await orderSupabase.from("order_items").insert(orderItems);
 
   if (itemsError) {
     return NextResponse.json(
@@ -238,10 +252,10 @@ export async function POST(request) {
   try {
     session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: customerEmail || user.email || undefined,
-      client_reference_id: user.id,
+      customer_email: customerEmail || user?.email || undefined,
+      client_reference_id: user?.id || undefined,
       metadata: {
-        user_id: user.id,
+        user_id: user?.id || "",
         order_id: order.id,
         promo_code: discount?.code || "",
         gift_card_code: giftCardDiscount?.code || "",
@@ -260,11 +274,10 @@ export async function POST(request) {
     );
   }
 
-  await supabase
+  await orderSupabase
     .from("orders")
     .update({ stripe_checkout_session_id: session.id })
-    .eq("id", order.id)
-    .eq("user_id", user.id);
+    .eq("id", order.id);
 
   return NextResponse.json({ url: session.url });
 }
