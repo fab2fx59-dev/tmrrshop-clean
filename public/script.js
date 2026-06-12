@@ -384,7 +384,14 @@ function renderPaymentPage() {
           giftCardCode: activePromo?.type === "gift_card" ? activePromo.code : ""
         })
       });
-      const payload = await response.json();
+      const responseText = await response.text();
+      let payload = {};
+
+      try {
+        payload = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        payload = { error: responseText || "Erreur technique pendant la preparation du paiement." };
+      }
 
       if (!response.ok) {
         if (message) message.textContent = payload.error || "Connecte-toi avant de passer au paiement.";
@@ -403,8 +410,12 @@ function renderPaymentPage() {
       }
 
       throw new Error("Aucune page de paiement recue.");
-    } catch {
-      if (message) message.textContent = "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+    } catch (error) {
+      if (message) {
+        message.textContent = error?.message
+          ? `Le paiement n'a pas pu demarrer : ${error.message}`
+          : "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+      }
       confirmButton.disabled = false;
     }
   });

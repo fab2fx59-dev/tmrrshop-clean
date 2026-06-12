@@ -233,23 +233,32 @@ export async function POST(request) {
   }
   const checkoutDiscounts = [discount, giftCardDiscount].filter(Boolean).map((item) => ({ coupon: item.stripeCouponId }));
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: customerEmail || user.email || undefined,
-    client_reference_id: user.id,
-    metadata: {
-      user_id: user.id,
-      order_id: order.id,
-      promo_code: discount?.code || "",
-      gift_card_code: giftCardDiscount?.code || "",
-      gift_card_amount: giftCardDiscount?.appliedAmount ? String(giftCardDiscount.appliedAmount) : "",
-      tmrr_cart: JSON.stringify(items).slice(0, 450)
-    },
-    line_items: lineItems,
-    discounts: checkoutDiscounts.length ? checkoutDiscounts : undefined,
-    success_url: `${origin}/compte?paiement=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/panier?paiement=cancel`
-  });
+  let session;
+
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer_email: customerEmail || user.email || undefined,
+      client_reference_id: user.id,
+      metadata: {
+        user_id: user.id,
+        order_id: order.id,
+        promo_code: discount?.code || "",
+        gift_card_code: giftCardDiscount?.code || "",
+        gift_card_amount: giftCardDiscount?.appliedAmount ? String(giftCardDiscount.appliedAmount) : "",
+        tmrr_cart: JSON.stringify(items).slice(0, 450)
+      },
+      line_items: lineItems,
+      discounts: checkoutDiscounts.length ? checkoutDiscounts : undefined,
+      success_url: `${origin}/compte?paiement=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/panier?paiement=cancel`
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: `Stripe refuse le demarrage du paiement : ${error.message}` },
+      { status: 500 }
+    );
+  }
 
   await supabase
     .from("orders")
