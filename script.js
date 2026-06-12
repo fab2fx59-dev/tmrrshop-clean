@@ -375,6 +375,7 @@ function renderPaymentPage() {
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json"
         },
@@ -384,11 +385,19 @@ function renderPaymentPage() {
           giftCardCode: activePromo?.type === "gift_card" ? activePromo.code : ""
         })
       });
-      const payload = await response.json();
+      const responseText = await response.text();
+      let payload = {};
+
+      try {
+        payload = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        payload = { error: responseText || "Erreur technique pendant la preparation du paiement." };
+      }
 
       if (!response.ok) {
-        if (message) message.textContent = payload.error || "Connecte-toi avant de passer au paiement.";
-        if (response.status === 401) {
+        const errorText = payload.error || "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+        if (message) message.textContent = errorText;
+        if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {
             window.location.href = "/compte";
           }, 1200);

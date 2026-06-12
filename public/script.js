@@ -396,8 +396,9 @@ function renderPaymentPage() {
       }
 
       if (!response.ok) {
-        if (message) message.textContent = payload.error || "Connecte-toi avant de passer au paiement.";
-        if (response.status === 401) {
+        const errorText = payload.error || "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+        if (message) message.textContent = errorText;
+        if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {
             window.location.href = "/compte";
           }, 1200);
