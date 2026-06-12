@@ -339,6 +339,7 @@ function renderPaymentPage() {
 
     const response = await fetch("/api/promo/validate", {
       method: "POST",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json"
       },
@@ -375,6 +376,7 @@ function renderPaymentPage() {
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json"
         },
