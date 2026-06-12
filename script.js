@@ -395,7 +395,7 @@ function renderPaymentPage() {
       }
 
       if (!response.ok) {
-        const errorText = payload.error || "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+        const errorText = payload.error || `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`;
         if (message) message.textContent = errorText;
         if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {

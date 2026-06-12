@@ -1,4 +1,4 @@
-﻿const menuButton = document.querySelector(".menu-toggle");
+const menuButton = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".nav");
 const CART_KEY = "tmrrCart";
 const USERS_KEY = "tmrrUsers";
@@ -128,7 +128,7 @@ function bindProductButtons() {
       const size = card.querySelector('[data-option="size"]')?.value;
       const quantity = Math.max(1, Number(card.querySelector('[data-option="quantity"]')?.value || 1));
       const baseOption = card.querySelector(".product-label")?.textContent?.trim() || "TMRR";
-      const selectedOptions = [baseOption, model && `ModÃ¨le ${model}`, size && `Taille ${size}`].filter(Boolean).join(" Â· ");
+      const selectedOptions = [baseOption, model && `Modèle ${model}`, size && `Taille ${size}`].filter(Boolean).join(" · ");
       addToCart({
         id: `${name}-${priceText}-${model || ""}-${size || ""}`.toLowerCase().replace(/\s+/g, "-"),
         name,
@@ -151,7 +151,7 @@ function bindProductButtons() {
       price: 39.9,
       image: "assets/pack/ticket-shirt-poster.png",
       quantity,
-      options: `T-shirt concours modÃ¨le ${model} taille ${size} Â· Casquette TMRR Â· 2 participations`
+      options: `T-shirt concours modèle ${model} taille ${size} · Casquette TMRR · 2 participations`
     });
   });
 
@@ -312,7 +312,7 @@ function renderPaymentPage() {
     row.innerHTML = `
       <span>
         ${item.quantity} x ${item.name}
-        <small>${item.options || "Article TMRR"} Â· Prix unitaire : ${formatPrice(item.price)}</small>
+        <small>${item.options || "Article TMRR"} · Prix unitaire : ${formatPrice(item.price)}</small>
       </span>
       <strong>${formatPrice(item.price * item.quantity)}</strong>
     `;
@@ -335,7 +335,7 @@ function renderPaymentPage() {
       return;
     }
 
-    if (message) message.textContent = "VÃ©rification du code promo...";
+    if (message) message.textContent = "Vérification du code promo...";
 
     const response = await fetch("/api/promo/validate", {
       method: "POST",
@@ -396,7 +396,7 @@ function renderPaymentPage() {
       }
 
       if (!response.ok) {
-        const errorText = payload.error || "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+        const errorText = payload.error || `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`;
         if (message) message.textContent = errorText;
         if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {
@@ -452,7 +452,7 @@ function bindAccountPage() {
     dashboard.hidden = false;
     document.querySelector("[data-account-name]").textContent = user.name;
     document.querySelector("[data-account-email]").textContent = user.email;
-    document.querySelector("[data-account-phone]").textContent = user.phone || "Non renseignÃ©";
+    document.querySelector("[data-account-phone]").textContent = user.phone || "Non renseigné";
 
     const orders = getUserOrders(user.email);
     const orderList = document.querySelector("[data-account-orders]");
@@ -468,20 +468,20 @@ function bindAccountPage() {
 
     if (contest) {
       contest.textContent = contestEntries
-        ? `${contestEntries} participation(s) concours associÃ©e(s) Ã  tes commandes enregistrÃ©es.`
-        : "Aucune participation concours enregistrÃ©e pour le moment.";
+        ? `${contestEntries} participation(s) concours associée(s) à tes commandes enregistrées.`
+        : "Aucune participation concours enregistrée pour le moment.";
     }
 
     if (!orderList) return;
     if (!orders.length) {
-      orderList.innerHTML = `<p>Aucune commande enregistrÃ©e pour le moment. Quand tu valideras un panier, il apparaÃ®tra ici.</p>`;
+      orderList.innerHTML = `<p>Aucune commande enregistrée pour le moment. Quand tu valideras un panier, il apparaîtra ici.</p>`;
       return;
     }
 
     orderList.innerHTML = orders.map((order) => `
       <article class="account-order">
         <div><strong>${order.id}</strong><span>${order.date}</span></div>
-        <p>${order.items.map((item) => `${item.quantity} x ${item.name}`).join(" Â· ")}</p>
+        <p>${order.items.map((item) => `${item.quantity} x ${item.name}`).join(" · ")}</p>
         <footer><span>${order.status}</span><strong>${formatPrice(order.total)}</strong></footer>
       </article>
     `).join("");
@@ -497,14 +497,14 @@ function bindAccountPage() {
     const users = readJson(USERS_KEY, []);
 
     if (users.some((user) => user.email === email)) {
-      if (registerMessage) registerMessage.textContent = "Un compte existe dÃ©jÃ  avec cet e-mail. Utilise la connexion.";
+      if (registerMessage) registerMessage.textContent = "Un compte existe déjà avec cet e-mail. Utilise la connexion.";
       return;
     }
 
     users.push({ email, password, name, phone, createdAt: new Date().toISOString() });
     writeJson(USERS_KEY, users);
     localStorage.setItem(SESSION_KEY, email);
-    if (registerMessage) registerMessage.textContent = "Compte crÃ©Ã©. Bienvenue dans ton espace TMRR.";
+    if (registerMessage) registerMessage.textContent = "Compte créé. Bienvenue dans ton espace TMRR.";
     showDashboard();
   });
 
@@ -516,7 +516,7 @@ function bindAccountPage() {
     const user = readJson(USERS_KEY, []).find((entry) => entry.email === email && entry.password === password);
 
     if (!user) {
-      if (loginMessage) loginMessage.textContent = "Identifiants introuvables. VÃ©rifie ton e-mail ou ton mot de passe.";
+      if (loginMessage) loginMessage.textContent = "Identifiants introuvables. Vérifie ton e-mail ou ton mot de passe.";
       return;
     }
 

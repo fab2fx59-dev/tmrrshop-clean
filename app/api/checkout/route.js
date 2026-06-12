@@ -189,7 +189,7 @@ export async function POST(request) {
 
   if (orderError) {
     return NextResponse.json(
-      { error: "La commande n'a pas pu être préparée. Vérifie les permissions Supabase." },
+      { error: `La commande n'a pas pu etre preparee : ${orderError.message || "permission Supabase refusee"}` },
       { status: 500 }
     );
   }
@@ -220,7 +220,7 @@ export async function POST(request) {
 
   if (itemsError) {
     return NextResponse.json(
-      { error: "Les articles de la commande n'ont pas pu être enregistrés." },
+      { error: `Les articles de la commande n'ont pas pu etre enregistres : ${itemsError.message || "permission Supabase refusee"}` },
       { status: 500 }
     );
   }
