@@ -79,6 +79,19 @@ function createOrderClient(fallbackClient) {
 }
 
 export async function POST(request) {
+  try {
+    return await handleCheckout(request);
+  } catch (error) {
+    console.error("Checkout fatal error", error);
+
+    return NextResponse.json(
+      { error: `Erreur serveur paiement : ${error?.message || "erreur inconnue"}` },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleCheckout(request) {
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
       { error: "Stripe n'est pas encore configure." },
