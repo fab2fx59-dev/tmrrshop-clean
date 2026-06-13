@@ -396,7 +396,10 @@ function renderPaymentPage() {
       }
 
       if (!response.ok) {
-        const errorText = payload.error || `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`;
+        const missingConfig = payload.config
+          ? ` Config: URL Supabase ${payload.config.supabaseUrl ? "OK" : "MANQUANTE"}, anon ${payload.config.supabaseAnon ? "OK" : "MANQUANTE"}, service ${payload.config.supabaseService ? "OK" : "MANQUANTE"}, Stripe ${payload.config.stripeSecret ? "OK" : "MANQUANTE"}.`
+          : "";
+        const errorText = (payload.error || `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`) + missingConfig;
         if (message) message.textContent = errorText;
         if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {

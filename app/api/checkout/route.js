@@ -57,7 +57,7 @@ function getShippingLine(items) {
 }
 
 function createGiftCardClient(fallbackClient) {
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -68,7 +68,7 @@ function createGiftCardClient(fallbackClient) {
 }
 
 function createOrderClient(fallbackClient) {
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -85,7 +85,15 @@ export async function POST(request) {
     console.error("Checkout fatal error", error);
 
     return NextResponse.json(
-      { error: `Erreur serveur paiement : ${error?.message || "erreur inconnue"}` },
+      {
+        error: `Erreur serveur paiement : ${error?.message || "erreur inconnue"}`,
+        config: {
+          supabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+          supabaseAnon: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+          supabaseService: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+          stripeSecret: Boolean(process.env.STRIPE_SECRET_KEY)
+        }
+      },
       { status: 500 }
     );
   }
@@ -100,10 +108,18 @@ async function handleCheckout(request) {
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  let supabase = null;
+  let user = null;
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    try {
+      supabase = await createSupabaseServerClient();
+      const { data } = await supabase.auth.getUser();
+      user = data?.user || null;
+    } catch {
+      user = null;
+    }
+  }
 
   const { items = [], customerEmail, promoCode = "", giftCardCode = "" } = await request.json();
 
@@ -123,7 +139,7 @@ async function handleCheckout(request) {
   let giftCardDiscount = null;
 
   if (cleanPromoCode) {
-    if (!user) {
+    if (!user || !supabase) {
       return NextResponse.json(
         { error: "Connecte-toi pour utiliser ton code promo fidelite." },
         { status: 401 }
@@ -185,6 +201,13 @@ async function handleCheckout(request) {
   }
 
   const orderSupabase = createOrderClient(supabase);
+  if (!orderSupabase) {
+    return NextResponse.json(
+      { error: "Supabase n'est pas encore configure sur Vercel : verifie NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY, puis redeploie." },
+      { status: 500 }
+    );
+  }
+
   const orderEmail = customerEmail || user?.email || "client-a-renseigner@tmrr.shop";
 
   const { data: order, error: orderError } = await orderSupabase
