@@ -78,6 +78,14 @@ function createOrderClient(fallbackClient) {
   return fallbackClient;
 }
 
+function getSiteUrl(request) {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const requestOrigin = request.headers.get("origin");
+  const baseUrl = configuredUrl || requestOrigin || "https://tmrr.shop";
+
+  return baseUrl.replace(/\/+$/, "");
+}
+
 export async function POST(request) {
   try {
     return await handleCheckout(request);
@@ -130,7 +138,7 @@ async function handleCheckout(request) {
     );
   }
 
-  const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL;
+  const siteUrl = getSiteUrl(request);
   const totals = getTotals(items);
   const orderNumber = `TMRR-${Date.now().toString().slice(-8)}`;
   const cleanPromoCode = String(promoCode || "").trim().toUpperCase();
@@ -302,8 +310,8 @@ async function handleCheckout(request) {
       },
       line_items: lineItems,
       discounts: checkoutDiscounts.length ? checkoutDiscounts : undefined,
-      success_url: `${origin}/compte?paiement=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/panier?paiement=cancel`
+      success_url: `${siteUrl}/compte?paiement=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/panier?paiement=cancel`
     });
   } catch (error) {
     return NextResponse.json(
