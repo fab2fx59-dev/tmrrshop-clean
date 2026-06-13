@@ -7,11 +7,11 @@ const SHIPPING_PRICE = 4.9;
 const FREE_SHIPPING_MIN = 60;
 
 function getContestEntries(item) {
-  const label = `${item.name || ""} ${item.options || ""}`.toLowerCase();
+  const label = `${item.name || ""} ${item.options || ""} ${item.category || ""}`.toLowerCase();
   const quantity = Number(item.quantity || 1);
 
   if (label.includes("ticket rebel")) return quantity * 2;
-  if (label.includes("concours") || label.includes("no rules")) return quantity;
+  if (label.includes("concours") || label.includes("no rules") || Number(item.price || 0) === 25.9) return quantity;
   return 0;
 }
 

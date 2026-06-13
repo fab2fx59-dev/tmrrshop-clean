@@ -134,6 +134,26 @@ function createAdminClient(fallbackClient) {
   return fallbackClient;
 }
 
+function getContestEntriesFromLabel(label, quantity = 1) {
+  const text = String(label || "").toLowerCase();
+  const safeQuantity = Math.max(1, Number(quantity || 1));
+
+  if (text.includes("ticket rebel")) return safeQuantity * 2;
+  if (text.includes("concours") || text.includes("no rules")) return safeQuantity;
+  return 0;
+}
+
+async function attachEmailOrders({ user, supabase }) {
+  if (!user?.email) return;
+
+  const adminSupabase = createAdminClient(supabase);
+  await adminSupabase
+    .from("orders")
+    .update({ user_id: user.id })
+    .eq("customer_email", user.email)
+    .is("user_id", null);
+}
+
 function makeGiftCardCode() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let suffix = "";
@@ -402,6 +422,55 @@ async function confirmStripeReturn({ sessionId, user, supabase }) {
     if (currentOrder?.user_id && currentOrder.user_id !== user.id) return "pending";
     const shouldApplyPaymentEffects = currentOrder?.status !== "paid";
 
+    let orderId = currentOrder?.id || session.metadata?.order_id || "";
+
+    if (!orderId) {
+      const { data: newOrder } = await adminSupabase
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          order_number: `TMRR-${Date.now().toString().slice(-8)}`,
+          customer_email: customerEmail,
+          status: "paid",
+          total_amount: Number(session.amount_total || 0) / 100,
+          currency: String(session.currency || "eur").toUpperCase(),
+          stripe_checkout_session_id: session.id,
+          stripe_payment_intent_id: session.payment_intent,
+          paid_at: new Date().toISOString()
+        })
+        .select("id")
+        .single();
+
+      orderId = newOrder?.id || "";
+
+      if (orderId) {
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+          limit: 100,
+          expand: ["data.price.product"]
+        });
+        const orderItems = (lineItems.data || []).map((line) => {
+          const product = typeof line.price?.product === "object" ? line.price.product : null;
+          const productName = line.description || product?.name || "Article TMRR";
+          const quantity = Math.max(1, Number(line.quantity || 1));
+
+          return {
+            order_id: orderId,
+            product_name: productName,
+            product_category: productName.toLowerCase().includes("livraison") ? "shipping" : "",
+            variant_model: product?.metadata?.model || "",
+            variant_size: product?.metadata?.size || "",
+            quantity,
+            unit_price: Number(line.amount_subtotal || line.amount_total || 0) / 100 / quantity,
+            contest_entries: getContestEntriesFromLabel(productName, quantity)
+          };
+        });
+
+        if (orderItems.length) {
+          await adminSupabase.from("order_items").insert(orderItems);
+        }
+      }
+    }
+
     await adminSupabase
       .from("orders")
       .update({
@@ -485,6 +554,7 @@ export default async function AccountPage({ searchParams }) {
     if (paymentParam === "success") {
       paymentStatus = await confirmStripeReturn({ sessionId, user, supabase });
     }
+    await attachEmailOrders({ user, supabase });
 
     const [{ data: profileData }, ordersData, { data: promoData }, { data: giftCardData }] = await Promise.all([
       supabase.from("profiles").select("first_name, last_name, full_name, phone, address").eq("id", user.id).maybeSingle(),

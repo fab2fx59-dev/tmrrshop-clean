@@ -206,16 +206,22 @@ export async function POST(request) {
         .eq("id", session.metadata.order_id)
         .maybeSingle();
       shouldApplyPaymentEffects = currentOrder?.status !== "paid";
+      const userId = session.client_reference_id || session.metadata?.user_id || null;
+      const updatePayload = {
+        status: "paid",
+        customer_email: session.customer_details?.email || session.customer_email || "",
+        stripe_checkout_session_id: session.id,
+        stripe_payment_intent_id: session.payment_intent,
+        paid_at: paidAt
+      };
+
+      if (userId) {
+        updatePayload.user_id = userId;
+      }
 
       await supabase
         .from("orders")
-        .update({
-          status: "paid",
-          customer_email: session.customer_details?.email || session.customer_email || "",
-          stripe_checkout_session_id: session.id,
-          stripe_payment_intent_id: session.payment_intent,
-          paid_at: paidAt
-        })
+        .update(updatePayload)
         .eq("id", session.metadata.order_id);
     } else {
       const orderNumber = `TMRR-${Date.now()}`;
