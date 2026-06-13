@@ -203,7 +203,9 @@ async function handleCheckout(request) {
   const orderSupabase = createOrderClient(supabase);
   if (!orderSupabase) {
     return NextResponse.json(
-      { error: "Supabase n'est pas encore configure sur Vercel : verifie NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY, puis redeploie." },
+      {
+        error: `Supabase n'est pas encore configure sur Vercel : NEXT_PUBLIC_SUPABASE_URL ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "OK" : "MANQUANTE"}, NEXT_PUBLIC_SUPABASE_ANON_KEY ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "OK" : "MANQUANTE"}, SUPABASE_SERVICE_ROLE_KEY ${process.env.SUPABASE_SERVICE_ROLE_KEY ? "OK" : "MANQUANTE"}.`
+      },
       { status: 500 }
     );
   }
