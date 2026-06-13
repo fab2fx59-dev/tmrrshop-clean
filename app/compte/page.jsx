@@ -124,7 +124,7 @@ function PaymentReturnMessage({ status }) {
 }
 
 function createAdminClient(fallbackClient) {
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -389,26 +389,29 @@ async function confirmStripeReturn({ sessionId, user, supabase }) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    if (session.client_reference_id !== user.id) return "pending";
     if (session.payment_status !== "paid") return "pending";
+    const adminSupabase = createAdminClient(supabase);
+    const customerEmail = session.customer_details?.email || session.customer_email || user.email || "";
 
-    const { data: currentOrder } = await supabase
+    const { data: currentOrder } = await adminSupabase
       .from("orders")
-      .select("id, status")
+      .select("id, status, user_id")
       .eq("stripe_checkout_session_id", session.id)
-      .eq("user_id", user.id)
       .maybeSingle();
+
+    if (currentOrder?.user_id && currentOrder.user_id !== user.id) return "pending";
     const shouldApplyPaymentEffects = currentOrder?.status !== "paid";
 
-    await supabase
+    await adminSupabase
       .from("orders")
       .update({
+        user_id: user.id,
+        customer_email: customerEmail,
         status: "paid",
         stripe_payment_intent_id: session.payment_intent,
         paid_at: new Date().toISOString()
       })
-      .eq("stripe_checkout_session_id", session.id)
-      .eq("user_id", user.id);
+      .eq("stripe_checkout_session_id", session.id);
 
     if (session.metadata?.promo_code) {
       await supabase
@@ -434,6 +437,34 @@ async function confirmStripeReturn({ sessionId, user, supabase }) {
   }
 }
 
+async function getAccountOrders({ user, supabase }) {
+  const adminSupabase = createAdminClient(supabase);
+  const orderSelect = "id, order_number, status, total_amount, currency, created_at, paid_at, order_items(product_name, product_category, variant_model, variant_size, quantity, unit_price, contest_entries)";
+
+  const byUserPromise = adminSupabase
+    .from("orders")
+    .select(orderSelect)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const byEmailPromise = user.email
+    ? adminSupabase
+        .from("orders")
+        .select(orderSelect)
+        .eq("customer_email", user.email)
+        .order("created_at", { ascending: false })
+    : Promise.resolve({ data: [] });
+
+  const [{ data: byUser }, { data: byEmail }] = await Promise.all([byUserPromise, byEmailPromise]);
+  const byId = new Map();
+
+  for (const order of [...(byUser || []), ...(byEmail || [])]) {
+    byId.set(order.id, order);
+  }
+
+  return Array.from(byId.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+}
+
 export default async function AccountPage({ searchParams }) {
   const params = await searchParams;
   const message = params?.message ? decodeURIComponent(params.message) : "";
@@ -455,13 +486,9 @@ export default async function AccountPage({ searchParams }) {
       paymentStatus = await confirmStripeReturn({ sessionId, user, supabase });
     }
 
-    const [{ data: profileData }, { data: ordersData }, { data: promoData }, { data: giftCardData }] = await Promise.all([
+    const [{ data: profileData }, ordersData, { data: promoData }, { data: giftCardData }] = await Promise.all([
       supabase.from("profiles").select("first_name, last_name, full_name, phone, address").eq("id", user.id).maybeSingle(),
-      supabase
-        .from("orders")
-        .select("id, order_number, status, total_amount, currency, created_at, paid_at, order_items(product_name, product_category, variant_model, variant_size, quantity, unit_price, contest_entries)")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false }),
+      getAccountOrders({ user, supabase }),
       supabase
         .from("promo_codes")
         .select("code, discount_percent, used_at, created_at")
