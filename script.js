@@ -193,8 +193,9 @@ function bindProductButtons() {
     button.addEventListener("click", (event) => {
       event.preventDefault();
       const pack = button.dataset.packChoice || "pack1";
-      const model = document.querySelector(`[data-pack-model="${pack}"]`)?.value || "Homme";
-      const size = document.querySelector(`[data-pack-size="${pack}"]`)?.value || "M";
+      const scope = button.closest(".mobile-pack-controls") || button.closest("[data-pack-selector]") || document;
+      const model = scope.querySelector(`[data-pack-model="${pack}"]`)?.value || "Homme";
+      const size = scope.querySelector(`[data-pack-size="${pack}"]`)?.value || "M";
       const isPackTwo = pack === "pack2";
       addToCart({
         id: `${pack}-${model}-${size}`.toLowerCase().replace(/\s+/g, "-"),
