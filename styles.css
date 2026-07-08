@@ -248,6 +248,10 @@ body.menu-open {
   filter: contrast(1.05) saturate(1.04);
 }
 
+.hero-video {
+  object-fit: cover;
+}
+
 .hero-art picture {
   display: block;
   width: 100%;
