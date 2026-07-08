@@ -80,6 +80,37 @@ function updateCartCount() {
   });
 }
 
+function bindHeroVideoSound() {
+  const video = document.querySelector("[data-hero-video]");
+  const button = document.querySelector("[data-hero-sound]");
+  const frame = video?.closest(".hero-art");
+  if (!video) return;
+
+  const setSoundState = (enabled) => {
+    video.muted = !enabled;
+    video.volume = enabled ? 1 : 0;
+    frame?.classList.toggle("is-sound-on", enabled);
+    if (button) {
+      button.textContent = enabled ? "Son on" : "Son off";
+      button.setAttribute("aria-pressed", String(enabled));
+    }
+  };
+
+  const toggleSound = async () => {
+    const nextState = video.muted;
+    setSoundState(nextState);
+    try {
+      await video.play();
+    } catch {
+      setSoundState(false);
+    }
+  };
+
+  video.addEventListener("click", toggleSound);
+  button?.addEventListener("click", toggleSound);
+  setSoundState(false);
+}
+
 function addToCart(item) {
   const cart = readCart();
   const existing = cart.find((cartItem) => cartItem.id === item.id);
@@ -776,6 +807,7 @@ clearCartAfterStripeReturn();
 bindDropProgress();
 bindSiteIntro();
 bindAccountPage();
+bindHeroVideoSound();
 updateCartCount();
 
 if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {

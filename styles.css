@@ -231,7 +231,8 @@ body.menu-open {
 
 .hero-art {
   position: relative;
-  width: 100%;
+  width: min(100%, 1500px);
+  margin: 0 auto;
   aspect-ratio: 1672 / 830;
   overflow: hidden;
   background: #050505;
@@ -250,6 +251,31 @@ body.menu-open {
 
 .hero-video {
   object-fit: cover;
+  cursor: pointer;
+}
+
+.hero-sound-toggle {
+  position: absolute;
+  right: clamp(0.8rem, 2vw, 1.4rem);
+  bottom: clamp(0.8rem, 2vw, 1.4rem);
+  z-index: 8;
+  min-width: 92px;
+  min-height: 42px;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(255, 90, 0, 0.76);
+  background: rgba(5, 5, 5, 0.72);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.hero-sound-toggle:hover,
+.hero-art.is-sound-on .hero-sound-toggle {
+  background: var(--orange);
+  color: #050505;
 }
 
 .hero-art picture {
@@ -3906,12 +3932,26 @@ body.intro-active {
   }
 
   .hero-art {
-    aspect-ratio: 1 / 1;
+    width: 100%;
+    aspect-ratio: 9 / 14;
+    max-height: calc(100svh - 76px);
     min-height: 0;
   }
 
   .hero-base {
-    object-position: center;
+    object-position: center center;
+  }
+
+  .hero-video {
+    object-fit: cover;
+  }
+
+  .hero-sound-toggle {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    min-width: 84px;
+    min-height: 38px;
+    font-size: 0.86rem;
   }
 
   .hero-stage,
