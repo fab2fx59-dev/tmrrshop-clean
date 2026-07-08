@@ -89,7 +89,7 @@ function addToCart(item) {
     cart.push({ ...item, quantity: item.quantity || 1 });
   }
   writeCart(cart);
-  window.location.href = "/panier";
+  window.location.href = window.location.protocol === "file:" ? "panier.html" : "/panier";
 }
 
 function readJson(key, fallback) {
@@ -152,6 +152,26 @@ function bindProductButtons() {
       image: "assets/pack/ticket-shirt-poster.png",
       quantity,
       options: `T-shirt concours modèle ${model} taille ${size} · Casquette TMRR · 2 participations`
+    });
+  });
+
+  document.querySelectorAll("[data-pack-choice]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const pack = button.dataset.packChoice || "pack1";
+      const model = document.querySelector(`[data-pack-model="${pack}"]`)?.value || "Homme";
+      const size = document.querySelector(`[data-pack-size="${pack}"]`)?.value || "M";
+      const isPackTwo = pack === "pack2";
+      addToCart({
+        id: `${pack}-${model}-${size}`.toLowerCase().replace(/\s+/g, "-"),
+        name: isPackTwo ? "Pack 2 - Ticket Rebel" : "Pack 1 - T-shirt concours",
+        price: isPackTwo ? 39.9 : 25.9,
+        image: "assets/campaign/packs.png",
+        quantity: 1,
+        options: isPackTwo
+          ? `T-shirt concours modÃ¨le ${model} taille ${size} Â· Casquette TMRR Â· 2 participations`
+          : `T-shirt concours modÃ¨le ${model} taille ${size} Â· 1 participation`
+      });
     });
   });
 

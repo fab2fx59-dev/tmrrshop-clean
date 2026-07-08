@@ -1002,6 +1002,170 @@ h3 {
   transition: width 0.6s ease;
 }
 
+.pack-choice-section {
+  padding: clamp(1.4rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 90, 0, 0.16), transparent 28rem),
+    #080808;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.pack-choice-frame {
+  position: relative;
+  max-width: 1668px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 90, 0, 0.32);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.54);
+}
+
+.pack-choice-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pack-choice-hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.pack-select {
+  position: absolute;
+  display: block;
+}
+
+.pack-select span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.pack-select select {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  opacity: 0.01;
+}
+
+.pack-select:focus-within,
+.pack-choice-button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+
+.pack-choice-button {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+}
+
+.pack-choice-button:hover {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 24px rgba(255, 90, 0, 0.6);
+}
+
+.pack-one-size {
+  left: 10.9%;
+  top: 76.4%;
+  width: 13.2%;
+  height: 6.4%;
+}
+
+.pack-one-model {
+  left: 32%;
+  top: 76.4%;
+  width: 13.2%;
+  height: 6.4%;
+}
+
+.pack-one-button {
+  left: 5.8%;
+  top: 85.9%;
+  width: 40.7%;
+  height: 7.8%;
+}
+
+.pack-two-size {
+  left: 57.9%;
+  top: 76.4%;
+  width: 13.2%;
+  height: 6.4%;
+}
+
+.pack-two-model {
+  left: 79.1%;
+  top: 76.4%;
+  width: 13.2%;
+  height: 6.4%;
+}
+
+.pack-two-button {
+  left: 53%;
+  top: 85.9%;
+  width: 40.8%;
+  height: 7.8%;
+}
+
+@media (max-width: 760px) {
+  .pack-choice-frame {
+    overflow: visible;
+  }
+
+  .pack-choice-hotspots {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    padding: 0.85rem;
+    background: #080808;
+  }
+
+  .pack-select,
+  .pack-choice-button {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+
+  .pack-select span {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    clip: auto;
+    margin-bottom: 0.35rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .pack-select select {
+    min-height: 44px;
+    padding: 0 0.7rem;
+    background: #111;
+    color: var(--white);
+    border: 1px solid var(--line);
+    opacity: 1;
+  }
+
+  .pack-choice-button {
+    grid-column: span 2;
+    min-height: 48px;
+    background: var(--orange);
+    color: #050505;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    text-transform: uppercase;
+  }
+}
+
 .section-heading {
   max-width: 920px;
   margin-bottom: 2rem;

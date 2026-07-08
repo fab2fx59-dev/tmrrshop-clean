@@ -75,8 +75,59 @@
           </picture>
           <div class="text-flash text-flash-title" aria-hidden="true"></div>
           <div class="spark-rain" aria-hidden="true"></div>
-          <a class="hero-hotspot hero-hotspot-ticket" href="#concours" aria-label="Je prends mon ticket"></a>
+          <a class="hero-hotspot hero-hotspot-ticket" href="#packs" aria-label="Je prends mon ticket"></a>
           <a class="hero-hotspot hero-hotspot-collection" href="tshirts.html" aria-label="Voir la collection"></a>
+        </div>
+      </section>
+
+      <section class="pack-choice-section" id="packs" aria-label="Choisis ton pack">
+        <div class="pack-choice-frame reveal">
+          <img src="assets/campaign/packs.png?v=20260708" alt="Choisis ton pack : Pack 1 T-shirt concours ou Pack 2 Ticket Rebel">
+          <form class="pack-choice-hotspots" data-pack-selector>
+            <label class="pack-select pack-one-size">
+              <span>Taille pack 1</span>
+              <select data-pack-size="pack1" aria-label="Taille du pack 1">
+                <option>S</option>
+                <option selected>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>3XL</option>
+              </select>
+            </label>
+            <label class="pack-select pack-one-model">
+              <span>Modèle pack 1</span>
+              <select data-pack-model="pack1" aria-label="Modèle du pack 1">
+                <option>Homme</option>
+                <option>Femme</option>
+              </select>
+            </label>
+            <button class="pack-choice-button pack-one-button" type="button" data-pack-choice="pack1">
+              Choisir le pack 1
+            </button>
+
+            <label class="pack-select pack-two-size">
+              <span>Taille pack 2</span>
+              <select data-pack-size="pack2" aria-label="Taille du pack 2">
+                <option>S</option>
+                <option selected>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>3XL</option>
+              </select>
+            </label>
+            <label class="pack-select pack-two-model">
+              <span>Modèle pack 2</span>
+              <select data-pack-model="pack2" aria-label="Modèle du pack 2">
+                <option>Homme</option>
+                <option>Femme</option>
+              </select>
+            </label>
+            <button class="pack-choice-button pack-two-button" type="button" data-pack-choice="pack2">
+              Choisir le pack 2
+            </button>
+          </form>
         </div>
       </section>
 
@@ -109,7 +160,7 @@
               <div><strong data-minutes>00</strong><span>min</span></div>
               <div><strong data-seconds>00</strong><span>sec</span></div>
             </div>
-            <a class="btn btn-primary magnetic" href="#panier">Je prends mon ticket</a>
+            <a class="btn btn-primary magnetic" href="#packs">Je prends mon ticket</a>
           </div>
         </div>
 
@@ -220,7 +271,7 @@
         <div>
           <h2>Concours</h2>
           <a href="index.html#concours">Honda Rebel à gagner</a>
-          <a href="index.html#panier">Pack Ticket Rebel</a>
+          <a href="index.html#packs">Pack Ticket Rebel</a>
           <a href="reglement-concours.html">Règlement concours</a>
           <a href="faq.html">FAQ</a>
         </div>
