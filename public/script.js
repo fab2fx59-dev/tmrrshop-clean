@@ -107,7 +107,10 @@ function bindHeroVideoSound() {
   };
 
   video.addEventListener("click", toggleSound);
-  button?.addEventListener("click", toggleSound);
+  button?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleSound();
+  });
   setSoundState(false);
 }
 

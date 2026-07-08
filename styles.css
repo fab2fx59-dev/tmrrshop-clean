@@ -231,7 +231,7 @@ body.menu-open {
 
 .hero-art {
   position: relative;
-  width: min(100%, 1500px);
+  width: min(94vw, 1360px);
   margin: 0 auto;
   aspect-ratio: 1672 / 830;
   overflow: hidden;
@@ -258,7 +258,7 @@ body.menu-open {
   position: absolute;
   right: clamp(0.8rem, 2vw, 1.4rem);
   bottom: clamp(0.8rem, 2vw, 1.4rem);
-  z-index: 8;
+  z-index: 30;
   min-width: 92px;
   min-height: 42px;
   padding: 0.55rem 0.8rem;
@@ -3933,8 +3933,8 @@ body.intro-active {
 
   .hero-art {
     width: 100%;
-    aspect-ratio: 9 / 14;
-    max-height: calc(100svh - 76px);
+    aspect-ratio: 83 / 40;
+    max-height: none;
     min-height: 0;
   }
 
@@ -3943,7 +3943,7 @@ body.intro-active {
   }
 
   .hero-video {
-    object-fit: cover;
+    object-fit: contain;
   }
 
   .hero-sound-toggle {
