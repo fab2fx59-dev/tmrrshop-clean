@@ -1189,24 +1189,24 @@ h3 {
 
   .mobile-pack-visual {
     position: relative;
-    height: clamp(330px, 103vw, 560px);
+    aspect-ratio: 750 / 651;
     overflow: hidden;
     background: #050505;
   }
 
   .mobile-pack-visual img {
     display: block;
-    width: auto;
+    width: 222.4%;
     max-width: none;
-    height: 100%;
+    height: auto;
   }
 
   .mobile-pack-visual-one img {
-    transform: translateX(0);
+    transform: translate(-3.9%, -21.4%);
   }
 
   .mobile-pack-visual-two img {
-    transform: translateX(-50%);
+    transform: translate(-51.1%, -21.4%);
   }
 
   .mobile-pack-controls {
@@ -1221,25 +1221,17 @@ h3 {
   }
 
   .mobile-pack-controls label:first-child {
-    left: 21.8%;
-    top: 76.4%;
-    width: 26.4%;
-    height: 6.4%;
+    left: 15.5%;
+    top: 73%;
+    width: 29.5%;
+    height: 8.5%;
   }
 
   .mobile-pack-controls label:nth-child(2) {
-    left: 64%;
-    top: 76.4%;
-    width: 26.4%;
-    height: 6.4%;
-  }
-
-  .mobile-pack-card-recommended .mobile-pack-controls label:first-child {
-    left: 15.8%;
-  }
-
-  .mobile-pack-card-recommended .mobile-pack-controls label:nth-child(2) {
-    left: 58.2%;
+    left: 62.3%;
+    top: 73%;
+    width: 29.5%;
+    height: 8.5%;
   }
 
   .mobile-pack-controls span {
@@ -1259,18 +1251,13 @@ h3 {
 
   .mobile-pack-button {
     position: absolute;
-    left: 11.6%;
-    top: 85.9%;
-    width: 81.4%;
-    height: 7.8%;
+    left: 4.2%;
+    top: 85.6%;
+    width: 90.7%;
+    height: 10.4%;
     min-height: 0;
     background: transparent;
     color: transparent;
-  }
-
-  .mobile-pack-card-recommended .mobile-pack-button {
-    left: 6%;
-    width: 81.6%;
   }
 }
 
