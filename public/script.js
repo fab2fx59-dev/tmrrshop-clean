@@ -653,6 +653,72 @@ function bindCollectionCarousel() {
   });
 }
 
+function bindReviewCarousel() {
+  document.querySelectorAll("[data-review-carousel]").forEach((carousel) => {
+    const viewport = carousel.querySelector("[data-review-viewport]");
+    const track = carousel.querySelector("[data-review-track]");
+    const previous = carousel.querySelector('[data-review-arrow="prev"]');
+    const next = carousel.querySelector('[data-review-arrow="next"]');
+    if (!viewport || !track) return;
+
+    const getCardStep = () => {
+      const firstCard = track.querySelector(".review-card");
+      if (!firstCard) return viewport.clientWidth;
+      const styles = window.getComputedStyle(track);
+      const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return firstCard.getBoundingClientRect().width + gap;
+    };
+
+    const getVisibleCards = () => Math.max(1, Math.round(viewport.clientWidth / getCardStep()));
+
+    const updateArrows = () => {
+      const maxScroll = viewport.scrollWidth - viewport.clientWidth - 2;
+      if (previous) previous.disabled = viewport.scrollLeft <= 2;
+      if (next) next.disabled = viewport.scrollLeft >= maxScroll;
+    };
+
+    previous?.addEventListener("click", () => {
+      viewport.scrollBy({ left: -getCardStep() * getVisibleCards(), behavior: "smooth" });
+    });
+
+    next?.addEventListener("click", () => {
+      viewport.scrollBy({ left: getCardStep() * getVisibleCards(), behavior: "smooth" });
+    });
+
+    viewport.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    updateArrows();
+  });
+}
+
+function bindRandomPackImage() {
+  document.querySelectorAll("[data-random-pack]").forEach((block) => {
+    const image = block.querySelector("[data-random-pack-image]");
+    const label = block.querySelector("[data-random-pack-label]");
+    if (!image) return;
+
+    const packs = [
+      {
+        src: image.dataset.packOneSrc,
+        alt: image.dataset.packOneAlt,
+        label: image.dataset.packOneLabel
+      },
+      {
+        src: image.dataset.packTwoSrc,
+        alt: image.dataset.packTwoAlt,
+        label: image.dataset.packTwoLabel
+      }
+    ].filter((pack) => pack.src);
+
+    const selected = packs[Math.floor(Math.random() * packs.length)];
+    if (!selected) return;
+
+    image.src = selected.src;
+    image.alt = selected.alt || image.alt;
+    if (label) label.textContent = selected.label || label.textContent;
+  });
+}
+
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
   if (!intro) return;
@@ -848,6 +914,8 @@ renderPaymentPage();
 clearCartAfterStripeReturn();
 bindDropProgress();
 bindCollectionCarousel();
+bindReviewCarousel();
+bindRandomPackImage();
 bindSiteIntro();
 bindAccountPage();
 bindHeroVideoSound();
