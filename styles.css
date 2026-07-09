@@ -1051,13 +1051,18 @@ h3 {
   box-shadow: 0 32px 90px rgba(0, 0, 0, 0.54);
 }
 
+.pack-choice-mobile-frame {
+  display: none;
+}
+
 .pack-choice-frame img {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.pack-choice-hotspots {
+.pack-choice-hotspots,
+.pack-choice-mobile-hotspots {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -1149,29 +1154,90 @@ h3 {
 
 @media (max-width: 980px) {
   .pack-choice-section {
-    display: none;
+    display: block;
     padding: 1.1rem 0.75rem 1.5rem;
   }
 
+  .pack-choice-desktop-frame {
+    display: none;
+  }
+
   .pack-choice-frame {
-    overflow: visible;
-    max-width: 460px;
+    overflow: hidden;
+    max-width: 430px;
     border-color: rgba(255, 90, 0, 0.26);
     background: #070707;
   }
 
-  .pack-choice-desktop-image,
-  .pack-choice-hotspots {
-    display: none;
+  .pack-choice-mobile-frame {
+    display: block;
   }
 
-  .pack-choice-mobile {
-    display: grid;
-    gap: 1rem;
-    justify-items: center;
-    max-width: 430px;
-    margin: 0 auto;
-    padding: 0.7rem 0;
+  .pack-mobile-one-region,
+  .pack-mobile-two-region {
+    z-index: 1;
+  }
+
+  .pack-mobile-one-region {
+    left: 5.4%;
+    top: 8.3%;
+    width: 89.2%;
+    height: 41.5%;
+  }
+
+  .pack-mobile-two-region {
+    left: 5.4%;
+    top: 53.3%;
+    width: 89.2%;
+    height: 43.7%;
+  }
+
+  .pack-choice-mobile-hotspots .pack-select,
+  .pack-choice-mobile-hotspots .pack-mobile-one-button,
+  .pack-choice-mobile-hotspots .pack-mobile-two-button {
+    z-index: 2;
+  }
+
+  .pack-mobile-one-size {
+    left: 19.4%;
+    top: 41%;
+    width: 26.3%;
+    height: 3.6%;
+  }
+
+  .pack-mobile-one-model {
+    left: 61.2%;
+    top: 41%;
+    width: 26.3%;
+    height: 3.6%;
+  }
+
+  .pack-mobile-one-button {
+    left: 9.3%;
+    top: 45.9%;
+    width: 81.4%;
+    height: 4.3%;
+  }
+
+  .pack-mobile-two-size {
+    left: 19.4%;
+    top: 86.3%;
+    width: 26.3%;
+    height: 3.6%;
+  }
+
+  .pack-mobile-two-model {
+    left: 61.2%;
+    top: 86.3%;
+    width: 26.3%;
+    height: 3.6%;
+  }
+
+  .pack-mobile-two-button {
+    left: 9.3%;
+    top: 91.2%;
+    width: 81.4%;
+    height: 4.3%;
   }
 
   .mobile-pack-card {

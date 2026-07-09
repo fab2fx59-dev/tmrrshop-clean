@@ -79,7 +79,7 @@
       </section>
 
       <section class="pack-choice-section" id="packs" aria-label="Choisis ton pack">
-        <div class="pack-choice-frame reveal">
+        <div class="pack-choice-frame pack-choice-desktop-frame reveal">
           <img class="pack-choice-desktop-image" src="assets/campaign/packs-horizontal.png?v=20260709" alt="Pack 1 t-shirt concours et Pack 2 Ticket Rebel">
           <form class="pack-choice-hotspots" data-pack-selector>
             <label class="pack-select pack-one-size">
@@ -123,6 +123,60 @@
               </select>
             </label>
             <button class="pack-choice-button pack-two-button" type="button" data-pack-choice="pack2">
+              Choisir le pack 2
+            </button>
+          </form>
+        </div>
+        <div class="pack-choice-frame pack-choice-mobile-frame reveal">
+          <img class="pack-choice-mobile-image" src="assets/campaign/packs-vertical.png?v=20260709" alt="Pack 1 t-shirt concours et Pack 2 Ticket Rebel">
+          <form class="pack-choice-mobile-hotspots" data-pack-selector>
+            <button class="pack-choice-button pack-mobile-one-region" type="button" data-pack-choice="pack1">
+              Choisir le pack 1
+            </button>
+            <button class="pack-choice-button pack-mobile-two-region" type="button" data-pack-choice="pack2">
+              Choisir le pack 2
+            </button>
+            <label class="pack-select pack-mobile-one-size">
+              <span>Taille pack 1</span>
+              <select data-pack-size="pack1" aria-label="Taille du pack 1 mobile">
+                <option selected>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>3XL</option>
+              </select>
+            </label>
+            <label class="pack-select pack-mobile-one-model">
+              <span>Modèle pack 1</span>
+              <select data-pack-model="pack1" aria-label="Modèle du pack 1 mobile">
+                <option selected>Homme</option>
+                <option>Femme</option>
+              </select>
+            </label>
+            <button class="pack-choice-button pack-mobile-one-button" type="button" data-pack-choice="pack1">
+              Choisir le pack 1
+            </button>
+
+            <label class="pack-select pack-mobile-two-size">
+              <span>Taille pack 2</span>
+              <select data-pack-size="pack2" aria-label="Taille du pack 2 mobile">
+                <option selected>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>3XL</option>
+              </select>
+            </label>
+            <label class="pack-select pack-mobile-two-model">
+              <span>Modèle pack 2</span>
+              <select data-pack-model="pack2" aria-label="Modèle du pack 2 mobile">
+                <option selected>Homme</option>
+                <option>Femme</option>
+              </select>
+            </label>
+            <button class="pack-choice-button pack-mobile-two-button" type="button" data-pack-choice="pack2">
               Choisir le pack 2
             </button>
           </form>
