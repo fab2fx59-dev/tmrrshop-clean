@@ -615,6 +615,44 @@ function bindDropProgress() {
   window.setInterval(update, 60000);
 }
 
+function bindCollectionCarousel() {
+  document.querySelectorAll("[data-collection-carousel]").forEach((carousel) => {
+    const viewport = carousel.querySelector("[data-collection-viewport]");
+    const track = carousel.querySelector("[data-collection-track]");
+    const previous = carousel.querySelector('[data-collection-arrow="prev"]');
+    const next = carousel.querySelector('[data-collection-arrow="next"]');
+    if (!viewport || !track) return;
+
+    const getCardStep = () => {
+      const firstCard = track.querySelector(".collection-model");
+      if (!firstCard) return viewport.clientWidth;
+      const styles = window.getComputedStyle(track);
+      const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return firstCard.getBoundingClientRect().width + gap;
+    };
+
+    const getVisibleCards = () => Math.max(1, Math.round(viewport.clientWidth / getCardStep()));
+
+    const updateArrows = () => {
+      const maxScroll = viewport.scrollWidth - viewport.clientWidth - 2;
+      if (previous) previous.disabled = viewport.scrollLeft <= 2;
+      if (next) next.disabled = viewport.scrollLeft >= maxScroll;
+    };
+
+    previous?.addEventListener("click", () => {
+      viewport.scrollBy({ left: -getCardStep() * getVisibleCards(), behavior: "smooth" });
+    });
+
+    next?.addEventListener("click", () => {
+      viewport.scrollBy({ left: getCardStep() * getVisibleCards(), behavior: "smooth" });
+    });
+
+    viewport.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    updateArrows();
+  });
+}
+
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
   if (!intro) return;
@@ -809,6 +847,7 @@ renderCartPage();
 renderPaymentPage();
 clearCartAfterStripeReturn();
 bindDropProgress();
+bindCollectionCarousel();
 bindSiteIntro();
 bindAccountPage();
 bindHeroVideoSound();

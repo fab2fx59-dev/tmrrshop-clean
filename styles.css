@@ -1032,6 +1032,162 @@ h3 {
   transition: width 0.6s ease;
 }
 
+.collection-band {
+  margin-top: 1rem;
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255,90,0,0.22), transparent 22rem),
+    linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,90,0,0.08), rgba(255,255,255,0.03)),
+    #070707;
+  border: 1px solid rgba(255, 90, 0, 0.3);
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.collection-band-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.collection-band h2 {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 4.4vw, 5rem);
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+
+.collection-band-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.collection-arrow {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 90, 0, 0.5);
+  background: rgba(5, 5, 5, 0.72);
+  color: var(--orange);
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+}
+
+.collection-arrow:hover,
+.collection-arrow:focus-visible {
+  background: var(--orange);
+  color: #050505;
+  border-color: var(--orange);
+}
+
+.collection-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.collection-gallery {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.collection-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.collection-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 3rem) / 4);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.collection-model {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  color: var(--white);
+  text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025)),
+    #0b0b0b;
+  border: 1px solid rgba(245, 241, 232, 0.12);
+  scroll-snap-align: start;
+  overflow: hidden;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.collection-model:hover,
+.collection-model:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(255, 90, 0, 0.72);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+.collection-model-media {
+  aspect-ratio: 1 / 1.08;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.45rem, 1.2vw, 0.85rem);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,90,0,0.22), transparent 55%),
+    #090909;
+  overflow: hidden;
+}
+
+.collection-model-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.46s ease, filter 0.46s ease;
+}
+
+.collection-model:hover .collection-model-media img,
+.collection-model:focus-visible .collection-model-media img {
+  transform: scale(1.055);
+  filter: contrast(1.08) saturate(1.08);
+}
+
+.collection-model-info {
+  min-height: 118px;
+  display: grid;
+  align-content: start;
+  gap: 0.38rem;
+  padding: 0.9rem;
+  text-transform: uppercase;
+}
+
+.collection-model-info em {
+  color: var(--orange);
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.collection-model-info strong {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.55vw, 1.75rem);
+  line-height: 0.92;
+}
+
+.collection-model-info b {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 950;
+}
+
 .pack-choice-section {
   display: block;
   padding: clamp(1.4rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem);
@@ -3936,6 +4092,10 @@ body.intro-active {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .collection-track {
+    grid-auto-columns: calc((100% - 2rem) / 3);
+  }
+
   .category-strip {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -4138,6 +4298,33 @@ body.intro-active {
   .steps,
   .product-grid {
     grid-template-columns: 1fr;
+  }
+
+  .collection-band {
+    padding: 1rem;
+  }
+
+  .collection-band-header {
+    align-items: center;
+  }
+
+  .collection-band h2 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .collection-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 1.9rem;
+  }
+
+  .collection-track {
+    grid-auto-columns: minmax(220px, 76%);
+    gap: 0.75rem;
+  }
+
+  .collection-model-info {
+    min-height: 108px;
   }
 
   .countdown {
