@@ -1033,7 +1033,7 @@ h3 {
 }
 
 .pack-choice-section {
-  display: none;
+  display: block;
   padding: clamp(1.4rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem);
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 90, 0, 0.16), transparent 28rem),
@@ -1149,6 +1149,7 @@ h3 {
 
 @media (max-width: 980px) {
   .pack-choice-section {
+    display: none;
     padding: 1.1rem 0.75rem 1.5rem;
   }
 
