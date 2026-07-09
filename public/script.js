@@ -383,7 +383,8 @@ function renderPaymentPage() {
   }
   totalElement.textContent = formatPrice(totals.total);
 
-  promoButton?.addEventListener("click", async () => {
+  if (promoButton) {
+    promoButton.onclick = async () => {
     const code = promoInput?.value?.trim();
     if (!code) {
       if (message) message.textContent = "Saisis un code promo.";
@@ -422,9 +423,10 @@ function renderPaymentPage() {
         : `Code ${payload.code} applique : -${activePromo.discountPercent} %.`;
     }
     renderPaymentPage();
-  });
+    };
+  }
 
-  confirmButton.addEventListener("click", async () => {
+  confirmButton.onclick = async () => {
     confirmButton.disabled = true;
     if (message) message.textContent = "Preparation du paiement securise...";
 
@@ -479,7 +481,7 @@ function renderPaymentPage() {
       }
       confirmButton.disabled = false;
     }
-  });
+  };
 }
 
 function clearCartAfterStripeReturn() {

@@ -5,6 +5,110 @@ import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 const SHIPPING_PRICE = 4.9;
 const FREE_SHIPPING_MIN = 60;
+const MAX_ITEM_QUANTITY = 99;
+const GIFT_CARD_AMOUNTS = [25, 50, 75, 100];
+const PRODUCT_NAMES = {
+  tshirt: ["People Think", "Never Fit", "Break The Frame", "Trop Libre", "Rebel By Nature"],
+  cap: ["Dragon Mark", "Fast Logo", "Rebel By Nature", "Smash The System", "TMRR Drip", "Graffiti", "Danger Script", "Danger Bold"],
+  hoodie: ["Smash The System", "Break The Frame", "Never Obey", "Out Of The Box", "Rebel By Nature", "Break The Rules", "People Think"],
+  bandana: ["Bullet Shield", "Gold Line", "White Signal", "Skull Guard"]
+};
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function hasProductName(item, names) {
+  const itemName = normalizeText(item.name);
+  return names.some((name) => itemName === normalizeText(name));
+}
+
+function getItemLabel(item) {
+  return [
+    item.name,
+    item.options,
+    item.category,
+    item.model,
+    item.size,
+    item.image
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function getCatalogPrice(item) {
+  const label = getItemLabel(item);
+
+  if (isGiftCardItem(item)) {
+    const amount = Number(item.price || 0);
+    return GIFT_CARD_AMOUNTS.includes(amount) ? amount : null;
+  }
+
+  if (hasProductName(item, ["Club TMRR 12 mois"])) return 199;
+  if (hasProductName(item, ["Club TMRR 6 mois"])) return 119;
+  if (hasProductName(item, ["T-shirt TMRR du mois"])) return 19.9;
+  if (hasProductName(item, ["Pack 2 - Ticket Rebel", "Pack Ticket Rebel"])) return 39.9;
+  if (hasProductName(item, ["Pack 1 - T-shirt concours"])) return 25.9;
+  if ((label.includes("hoodie") || label.includes("assets/hoodies/")) && hasProductName(item, PRODUCT_NAMES.hoodie)) return 39.9;
+  if ((label.includes("t-shirt noir") || label.includes("assets/products/")) && hasProductName(item, PRODUCT_NAMES.tshirt)) return 24.9;
+  if ((label.includes("casquette") || label.includes("assets/caps/")) && hasProductName(item, PRODUCT_NAMES.cap)) return 14.9;
+  if ((label.includes("bandana") || label.includes("assets/bandanas/")) && hasProductName(item, PRODUCT_NAMES.bandana)) return 16.9;
+
+  return null;
+}
+
+function normalizeQuantity(quantity) {
+  const parsed = Number(quantity || 1);
+
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > MAX_ITEM_QUANTITY) {
+    return null;
+  }
+
+  return parsed;
+}
+
+function normalizeCheckoutItems(rawItems) {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
+    return { error: "Le panier est vide." };
+  }
+
+  const items = [];
+
+  for (const rawItem of rawItems) {
+    const safeRawItem = rawItem || {};
+    const quantity = normalizeQuantity(safeRawItem.quantity);
+    const price = getCatalogPrice(safeRawItem);
+
+    if (!quantity) {
+      return { error: "Une quantite du panier est invalide." };
+    }
+
+    if (!price || price <= 0) {
+      return { error: "Un article du panier n'est pas reconnu par la boutique TMRR." };
+    }
+
+    if (isGiftCardItem(safeRawItem) && !String(safeRawItem.recipientEmail || "").includes("@")) {
+      return { error: "Renseigne l'e-mail du destinataire de la carte cadeau." };
+    }
+
+    items.push({
+      ...safeRawItem,
+      quantity,
+      price,
+      name: String(safeRawItem.name || "Article TMRR").slice(0, 120),
+      options: String(safeRawItem.options || "").slice(0, 400),
+      model: String(safeRawItem.model || "").slice(0, 80),
+      size: String(safeRawItem.size || "").slice(0, 80),
+      category: String(safeRawItem.category || "").slice(0, 80),
+      recipientEmail: String(safeRawItem.recipientEmail || "").slice(0, 180),
+      recipientName: String(safeRawItem.recipientName || "").slice(0, 120)
+    });
+  }
+
+  return { items };
+}
 
 function getContestEntries(item) {
   const label = `${item.name || ""} ${item.options || ""} ${item.category || ""}`.toLowerCase();
@@ -80,8 +184,16 @@ function createOrderClient(fallbackClient) {
 
 function getSiteUrl(request) {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const requestOrigin = request.headers.get("origin");
-  const baseUrl = configuredUrl || requestOrigin || "https://tmrr.shop";
+  const requestOrigin = request.nextUrl?.origin || request.headers.get("origin") || "https://tmrr.shop";
+  const isLocal = (url) => {
+    try {
+      return ["localhost", "127.0.0.1", "::1"].includes(new URL(url).hostname);
+    } catch {
+      return false;
+    }
+  };
+  const shouldUseConfiguredUrl = configuredUrl && (!isLocal(configuredUrl) || isLocal(requestOrigin));
+  const baseUrl = shouldUseConfiguredUrl ? configuredUrl : requestOrigin;
 
   return baseUrl.replace(/\/+$/, "");
 }
@@ -129,15 +241,17 @@ async function handleCheckout(request) {
     }
   }
 
-  const { items = [], customerEmail, promoCode = "", giftCardCode = "" } = await request.json();
+  const { items: rawItems = [], customerEmail, promoCode = "", giftCardCode = "" } = await request.json();
+  const normalizedCart = normalizeCheckoutItems(rawItems);
 
-  if (!Array.isArray(items) || items.length === 0) {
+  if (normalizedCart.error) {
     return NextResponse.json(
-      { error: "Le panier est vide." },
+      { error: normalizedCart.error },
       { status: 400 }
     );
   }
 
+  const items = normalizedCart.items;
   const siteUrl = getSiteUrl(request);
   const totals = getTotals(items);
   const orderNumber = `TMRR-${Date.now().toString().slice(-8)}`;
@@ -145,6 +259,13 @@ async function handleCheckout(request) {
   const cleanGiftCardCode = String(giftCardCode || "").trim().toUpperCase();
   let discount = null;
   let giftCardDiscount = null;
+
+  if (cleanPromoCode && cleanGiftCardCode) {
+    return NextResponse.json(
+      { error: "Utilise un seul code de reduction par commande." },
+      { status: 400 }
+    );
+  }
 
   if (cleanPromoCode) {
     if (!user || !supabase) {
@@ -166,7 +287,7 @@ async function handleCheckout(request) {
     }
 
     const coupon = await stripe.coupons.create({
-      percent_off: Number(promo.discount_percent || 15),
+      percent_off: Math.min(100, Math.max(1, Number(promo.discount_percent || 15))),
       duration: "once",
       name: `Fidélité TMRR ${promo.code}`
     });
@@ -265,6 +386,8 @@ async function handleCheckout(request) {
   const { error: itemsError } = await orderSupabase.from("order_items").insert(orderItems);
 
   if (itemsError) {
+    await orderSupabase.from("orders").delete().eq("id", order.id).eq("status", "pending");
+
     return NextResponse.json(
       { error: `Les articles de la commande n'ont pas pu etre enregistres : ${itemsError.message || "permission Supabase refusee"}` },
       { status: 500 }
@@ -314,6 +437,8 @@ async function handleCheckout(request) {
       cancel_url: `${siteUrl}/panier?paiement=cancel`
     });
   } catch (error) {
+    await orderSupabase.from("orders").delete().eq("id", order.id).eq("status", "pending");
+
     return NextResponse.json(
       { error: `Stripe refuse le demarrage du paiement : ${error.message}` },
       { status: 500 }
