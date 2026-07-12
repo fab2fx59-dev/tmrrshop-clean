@@ -55,24 +55,6 @@ export async function signUp(formData) {
   const phone = String(formData.get("phone") || "").trim();
   const address = String(formData.get("address") || "").trim();
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: fullName,
-        phone,
-        address
-      }
-    }
-  });
-
-  if (error) {
-    redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, error.message));
-  }
-
   const profile = {
     first_name: firstName,
     last_name: lastName,
@@ -80,17 +62,30 @@ export async function signUp(formData) {
     phone,
     address
   };
+  const adminSupabase = createAdminClient();
 
-  if (data.user) {
-    const adminSupabase = createAdminClient();
-    const profileClient = adminSupabase || supabase;
-
-    await profileClient.from("profiles").upsert({
-      id: data.user.id,
-      ...profile
+  if (adminSupabase) {
+    const { data, error } = await adminSupabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: profile
     });
 
-    if (!data.session && adminSupabase) {
+    if (error) {
+      const message = error.message?.toLowerCase().includes("already")
+        ? "Ce compte existe deja. Connecte-toi avec ton e-mail et ton mot de passe."
+        : error.message;
+
+      redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, message));
+    }
+
+    if (data.user) {
+      await adminSupabase.from("profiles").upsert({
+        id: data.user.id,
+        ...profile
+      });
+
       await adminSupabase.auth.admin.updateUserById(data.user.id, {
         email_confirm: true,
         user_metadata: profile
@@ -104,7 +99,28 @@ export async function signUp(formData) {
       if (!signInError) {
         redirect(redirectTo);
       }
+
+      redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, signInError.message));
     }
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: profile
+    }
+  });
+
+  if (error) {
+    redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, error.message));
+  }
+
+  if (data.user) {
+    await supabase.from("profiles").upsert({
+      id: data.user.id,
+      ...profile
+    });
   }
 
   if (data.session) {
