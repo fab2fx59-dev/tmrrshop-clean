@@ -460,7 +460,8 @@ function renderPaymentPage() {
         if (message) message.textContent = errorText;
         if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
           window.setTimeout(() => {
-            window.location.href = "/compte";
+            const accountMessage = encodeURIComponent("Connecte-toi ou cree un compte client pour passer commande.");
+            window.location.href = `/compte?message=${accountMessage}`;
           }, 1200);
         }
         confirmButton.disabled = false;

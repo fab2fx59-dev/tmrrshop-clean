@@ -220,14 +220,6 @@ export async function POST(request) {
 }
 
 async function handleCheckout(request) {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json(
-      { error: "Stripe n'est pas encore configure." },
-      { status: 500 }
-    );
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   let supabase = null;
   let user = null;
 
@@ -241,7 +233,29 @@ async function handleCheckout(request) {
     }
   }
 
-  const { items: rawItems = [], customerEmail, promoCode = "", giftCardCode = "" } = await request.json();
+  if (!supabase) {
+    return NextResponse.json(
+      { error: "Le compte client est obligatoire pour commander, mais Supabase n'est pas encore configure." },
+      { status: 500 }
+    );
+  }
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Connecte-toi ou cree un compte client pour passer commande." },
+      { status: 401 }
+    );
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: "Stripe n'est pas encore configure." },
+      { status: 500 }
+    );
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const { items: rawItems = [], promoCode = "", giftCardCode = "" } = await request.json();
   const normalizedCart = normalizeCheckoutItems(rawItems);
 
   if (normalizedCart.error) {
@@ -339,7 +353,7 @@ async function handleCheckout(request) {
     );
   }
 
-  const orderEmail = customerEmail || user?.email || "client-a-renseigner@tmrr.shop";
+  const orderEmail = user.email;
 
   const { data: order, error: orderError } = await orderSupabase
     .from("orders")
@@ -421,10 +435,10 @@ async function handleCheckout(request) {
   try {
     session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: customerEmail || user?.email || undefined,
-      client_reference_id: user?.id || undefined,
+      customer_email: user.email || undefined,
+      client_reference_id: user.id,
       metadata: {
-        user_id: user?.id || "",
+        user_id: user.id,
         order_id: order.id,
         promo_code: discount?.code || "",
         gift_card_code: giftCardDiscount?.code || "",
