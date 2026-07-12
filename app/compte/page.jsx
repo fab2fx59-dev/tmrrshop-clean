@@ -308,7 +308,7 @@ async function consumeGiftCard({ session, supabase }) {
     .eq("id", giftCard.id);
 }
 
-function AuthForms({ message, redirectTo = "/compte" }) {
+function AuthForms({ message, redirectTo = "/paiement" }) {
   return (
     <div className="account-forms">
       <form className="gift-form account-card" action={signIn}>
