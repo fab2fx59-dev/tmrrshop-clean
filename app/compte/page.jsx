@@ -1,10 +1,21 @@
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { signIn, signOut, signUp } from "../auth/actions";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 import AccountTabs from "./account-tabs";
 
 export const dynamic = "force-dynamic";
+
+function getSafePath(value, fallback = "/compte") {
+  const path = String(value || "").trim();
+
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return fallback;
+  }
+
+  return path;
+}
 
 function Header() {
   return (
@@ -539,6 +550,7 @@ async function getAccountOrders({ user, supabase }) {
 export default async function AccountPage({ searchParams }) {
   const params = await searchParams;
   const message = params?.message ? decodeURIComponent(params.message) : "";
+  const redirectTo = getSafePath(params?.redirect, "/compte");
   const paymentParam = params?.paiement || "";
   const sessionId = params?.session_id || "";
   const supabase = await createSupabaseServerClient();
@@ -553,6 +565,10 @@ export default async function AccountPage({ searchParams }) {
   let paymentStatus = paymentParam === "cancel" ? "cancel" : "";
 
   if (user) {
+    if (redirectTo !== "/compte" && !paymentParam && !sessionId) {
+      redirect(redirectTo);
+    }
+
     if (paymentParam === "success") {
       paymentStatus = await confirmStripeReturn({ sessionId, user, supabase });
     }
@@ -595,7 +611,7 @@ export default async function AccountPage({ searchParams }) {
             {user ? (
               <AccountDashboard user={user} profile={profile} orders={orders} promos={promos} giftCards={giftCards} paymentStatus={paymentStatus} />
             ) : (
-              <AuthForms message={message || (paymentStatus === "cancel" ? "Paiement annulé." : "")} />
+              <AuthForms message={message || (paymentStatus === "cancel" ? "Paiement annulé." : "")} redirectTo={redirectTo} />
             )}
           </div>
         </section>

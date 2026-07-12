@@ -201,7 +201,7 @@ function bindProductButtons() {
         id: `${pack}-${model}-${size}`.toLowerCase().replace(/\s+/g, "-"),
         name: isPackTwo ? "Pack 2 - Ticket Rebel" : "Pack 1 - T-shirt concours",
         price: isPackTwo ? 39.9 : 25.9,
-        image: "assets/campaign/packs.png",
+        image: "assets/campaign/packs-horizontal.png",
         quantity: 1,
         options: isPackTwo
           ? `T-shirt concours modÃ¨le ${model} taille ${size} Â· Casquette TMRR Â· 2 participations`
