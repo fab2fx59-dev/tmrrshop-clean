@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 
 async function getSafeRedirect(formData) {
@@ -29,6 +30,18 @@ async function getSafeRedirect(formData) {
 function addMessage(path, message) {
   const separator = path.includes("?") ? "&" : "?";
   return `${path}${separator}message=${encodeURIComponent(message)}`;
+}
+
+function createAdminClient() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return null;
+  }
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { persistSession: false } }
+  );
 }
 
 export async function signUp(formData) {
@@ -60,15 +73,38 @@ export async function signUp(formData) {
     redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, error.message));
   }
 
+  const profile = {
+    first_name: firstName,
+    last_name: lastName,
+    full_name: fullName,
+    phone,
+    address
+  };
+
   if (data.user) {
-    await supabase.from("profiles").upsert({
+    const adminSupabase = createAdminClient();
+    const profileClient = adminSupabase || supabase;
+
+    await profileClient.from("profiles").upsert({
       id: data.user.id,
-      first_name: firstName,
-      last_name: lastName,
-      full_name: fullName,
-      phone,
-      address
+      ...profile
     });
+
+    if (!data.session && adminSupabase) {
+      await adminSupabase.auth.admin.updateUserById(data.user.id, {
+        email_confirm: true,
+        user_metadata: profile
+      });
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (!signInError) {
+        redirect(redirectTo);
+      }
+    }
   }
 
   if (data.session) {
@@ -77,7 +113,7 @@ export async function signUp(formData) {
 
   redirect(addMessage(
     `/compte?redirect=${encodeURIComponent(redirectTo)}`,
-    "Compte cree. Connecte-toi maintenant pour continuer ta commande."
+    "Compte cree. Si la connexion ne passe pas encore, verifie l'e-mail de confirmation."
   ));
 }
 
