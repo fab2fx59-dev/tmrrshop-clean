@@ -1,10 +1,39 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createSupabaseServerClient } from "../lib/supabase/server";
+
+async function getSafeRedirect(formData) {
+  const directRedirect = String(formData.get("redirect_to") || "").trim();
+  let refererRedirect = "";
+
+  try {
+    const referer = (await headers()).get("referer");
+    if (referer) {
+      refererRedirect = new URL(referer).searchParams.get("redirect") || "";
+    }
+  } catch {
+    refererRedirect = "";
+  }
+
+  const redirectTo = refererRedirect || directRedirect || "/compte";
+
+  if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+    return "/compte";
+  }
+
+  return redirectTo;
+}
+
+function addMessage(path, message) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}message=${encodeURIComponent(message)}`;
+}
 
 export async function signUp(formData) {
   const supabase = await createSupabaseServerClient();
+  const redirectTo = await getSafeRedirect(formData);
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
   const firstName = String(formData.get("first_name") || "").trim();
@@ -28,7 +57,7 @@ export async function signUp(formData) {
   });
 
   if (error) {
-    redirect(`/compte?message=${encodeURIComponent(error.message)}`);
+    redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, error.message));
   }
 
   if (data.user) {
@@ -42,11 +71,19 @@ export async function signUp(formData) {
     });
   }
 
-  redirect("/compte?message=Compte cree. Tu peux maintenant te connecter.");
+  if (data.session) {
+    redirect(redirectTo);
+  }
+
+  redirect(addMessage(
+    `/compte?redirect=${encodeURIComponent(redirectTo)}`,
+    "Compte cree. Connecte-toi maintenant pour continuer ta commande."
+  ));
 }
 
 export async function signIn(formData) {
   const supabase = await createSupabaseServerClient();
+  const redirectTo = await getSafeRedirect(formData);
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
 
@@ -56,10 +93,10 @@ export async function signIn(formData) {
   });
 
   if (error) {
-    redirect(`/compte?message=${encodeURIComponent(error.message)}`);
+    redirect(addMessage(`/compte?redirect=${encodeURIComponent(redirectTo)}`, error.message));
   }
 
-  redirect("/compte");
+  redirect(redirectTo);
 }
 
 export async function signOut() {

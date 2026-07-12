@@ -308,10 +308,11 @@ async function consumeGiftCard({ session, supabase }) {
     .eq("id", giftCard.id);
 }
 
-function AuthForms({ message }) {
+function AuthForms({ message, redirectTo = "/compte" }) {
   return (
     <div className="account-forms">
       <form className="gift-form account-card" action={signIn}>
+        <input type="hidden" name="redirect_to" value={redirectTo} />
         <h2>Se connecter</h2>
         <p>Utilise ton e-mail et ton mot de passe pour retrouver tes commandes et ton suivi TMRR.</p>
         <label>
@@ -328,6 +329,7 @@ function AuthForms({ message }) {
         <Message text={message} />
       </form>
       <form className="gift-form account-card" action={signUp}>
+        <input type="hidden" name="redirect_to" value={redirectTo} />
         <h2>Créer un compte</h2>
         <p>Ton compte garde tes commandes, tes informations et tes participations au concours au même endroit.</p>
         <label>
