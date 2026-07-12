@@ -6,7 +6,6 @@ export const pageFiles = {
   "carte-kdo": "carte-kdo.html",
   "casquettes": "casquettes.html",
   "club": "club.html",
-  "compte": "compte.html",
   "confidentialite": "confidentialite.html",
   "contact": "contact.html",
   "faq": "faq.html",
