@@ -204,8 +204,8 @@ function bindProductButtons() {
         image: "assets/campaign/packs-horizontal.png",
         quantity: 1,
         options: isPackTwo
-          ? `T-shirt concours modÃ¨le ${model} taille ${size} Â· Casquette TMRR Â· 2 participations`
-          : `T-shirt concours modÃ¨le ${model} taille ${size} Â· 1 participation`
+          ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
+          : `T-shirt concours modele ${model} taille ${size} - 1 participation`
       });
     });
   });
