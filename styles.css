@@ -5533,3 +5533,120 @@ body.intro-active {
     padding-top: 1.4rem !important;
   }
 }
+
+/* Admin multi-view additions */
+.admin-wide-card {
+  overflow: hidden;
+}
+
+.admin-bulk-form {
+  display: grid;
+}
+
+.admin-bulk-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-bulk-actions span {
+  margin-right: auto;
+  color: #b9afa4;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-bulk-actions button,
+.admin-row-link {
+  border: 1px solid rgba(245, 241, 232, 0.2);
+  border-radius: 6px;
+  color: #f5f1e8;
+  background: rgba(245, 241, 232, 0.08);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-bulk-actions button {
+  min-height: 34px;
+  padding: 0.45rem 0.7rem;
+}
+
+.admin-bulk-actions button:hover,
+.admin-row-link:hover {
+  border-color: rgba(255, 90, 0, 0.55);
+  background: rgba(255, 90, 0, 0.16);
+}
+
+.admin-bulk-actions .is-danger {
+  color: #ffb6a8;
+  border-color: rgba(255, 99, 71, 0.35);
+}
+
+.admin-orders-grid {
+  grid-template-columns: 42px 1.05fr 1.55fr 1.5fr 0.85fr 0.85fr 0.9fr 68px !important;
+}
+
+.admin-clients-grid {
+  grid-template-columns: 1.45fr 1.65fr 0.9fr 0.95fr 0.9fr 78px !important;
+}
+
+.admin-invoices-grid {
+  grid-template-columns: 42px 1.25fr 1.6fr 1fr 0.9fr 76px !important;
+}
+
+.admin-contest-grid {
+  grid-template-columns: 42px 1.2fr 1.45fr 1.5fr 0.9fr 88px !important;
+}
+
+.admin-check-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.admin-check-cell input {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff5a00;
+  cursor: pointer;
+}
+
+.admin-row-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.4rem 0.62rem;
+}
+
+.admin-filters-compact {
+  grid-template-columns: minmax(240px, 1fr) 120px;
+}
+
+.invoice-sheet + .invoice-sheet {
+  margin-top: 2rem;
+  page-break-before: always;
+}
+
+@media (max-width: 1180px) {
+  .admin-orders-grid,
+  .admin-clients-grid,
+  .admin-invoices-grid,
+  .admin-contest-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-check-cell {
+    justify-content: flex-start;
+  }
+}

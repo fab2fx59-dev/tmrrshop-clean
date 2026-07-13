@@ -6,7 +6,8 @@ alter table public.profiles
 alter table public.orders
   add column if not exists admin_notes text,
   add column if not exists tracking_number text,
-  add column if not exists shipped_at timestamptz;
+  add column if not exists shipped_at timestamptz,
+  add column if not exists archived_at timestamptz;
 
 create or replace function public.handle_new_user()
 returns trigger

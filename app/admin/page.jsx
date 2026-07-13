@@ -1,7 +1,9 @@
-import { adminLogin, adminLogout, updateOrderManagement } from "./actions";
+import { adminLogin, adminLogout, bulkOrderAction, deleteContestParticipations, updateOrderManagement } from "./actions";
 import { createAdminSupabaseClient, isAdminConfigured, isAdminSession } from "./utils";
 
 export const dynamic = "force-dynamic";
+
+const VIEWS = new Set(["orders", "clients", "invoices", "contest", "archives"]);
 
 const STATUS_LABELS = {
   pending: "En attente",
@@ -57,16 +59,31 @@ function normalizeText(value) {
     .toLowerCase();
 }
 
+function fullName(profile) {
+  if (!profile) return "";
+  return profile.full_name || `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
+}
+
+function adminUrl(values = {}) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== undefined && value !== null && value !== "" && value !== "all" && value !== "orders") {
+      params.set(key, value);
+    }
+  }
+  const query = params.toString();
+  return `/admin${query ? `?${query}` : ""}`;
+}
+
 function orderMatches(order, query) {
   if (!query) return true;
   const haystack = normalizeText([
     order.order_number,
     order.customer_email,
-    order.profile?.full_name,
-    order.profile?.first_name,
-    order.profile?.last_name,
+    fullName(order.profile),
     order.profile?.phone,
     order.profile?.address,
+    order.tracking_number,
     ...getItems(order).flatMap((item) => [item.product_name, item.variant_model, item.variant_size])
   ].filter(Boolean).join(" "));
 
@@ -78,21 +95,21 @@ async function fetchOrders() {
   if (!supabase) return { orders: [], configError: true };
 
   const itemSelect = "order_items(id, product_name, product_category, variant_model, variant_size, quantity, unit_price, contest_entries)";
-  const extendedSelect = `id, order_number, user_id, customer_email, status, total_amount, currency, stripe_checkout_session_id, stripe_payment_intent_id, created_at, paid_at, admin_notes, tracking_number, shipped_at, ${itemSelect}`;
+  const extendedSelect = `id, order_number, user_id, customer_email, status, total_amount, currency, stripe_checkout_session_id, stripe_payment_intent_id, created_at, paid_at, admin_notes, tracking_number, shipped_at, archived_at, ${itemSelect}`;
   const baseSelect = `id, order_number, user_id, customer_email, status, total_amount, currency, stripe_checkout_session_id, stripe_payment_intent_id, created_at, paid_at, ${itemSelect}`;
 
   let { data: orders, error } = await supabase
     .from("orders")
     .select(extendedSelect)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(500);
 
   if (error) {
     const fallback = await supabase
       .from("orders")
       .select(baseSelect)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(500);
     orders = fallback.data || [];
     error = fallback.error;
   }
@@ -113,6 +130,7 @@ async function fetchOrders() {
   return {
     orders: (orders || []).map((order) => ({
       ...order,
+      archived_at: order.archived_at || null,
       profile: profileById.get(order.user_id) || null
     }))
   };
@@ -157,7 +175,40 @@ function StatusBadge({ status }) {
   return <span className={`admin-status admin-status-${status || "pending"}`}>{STATUS_LABELS[status] || status || "En attente"}</span>;
 }
 
-function OrderRows({ orders, selectedId, searchParams }) {
+function AdminNav({ view }) {
+  const items = [
+    ["orders", "Commandes", "/admin"],
+    ["clients", "Clients", "/admin?view=clients"],
+    ["invoices", "Factures", "/admin?view=invoices"],
+    ["contest", "Concours", "/admin?view=contest"],
+    ["archives", "Archives", "/admin?view=archives"]
+  ];
+
+  return (
+    <nav>
+      {items.map(([key, label, href]) => (
+        <a className={view === key ? "is-active" : ""} href={href} key={key}>{label}</a>
+      ))}
+    </nav>
+  );
+}
+
+function BulkOrderActions({ mode = "active" }) {
+  return (
+    <div className="admin-bulk-actions">
+      <span>Actions selection</span>
+      <button type="submit" name="bulk_action" value="invoice">Imprimer facture</button>
+      {mode === "archives" ? (
+        <button type="submit" name="bulk_action" value="restore">Restaurer</button>
+      ) : (
+        <button type="submit" name="bulk_action" value="archive">Archiver</button>
+      )}
+      <button className="is-danger" type="submit" name="bulk_action" value="delete">Supprimer</button>
+    </div>
+  );
+}
+
+function OrdersTable({ orders, selectedId, searchParams, currentPath, mode = "active" }) {
   if (!orders.length) {
     return (
       <div className="admin-empty">
@@ -167,32 +218,53 @@ function OrderRows({ orders, selectedId, searchParams }) {
     );
   }
 
-  return orders.map((order) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("order", order.id);
-    const products = getProductItems(order);
-    const mainProduct = products[0]?.product_name || "Commande TMRR";
+  return (
+    <form action={bulkOrderAction} className="admin-bulk-form">
+      <input type="hidden" name="redirect_to" value={currentPath} />
+      <BulkOrderActions mode={mode} />
+      <div className="admin-table-head admin-orders-grid">
+        <span></span>
+        <span>Commande</span>
+        <span>Client</span>
+        <span>Articles</span>
+        <span>Total</span>
+        <span>Statut</span>
+        <span>Concours</span>
+        <span></span>
+      </div>
+      {orders.map((order) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("order", order.id);
+        if (mode === "archives") params.set("view", "archives");
+        const products = getProductItems(order);
+        const mainProduct = products[0]?.product_name || "Commande TMRR";
 
-    return (
-      <a className={`admin-order-row ${selectedId === order.id ? "is-selected" : ""}`} href={`/admin?${params.toString()}`} key={order.id}>
-        <span>
-          <strong>{order.order_number}</strong>
-          <small>{formatDate(order.created_at)}</small>
-        </span>
-        <span>
-          <strong>{order.customer_email}</strong>
-          <small>{order.profile?.phone || "Telephone non renseigne"}</small>
-        </span>
-        <span>
-          <strong>{mainProduct}</strong>
-          <small>{products.length > 1 ? `${products.length} articles` : "1 article"}</small>
-        </span>
-        <span>{formatPrice(order.total_amount)}</span>
-        <span><StatusBadge status={order.status} /></span>
-        <span>{getEntries(order)} participation{getEntries(order) > 1 ? "s" : ""}</span>
-      </a>
-    );
-  });
+        return (
+          <div className={`admin-order-row admin-orders-grid ${selectedId === order.id ? "is-selected" : ""}`} key={order.id}>
+            <label className="admin-check-cell" aria-label={`Selectionner ${order.order_number}`}>
+              <input type="checkbox" name="order_ids" value={order.id} />
+            </label>
+            <span>
+              <strong>{order.order_number}</strong>
+              <small>{mode === "archives" ? `Archivee le ${formatDate(order.archived_at)}` : formatDate(order.created_at)}</small>
+            </span>
+            <span>
+              <strong>{order.customer_email}</strong>
+              <small>{order.profile?.phone || "Telephone non renseigne"}</small>
+            </span>
+            <span>
+              <strong>{mainProduct}</strong>
+              <small>{products.length > 1 ? `${products.length} articles` : "1 article"}</small>
+            </span>
+            <span>{formatPrice(order.total_amount)}</span>
+            <span><StatusBadge status={order.status} /></span>
+            <span>{getEntries(order)} participation{getEntries(order) > 1 ? "s" : ""}</span>
+            <span><a className="admin-row-link" href={`/admin?${params.toString()}`}>Voir</a></span>
+          </div>
+        );
+      })}
+    </form>
+  );
 }
 
 function OrderDetail({ order, currentPath }) {
@@ -225,6 +297,7 @@ function OrderDetail({ order, currentPath }) {
 
       <section className="admin-detail-section">
         <h3>Client</h3>
+        {fullName(order.profile) && <p>{fullName(order.profile)}</p>}
         <p><strong>{order.customer_email}</strong></p>
         <p>{order.profile?.phone || "Telephone non renseigne"}</p>
         <p>{order.profile?.address || "Adresse non renseignee"}</p>
@@ -287,9 +360,266 @@ function OrderDetail({ order, currentPath }) {
 
       <div className="admin-detail-actions">
         <a className="admin-secondary-button" href={`/admin/invoices/${order.id}`} target="_blank" rel="noreferrer">Creer facture PDF</a>
-        <a className="admin-secondary-button" href={`/admin?q=${encodeURIComponent(order.customer_email)}`}>Voir client</a>
+        <a className="admin-secondary-button" href={`/admin?view=clients&q=${encodeURIComponent(order.customer_email)}`}>Voir client</a>
       </div>
     </aside>
+  );
+}
+
+function OrdersView({ orders, query, status, selectedId, params, mode = "active" }) {
+  const filteredOrders = orders.filter((order) => {
+    const statusMatches = status === "all" || order.status === status;
+    return statusMatches && orderMatches(order, query);
+  });
+  const selectedOrder = filteredOrders.find((order) => order.id === selectedId) || filteredOrders[0] || null;
+  const view = mode === "archives" ? "archives" : "orders";
+  const currentPath = adminUrl({
+    view,
+    q: query,
+    status,
+    order: selectedOrder?.id
+  });
+
+  return (
+    <>
+      <form className="admin-filters" action="/admin">
+        {view !== "orders" && <input type="hidden" name="view" value={view} />}
+        <input name="q" defaultValue={query} placeholder="Rechercher email, nom, commande..." />
+        <select name="status" defaultValue={status}>
+          <option value="all">Tous les statuts</option>
+          {STATUS_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+        </select>
+        <button type="submit">Filtrer</button>
+      </form>
+
+      <div className="admin-workspace">
+        <section className="admin-table-card">
+          <OrdersTable orders={filteredOrders} selectedId={selectedOrder?.id} searchParams={params || {}} currentPath={currentPath} mode={mode} />
+        </section>
+
+        <OrderDetail order={selectedOrder} currentPath={currentPath} />
+      </div>
+    </>
+  );
+}
+
+function buildClients(orders) {
+  const map = new Map();
+
+  for (const order of orders) {
+    const key = order.customer_email || order.user_id || "client";
+    const current = map.get(key) || {
+      key,
+      email: order.customer_email,
+      name: fullName(order.profile),
+      phone: order.profile?.phone || "",
+      address: order.profile?.address || "",
+      orders: 0,
+      paidOrders: 0,
+      total: 0,
+      entries: 0,
+      lastOrderAt: ""
+    };
+
+    current.orders += 1;
+    current.entries += getEntries(order);
+    if (order.status === "paid" || order.paid_at) {
+      current.paidOrders += 1;
+      current.total += Number(order.total_amount || 0);
+    }
+    if (!current.lastOrderAt || new Date(order.created_at) > new Date(current.lastOrderAt)) {
+      current.lastOrderAt = order.created_at;
+    }
+    if (!current.name) current.name = fullName(order.profile);
+    if (!current.phone) current.phone = order.profile?.phone || "";
+    if (!current.address) current.address = order.profile?.address || "";
+    map.set(key, current);
+  }
+
+  return [...map.values()].sort((a, b) => new Date(b.lastOrderAt) - new Date(a.lastOrderAt));
+}
+
+function ClientsView({ orders, query }) {
+  const clients = buildClients(orders).filter((client) => {
+    if (!query) return true;
+    return normalizeText([client.email, client.name, client.phone, client.address].filter(Boolean).join(" ")).includes(normalizeText(query));
+  });
+
+  return (
+    <>
+      <form className="admin-filters admin-filters-compact" action="/admin">
+        <input type="hidden" name="view" value="clients" />
+        <input name="q" defaultValue={query} placeholder="Rechercher client, email, telephone..." />
+        <button type="submit">Filtrer</button>
+      </form>
+
+      <section className="admin-table-card admin-wide-card">
+        <div className="admin-table-head admin-clients-grid">
+          <span>Client</span>
+          <span>Contact</span>
+          <span>Commandes</span>
+          <span>Total paye</span>
+          <span>Concours</span>
+          <span></span>
+        </div>
+        {clients.length ? clients.map((client) => (
+          <div className="admin-order-row admin-clients-grid" key={client.key}>
+            <span>
+              <strong>{client.name || "Client sans nom"}</strong>
+              <small>{client.email}</small>
+            </span>
+            <span>
+              <strong>{client.phone || "Telephone non renseigne"}</strong>
+              <small>{client.address || "Adresse non renseignee"}</small>
+            </span>
+            <span>{client.orders} commande{client.orders > 1 ? "s" : ""}</span>
+            <span>{formatPrice(client.total)}</span>
+            <span>{client.entries} participation{client.entries > 1 ? "s" : ""}</span>
+            <span><a className="admin-row-link" href={`/admin?q=${encodeURIComponent(client.email || "")}`}>Commandes</a></span>
+          </div>
+        )) : (
+          <div className="admin-empty">
+            <strong>Aucun client</strong>
+            <span>Aucun resultat pour cette recherche.</span>
+          </div>
+        )}
+      </section>
+    </>
+  );
+}
+
+function InvoicesView({ orders, query, params }) {
+  const invoiceOrders = orders
+    .filter((order) => order.status === "paid" || order.paid_at)
+    .filter((order) => orderMatches(order, query));
+  const currentPath = adminUrl({ view: "invoices", q: query });
+
+  return (
+    <>
+      <form className="admin-filters admin-filters-compact" action="/admin">
+        <input type="hidden" name="view" value="invoices" />
+        <input name="q" defaultValue={query} placeholder="Rechercher facture, email, commande..." />
+        <button type="submit">Filtrer</button>
+      </form>
+
+      <section className="admin-table-card admin-wide-card">
+        <form action={bulkOrderAction} className="admin-bulk-form">
+          <input type="hidden" name="redirect_to" value={currentPath} />
+          <BulkOrderActions />
+          <div className="admin-table-head admin-invoices-grid">
+            <span></span>
+            <span>Facture</span>
+            <span>Client</span>
+            <span>Date</span>
+            <span>Total</span>
+            <span></span>
+          </div>
+          {invoiceOrders.length ? invoiceOrders.map((order) => (
+            <div className="admin-order-row admin-invoices-grid" key={order.id}>
+              <label className="admin-check-cell" aria-label={`Selectionner ${order.order_number}`}>
+                <input type="checkbox" name="order_ids" value={order.id} />
+              </label>
+              <span>
+                <strong>FAC-{order.order_number}</strong>
+                <small>{order.order_number}</small>
+              </span>
+              <span>
+                <strong>{order.customer_email}</strong>
+                <small>{fullName(order.profile) || "Client sans nom"}</small>
+              </span>
+              <span>{formatDate(order.paid_at || order.created_at)}</span>
+              <span>{formatPrice(order.total_amount)}</span>
+              <span><a className="admin-row-link" href={`/admin/invoices/${order.id}`} target="_blank" rel="noreferrer">Ouvrir</a></span>
+            </div>
+          )) : (
+            <div className="admin-empty">
+              <strong>Aucune facture</strong>
+              <span>Les commandes payees apparaitront ici.</span>
+            </div>
+          )}
+        </form>
+      </section>
+    </>
+  );
+}
+
+function buildContestRows(orders) {
+  return orders.flatMap((order) => (
+    getProductItems(order)
+      .filter((item) => Number(item.contest_entries || 0) > 0)
+      .map((item) => ({
+        id: item.id,
+        orderId: order.id,
+        orderNumber: order.order_number,
+        email: order.customer_email,
+        product: item.product_name,
+        variant: [item.variant_size && `Taille ${item.variant_size}`, item.variant_model && `Modele ${item.variant_model}`].filter(Boolean).join(" - "),
+        entries: Number(item.contest_entries || 0),
+        createdAt: order.paid_at || order.created_at
+      }))
+  ));
+}
+
+function ContestView({ orders, query }) {
+  const rows = buildContestRows(orders).filter((row) => {
+    if (!query) return true;
+    return normalizeText([row.orderNumber, row.email, row.product, row.variant].filter(Boolean).join(" ")).includes(normalizeText(query));
+  });
+  const currentPath = adminUrl({ view: "contest", q: query });
+  const totalEntries = rows.reduce((sum, row) => sum + row.entries, 0);
+
+  return (
+    <>
+      <form className="admin-filters admin-filters-compact" action="/admin">
+        <input type="hidden" name="view" value="contest" />
+        <input name="q" defaultValue={query} placeholder="Rechercher participation, commande, client..." />
+        <button type="submit">Filtrer</button>
+      </form>
+
+      <section className="admin-table-card admin-wide-card">
+        <form action={deleteContestParticipations} className="admin-bulk-form">
+          <input type="hidden" name="redirect_to" value={currentPath} />
+          <div className="admin-bulk-actions">
+            <span>{totalEntries} participation{totalEntries > 1 ? "s" : ""}</span>
+            <button className="is-danger" type="submit">Supprimer participations selectionnees</button>
+          </div>
+          <div className="admin-table-head admin-contest-grid">
+            <span></span>
+            <span>Commande</span>
+            <span>Client</span>
+            <span>Article</span>
+            <span>Participations</span>
+            <span></span>
+          </div>
+          {rows.length ? rows.map((row) => (
+            <div className="admin-order-row admin-contest-grid" key={row.id}>
+              <label className="admin-check-cell" aria-label={`Selectionner ${row.orderNumber}`}>
+                <input type="checkbox" name="contest_item_ids" value={row.id} />
+              </label>
+              <span>
+                <strong>{row.orderNumber}</strong>
+                <small>{formatDate(row.createdAt)}</small>
+              </span>
+              <span>
+                <strong>{row.email}</strong>
+                <small>Participation achat</small>
+              </span>
+              <span>
+                <strong>{row.product}</strong>
+                <small>{row.variant || "Sans variante"}</small>
+              </span>
+              <span>{row.entries}</span>
+              <span><a className="admin-row-link" href={`/admin?order=${row.orderId}`}>Commande</a></span>
+            </div>
+          )) : (
+            <div className="admin-empty">
+              <strong>Aucune participation</strong>
+              <span>Les participations de concours apparaitront ici.</span>
+            </div>
+          )}
+        </form>
+      </section>
+    </>
   );
 }
 
@@ -301,25 +631,19 @@ export default async function AdminPage({ searchParams }) {
     return <LoginScreen error={params?.error === "1"} />;
   }
 
+  const requestedView = String(params?.view || "orders");
+  const view = VIEWS.has(requestedView) ? requestedView : "orders";
   const query = String(params?.q || "").trim();
   const status = String(params?.status || "all");
   const selectedId = String(params?.order || "");
   const { orders, configError, dataError } = await fetchOrders();
-  const filteredOrders = orders.filter((order) => {
-    const statusMatches = status === "all" || order.status === status;
-    return statusMatches && orderMatches(order, query);
-  });
-  const selectedOrder = filteredOrders.find((order) => order.id === selectedId) || filteredOrders[0] || null;
-  const paidOrders = orders.filter((order) => order.status === "paid" || order.paid_at);
+  const activeOrders = orders.filter((order) => !order.archived_at);
+  const archivedOrders = orders.filter((order) => order.archived_at);
+  const paidOrders = activeOrders.filter((order) => order.status === "paid" || order.paid_at);
   const revenue = paidOrders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-  const preparing = orders.filter((order) => ["paid", "preparing"].includes(order.status)).length;
-  const entries = orders.reduce((sum, order) => sum + getEntries(order), 0);
-  const customerCount = new Set(orders.map((order) => order.customer_email).filter(Boolean)).size;
-  const currentPath = `/admin?${new URLSearchParams({
-    ...(query ? { q: query } : {}),
-    ...(status !== "all" ? { status } : {}),
-    ...(selectedOrder ? { order: selectedOrder.id } : {})
-  }).toString()}`;
+  const preparing = activeOrders.filter((order) => ["paid", "preparing"].includes(order.status)).length;
+  const entries = activeOrders.reduce((sum, order) => sum + getEntries(order), 0);
+  const customerCount = new Set(activeOrders.map((order) => order.customer_email).filter(Boolean)).size;
 
   return (
     <main className="admin-shell">
@@ -328,12 +652,7 @@ export default async function AdminPage({ searchParams }) {
           <strong>TMRR</strong>
           <span>ADMIN</span>
         </div>
-        <nav>
-          <a className="is-active" href="/admin">Commandes</a>
-          <a href="/admin#clients">Clients</a>
-          <a href="/admin#factures">Factures</a>
-          <a href="/admin#concours">Concours</a>
-        </nav>
+        <AdminNav view={view} />
         <form action={adminLogout}>
           <button type="submit">Deconnexion</button>
         </form>
@@ -343,7 +662,7 @@ export default async function AdminPage({ searchParams }) {
         <header className="admin-topbar">
           <div>
             <p className="admin-kicker">Gestion boutique TMRR</p>
-            <h1>Commandes & clients</h1>
+            <h1>{view === "archives" ? "Commandes archivees" : view === "clients" ? "Clients" : view === "invoices" ? "Factures" : view === "contest" ? "Concours" : "Commandes & clients"}</h1>
           </div>
           <a className="admin-secondary-button" href="/admin/export">Export CSV</a>
         </header>
@@ -354,37 +673,28 @@ export default async function AdminPage({ searchParams }) {
           </p>
         )}
 
-        <form className="admin-filters" action="/admin">
-          <input name="q" defaultValue={query} placeholder="Rechercher email, nom, commande..." />
-          <select name="status" defaultValue={status}>
-            <option value="all">Tous les statuts</option>
-            {STATUS_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-          </select>
-          <button type="submit">Filtrer</button>
-        </form>
-
         <div className="admin-metrics">
-          <MetricCard label="CA paye" value={formatPrice(revenue)} hint="Commandes payees" />
-          <MetricCard label="Commandes" value={orders.length} hint={`${customerCount} client${customerCount > 1 ? "s" : ""}`} />
+          <MetricCard label="CA paye" value={formatPrice(revenue)} hint="Commandes payees actives" />
+          <MetricCard label="Commandes" value={activeOrders.length} hint={`${customerCount} client${customerCount > 1 ? "s" : ""}`} />
           <MetricCard label="A preparer" value={preparing} hint="Payees ou en preparation" />
-          <MetricCard label="Participations" value={entries} hint="Concours total" />
+          <MetricCard label="Participations" value={entries} hint="Concours total actif" />
         </div>
 
-        <div className="admin-workspace">
-          <section className="admin-table-card">
-            <div className="admin-table-head">
-              <span>Commande</span>
-              <span>Client</span>
-              <span>Articles</span>
-              <span>Total</span>
-              <span>Statut</span>
-              <span>Concours</span>
-            </div>
-            <OrderRows orders={filteredOrders} selectedId={selectedOrder?.id} searchParams={params || {}} />
-          </section>
-
-          <OrderDetail order={selectedOrder} currentPath={currentPath} />
-        </div>
+        {view === "orders" && (
+          <OrdersView orders={activeOrders} query={query} status={status} selectedId={selectedId} params={params} />
+        )}
+        {view === "archives" && (
+          <OrdersView orders={archivedOrders} query={query} status={status} selectedId={selectedId} params={params} mode="archives" />
+        )}
+        {view === "clients" && (
+          <ClientsView orders={orders} query={query} />
+        )}
+        {view === "invoices" && (
+          <InvoicesView orders={orders} query={query} params={params} />
+        )}
+        {view === "contest" && (
+          <ContestView orders={orders} query={query} />
+        )}
       </section>
     </main>
   );

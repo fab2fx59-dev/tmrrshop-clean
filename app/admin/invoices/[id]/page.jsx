@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createAdminSupabaseClient, isAdminSession } from "../../utils";
-import PrintButton from "./print-button";
+import PrintButton from "../print-button";
 
 export const dynamic = "force-dynamic";
 

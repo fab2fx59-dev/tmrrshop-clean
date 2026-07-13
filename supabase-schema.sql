@@ -27,6 +27,7 @@ create table if not exists public.orders (
   admin_notes text,
   tracking_number text,
   shipped_at timestamptz,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   paid_at timestamptz
 );
