@@ -197,6 +197,10 @@ function BulkOrderActions({ mode = "active" }) {
   return (
     <div className="admin-bulk-actions">
       <span>Actions selection</span>
+      <select name="bulk_status" defaultValue="preparing" aria-label="Nouveau statut">
+        {STATUS_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+      </select>
+      <button type="submit" name="bulk_action" value="status">Changer statut</button>
       <button type="submit" name="bulk_action" value="invoice">Imprimer facture</button>
       {mode === "archives" ? (
         <button type="submit" name="bulk_action" value="restore">Restaurer</button>
@@ -359,7 +363,7 @@ function OrderDetail({ order, currentPath }) {
       </form>
 
       <div className="admin-detail-actions">
-        <a className="admin-secondary-button" href={`/admin/invoices/${order.id}`} target="_blank" rel="noreferrer">Creer facture PDF</a>
+        <a className="admin-secondary-button" href={`/admin/invoices/${order.id}`}>Creer facture PDF</a>
         <a className="admin-secondary-button" href={`/admin?view=clients&q=${encodeURIComponent(order.customer_email)}`}>Voir client</a>
       </div>
     </aside>
@@ -529,7 +533,7 @@ function InvoicesView({ orders, query, params }) {
               </span>
               <span>{formatDate(order.paid_at || order.created_at)}</span>
               <span>{formatPrice(order.total_amount)}</span>
-              <span><a className="admin-row-link" href={`/admin/invoices/${order.id}`} target="_blank" rel="noreferrer">Ouvrir</a></span>
+              <span><a className="admin-row-link" href={`/admin/invoices/${order.id}`}>Voir facture</a></span>
             </div>
           )) : (
             <div className="admin-empty">

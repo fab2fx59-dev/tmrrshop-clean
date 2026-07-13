@@ -5562,6 +5562,7 @@ body.intro-active {
 }
 
 .admin-bulk-actions button,
+.admin-bulk-actions select,
 .admin-row-link {
   border: 1px solid rgba(245, 241, 232, 0.2);
   border-radius: 6px;
@@ -5577,6 +5578,11 @@ body.intro-active {
 .admin-bulk-actions button {
   min-height: 34px;
   padding: 0.45rem 0.7rem;
+}
+
+.admin-bulk-actions select {
+  min-height: 34px;
+  padding: 0.45rem 0.65rem;
 }
 
 .admin-bulk-actions button:hover,

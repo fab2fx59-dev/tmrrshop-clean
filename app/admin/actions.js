@@ -156,7 +156,16 @@ export async function bulkOrderAction(formData) {
   }
 
   let error;
-  if (action === "archive") {
+  if (action === "status") {
+    const status = String(formData.get("bulk_status") || "");
+    if (!ORDER_STATUSES.has(status)) {
+      redirect(addQuery(redirectTo, "error", "status"));
+    }
+    ({ error } = await supabase
+      .from("orders")
+      .update({ status })
+      .in("id", orderIds));
+  } else if (action === "archive") {
     ({ error } = await supabase
       .from("orders")
       .update({ archived_at: new Date().toISOString() })
