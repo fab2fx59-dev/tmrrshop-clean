@@ -17,6 +17,605 @@
   box-sizing: border-box;
 }
 
+/* TMRR admin dashboard */
+.admin-shell,
+.admin-login-screen,
+.invoice-page {
+  min-height: 100vh;
+  background: #070707;
+  color: #f5f1e8;
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: 0;
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  border-right: 1px solid rgba(245, 241, 232, 0.12);
+  background: #050505;
+}
+
+.admin-brand {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.5rem 0.75rem 1.4rem;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.12);
+}
+
+.admin-brand strong {
+  color: #ff5a00;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+
+.admin-brand span {
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-sidebar nav {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-sidebar a,
+.admin-sidebar button,
+.admin-secondary-button,
+.admin-link {
+  color: #f5f1e8;
+  text-decoration: none;
+}
+
+.admin-sidebar nav a,
+.admin-sidebar form button {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #f5f1e8;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-sidebar nav a.is-active,
+.admin-sidebar nav a:hover,
+.admin-sidebar form button:hover {
+  border-color: rgba(255, 90, 0, 0.4);
+  background: rgba(255, 90, 0, 0.12);
+  color: #ff7a1a;
+}
+
+.admin-sidebar form {
+  margin-top: auto;
+}
+
+.admin-main {
+  min-width: 0;
+  padding: 2rem;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-kicker {
+  margin: 0 0 0.35rem;
+  color: #ff7a1a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-topbar h1,
+.admin-detail-head h2,
+.admin-login-card h1 {
+  margin: 0;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  line-height: 1;
+}
+
+.admin-filters,
+.admin-metrics,
+.admin-workspace {
+  margin-bottom: 1.35rem;
+}
+
+.admin-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 190px 120px;
+  gap: 0.75rem;
+}
+
+.admin-filters input,
+.admin-filters select,
+.admin-management-form input,
+.admin-management-form select,
+.admin-management-form textarea,
+.admin-login-form input {
+  width: 100%;
+  border: 1px solid rgba(245, 241, 232, 0.18);
+  border-radius: 6px;
+  background: #0d0d0d;
+  color: #f5f1e8;
+  font: inherit;
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+}
+
+.admin-filters button,
+.admin-primary-button,
+.admin-login-form button {
+  border: 0;
+  border-radius: 6px;
+  background: #ff5a00;
+  color: #050505;
+  font: inherit;
+  font-weight: 900;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.admin-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid rgba(245, 241, 232, 0.18);
+  border-radius: 6px;
+  background: #101010;
+  font-weight: 800;
+}
+
+.admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-metric-card,
+.admin-table-card,
+.admin-detail-panel,
+.admin-login-card {
+  border: 1px solid rgba(245, 241, 232, 0.14);
+  border-radius: 8px;
+  background: #101010;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+}
+
+.admin-metric-card {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 112px;
+  padding: 1.2rem;
+}
+
+.admin-metric-card span,
+.admin-metric-card small,
+.admin-detail-section p,
+.admin-detail-line small,
+.admin-total-line,
+.admin-empty span {
+  color: #b9afa4;
+}
+
+.admin-metric-card strong {
+  color: #fff;
+  font-size: 1.75rem;
+}
+
+.admin-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.admin-table-card {
+  overflow: hidden;
+}
+
+.admin-table-head,
+.admin-order-row {
+  display: grid;
+  grid-template-columns: 1.05fr 1.55fr 1.5fr 0.9fr 0.9fr 0.9fr;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+}
+
+.admin-table-head {
+  color: #b9afa4;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.12);
+}
+
+.admin-order-row {
+  color: #f5f1e8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.08);
+}
+
+.admin-order-row:hover,
+.admin-order-row.is-selected {
+  background: rgba(255, 90, 0, 0.12);
+}
+
+.admin-order-row span {
+  min-width: 0;
+}
+
+.admin-order-row strong,
+.admin-order-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-order-row small {
+  margin-top: 0.2rem;
+  color: #b9afa4;
+}
+
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  min-height: 28px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  background: rgba(245, 241, 232, 0.1);
+  color: #f5f1e8;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.admin-status-paid { background: rgba(30, 185, 95, 0.22); color: #4df08a; }
+.admin-status-preparing { background: rgba(255, 90, 0, 0.22); color: #ff8b36; }
+.admin-status-shipped,
+.admin-status-delivered { background: rgba(55, 133, 255, 0.2); color: #72b2ff; }
+.admin-status-cancelled,
+.admin-status-refunded { background: rgba(245, 241, 232, 0.14); color: #b9afa4; }
+
+.admin-detail-panel {
+  position: sticky;
+  top: 1rem;
+  padding: 1.3rem;
+}
+
+.admin-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.12);
+}
+
+.admin-detail-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.1);
+}
+
+.admin-detail-section h3 {
+  margin: 0 0 0.75rem;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.admin-detail-section p {
+  margin: 0.25rem 0;
+}
+
+.admin-detail-lines {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-detail-line,
+.admin-total-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-detail-line strong,
+.admin-detail-line small {
+  display: block;
+}
+
+.admin-total-line {
+  margin-top: 0.75rem;
+}
+
+.admin-total-line.is-grand {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.admin-management-form {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 1rem;
+}
+
+.admin-management-form label,
+.admin-login-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: #f5f1e8;
+  font-weight: 800;
+}
+
+.admin-management-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.admin-detail-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.admin-empty {
+  display: grid;
+  gap: 0.35rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.admin-alert {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 90, 0, 0.4);
+  border-radius: 6px;
+  background: rgba(255, 90, 0, 0.12);
+  color: #ffb17a;
+}
+
+.admin-login-screen {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.admin-login-card {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 1.2rem;
+  padding: 2rem;
+}
+
+.admin-login-card p {
+  color: #b9afa4;
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.invoice-page {
+  padding: 2rem;
+}
+
+.invoice-toolbar {
+  max-width: 920px;
+  margin: 0 auto 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.invoice-toolbar a,
+.invoice-toolbar button {
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(245, 241, 232, 0.18);
+  border-radius: 6px;
+  background: #111;
+  color: #f5f1e8;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.invoice-sheet {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 3rem;
+  background: #fff;
+  color: #111;
+  border-radius: 8px;
+}
+
+.invoice-header,
+.invoice-grid,
+.invoice-totals p {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.invoice-header {
+  align-items: flex-start;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #111;
+}
+
+.invoice-header strong {
+  display: block;
+  color: #ff5a00;
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: 0.85;
+}
+
+.invoice-header h1 {
+  margin: 0;
+  font-size: 2.4rem;
+}
+
+.invoice-grid {
+  margin: 2rem 0;
+}
+
+.invoice-grid section {
+  width: 50%;
+}
+
+.invoice-grid h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.invoice-grid p {
+  margin: 0.2rem 0;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+
+.invoice-table th,
+.invoice-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.invoice-table th {
+  background: #111;
+  color: #fff;
+}
+
+.invoice-totals {
+  width: min(100%, 360px);
+  margin-left: auto;
+}
+
+.invoice-totals p {
+  margin: 0;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.invoice-grand-total {
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.invoice-footer {
+  margin-top: 3rem;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1180px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .admin-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-detail-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-main,
+  .invoice-page {
+    padding: 1rem;
+  }
+
+  .admin-topbar,
+  .invoice-toolbar,
+  .invoice-header,
+  .invoice-grid {
+    flex-direction: column;
+  }
+
+  .admin-filters,
+  .admin-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-table-head {
+    display: none;
+  }
+
+  .admin-order-row {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-sheet {
+    padding: 1.25rem;
+  }
+
+  .invoice-grid section {
+    width: 100%;
+  }
+}
+
+@media print {
+  .invoice-toolbar,
+  .site-noise,
+  .spark-canvas {
+    display: none !important;
+  }
+
+  .invoice-page {
+    padding: 0;
+    background: #fff;
+  }
+
+  .invoice-sheet {
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
+
 [hidden] {
   display: none !important;
 }

@@ -5,8 +5,11 @@ create extension if not exists "pgcrypto";
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
+  first_name text,
+  last_name text,
   full_name text,
   phone text,
+  address text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -21,6 +24,9 @@ create table if not exists public.orders (
   currency text not null default 'EUR',
   stripe_checkout_session_id text,
   stripe_payment_intent_id text,
+  admin_notes text,
+  tracking_number text,
+  shipped_at timestamptz,
   created_at timestamptz not null default now(),
   paid_at timestamptz
 );
@@ -112,8 +118,15 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', ''))
+  insert into public.profiles (id, first_name, last_name, full_name, phone, address)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'first_name', ''),
+    coalesce(new.raw_user_meta_data->>'last_name', ''),
+    coalesce(new.raw_user_meta_data->>'full_name', ''),
+    coalesce(new.raw_user_meta_data->>'phone', ''),
+    coalesce(new.raw_user_meta_data->>'address', '')
+  )
   on conflict (id) do nothing;
 
   return new;
