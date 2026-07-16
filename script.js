@@ -8,6 +8,18 @@ const SHIPPING_PRICE = 4.9;
 const FREE_SHIPPING_MIN = 60;
 let activePromo = null;
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+const shouldSaveData = Boolean(connection?.saveData || ["slow-2g", "2g"].includes(connection?.effectiveType));
+
+function runWhenIdle(callback, timeout = 1600) {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(callback, { timeout });
+  } else {
+    window.setTimeout(callback, Math.min(timeout, 800));
+  }
+}
+
 function readCart() {
   const readWindowName = () => {
     try {
@@ -112,6 +124,53 @@ function bindHeroVideoSound() {
     toggleSound();
   });
   setSoundState(false);
+}
+
+function setVideoSource(video) {
+  if (!video || video.dataset.videoLoaded === "true") return false;
+  const source = video.dataset.videoSrc;
+  if (!source || shouldSaveData || prefersReducedMotion.matches) return false;
+  video.src = source;
+  video.dataset.videoLoaded = "true";
+  video.load();
+  return true;
+}
+
+function playDecorativeVideo(video) {
+  if (!setVideoSource(video) && video.dataset.videoLoaded !== "true") return;
+  video.play?.().catch(() => {});
+}
+
+function bindDeferredVideos() {
+  const heroVideo = document.querySelector("[data-hero-video]");
+  const navVideo = document.querySelector(".nav-video");
+
+  const loadHero = () => {
+    if (!heroVideo) return;
+    const start = () => playDecorativeVideo(heroVideo);
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          runWhenIdle(start, 1200);
+        }
+      }, { rootMargin: "220px 0px", threshold: 0.05 });
+      observer.observe(heroVideo);
+    } else {
+      runWhenIdle(start, 1200);
+    }
+  };
+
+  const loadNav = () => {
+    if (!navVideo || window.innerWidth < 900) return;
+    runWhenIdle(() => playDecorativeVideo(navVideo), 2600);
+  };
+
+  window.addEventListener("tmrr:intro-finished", loadHero, { once: true });
+  window.addEventListener("load", loadNav, { once: true });
+  if (!document.querySelector(".site-intro")) {
+    loadHero();
+  }
 }
 
 function addToCart(item) {
@@ -853,16 +912,20 @@ function bindCinematicIntroCanvas(intro) {
 }
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
-  if (!intro) return;
+  if (!intro) {
+    window.dispatchEvent(new Event("tmrr:intro-finished"));
+    return;
+  }
 
   const finishIntro = () => {
     intro.classList.add("is-finished");
     document.body.classList.remove("intro-active");
+    window.dispatchEvent(new Event("tmrr:intro-finished"));
   };
 
   document.body.classList.add("intro-active");
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (prefersReducedMotion.matches || shouldSaveData) {
     finishIntro();
     return;
   }
@@ -972,9 +1035,26 @@ bikePlay?.addEventListener("click", () => {
   bikePlay.textContent = bikeAuto ? "Pause auto" : "Reprendre auto";
 });
 
-window.setInterval(() => {
-  if (bikeAuto) setBikeFrame(bikeIndex + 1);
-}, 1800);
+function startBikeAutoplay() {
+  if (!bikeImage || bikeImage.dataset.autoplayStarted === "true" || shouldSaveData || prefersReducedMotion.matches) return;
+  bikeImage.dataset.autoplayStarted = "true";
+  window.setInterval(() => {
+    if (bikeAuto) setBikeFrame(bikeIndex + 1);
+  }, 1800);
+}
+
+const bikeViewer = document.querySelector(".bike-viewer");
+if (bikeViewer && "IntersectionObserver" in window) {
+  const bikeObserver = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      bikeObserver.disconnect();
+      startBikeAutoplay();
+    }
+  }, { rootMargin: "220px 0px", threshold: 0.08 });
+  bikeObserver.observe(bikeViewer);
+} else {
+  runWhenIdle(startBikeAutoplay, 2600);
+}
 
 document.querySelectorAll(".magnetic").forEach((button) => {
   button.addEventListener("mousemove", (event) => {
@@ -1050,6 +1130,7 @@ bindDropProgress();
 bindCollectionCarousel();
 bindReviewCarousel();
 bindRandomPackImage();
+bindDeferredVideos();
 bindSiteIntro();
 bindAccountPage();
 bindHeroVideoSound();
@@ -1062,7 +1143,9 @@ document.querySelectorAll(".hero-hotspot-collection").forEach((link) => {
   });
 });
 
-if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+function startSparkCanvas() {
+  if (!canvas || !ctx || prefersReducedMotion.matches || shouldSaveData || canvas.dataset.started === "true") return;
+  canvas.dataset.started = "true";
   resizeCanvas();
   seedSparks();
   drawSparks();
@@ -1071,4 +1154,8 @@ if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matc
     seedSparks();
   });
 }
+
+window.addEventListener("tmrr:intro-finished", () => {
+  runWhenIdle(startSparkCanvas, 2200);
+}, { once: true });
 
