@@ -1530,6 +1530,91 @@ h3 {
     var(--panel);
 }
 
+.contest-countdown-strip {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(520px, 1.28fr);
+  align-items: center;
+  gap: clamp(1.2rem, 4vw, 4rem);
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem);
+  background:
+    linear-gradient(105deg, rgba(255, 90, 0, 0.18), transparent 48%),
+    #090909;
+  border-top: 1px solid rgba(255, 90, 0, 0.32);
+  border-bottom: 1px solid rgba(255, 90, 0, 0.32);
+}
+
+.contest-countdown-copy h2 {
+  max-width: 680px;
+  margin: 0;
+  font-size: clamp(2.2rem, 4.5vw, 5rem);
+}
+
+.contest-countdown-strip .countdown {
+  width: min(900px, 100%);
+  margin: 0;
+}
+
+.contest-content > h2 {
+  font-size: clamp(2.2rem, 3.8vw, 4.5rem);
+}
+
+.bike-specs {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0.75rem 0 1.35rem;
+}
+
+.bike-specs section {
+  padding: 0.9rem;
+  background: rgba(5, 5, 5, 0.52);
+  border: 1px solid rgba(255, 90, 0, 0.26);
+}
+
+.bike-specs h3 {
+  margin: 0 0 0.65rem;
+  color: var(--orange);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.55vw, 1.55rem);
+  line-height: 1;
+}
+
+.bike-specs dl,
+.bike-specs dd {
+  margin: 0;
+}
+
+.bike-specs dl {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.bike-specs dl div {
+  display: grid;
+  grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bike-specs dl div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.bike-specs dt {
+  color: var(--white);
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.bike-specs dd {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .countdown {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -5224,6 +5309,20 @@ body.intro-active {
     gap: 0.35rem;
   }
 
+  .contest-countdown-strip {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.35rem 1rem 1.5rem;
+  }
+
+  .contest-countdown-copy {
+    text-align: center;
+  }
+
+  .contest-countdown-copy h2 {
+    font-size: clamp(2.1rem, 11vw, 3.4rem);
+  }
+
   .countdown div {
     min-height: 68px;
     padding: 0.42rem 0.24rem;
@@ -5235,6 +5334,15 @@ body.intro-active {
 
   .countdown span {
     font-size: 0.58rem;
+  }
+
+  .contest-content > h2 {
+    font-size: clamp(2.25rem, 11vw, 3.7rem);
+  }
+
+  .bike-specs dl div {
+    grid-template-columns: minmax(96px, 0.4fr) minmax(0, 1fr);
+    gap: 0.5rem;
   }
 
   .hero-meter {
