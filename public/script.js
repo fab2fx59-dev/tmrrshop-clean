@@ -643,30 +643,6 @@ function bindAccountPage() {
   showDashboard();
 }
 
-function bindDropProgress() {
-  const progress = document.querySelector("[data-drop-progress]");
-  if (!progress) return;
-
-  const start = Number(progress.dataset.dropStart || 651);
-  const total = Number(progress.dataset.dropTotal || 2500);
-  const dailyIncrement = Number(progress.dataset.dropDaily || 21);
-  const resetDate = new Date(`${progress.dataset.dropDate || "2026-06-02"}T00:00:00`);
-  const current = progress.querySelector("[data-drop-current]");
-  const bar = progress.querySelector("[data-drop-bar]");
-
-  const update = () => {
-    const days = Math.max(0, Math.floor((Date.now() - resetDate.getTime()) / 86400000));
-    const value = Math.min(total, start + days * dailyIncrement);
-    const percent = Math.min(100, (value / total) * 100);
-
-    if (current) current.textContent = String(value);
-    if (bar) bar.style.width = `${percent}%`;
-  };
-
-  update();
-  window.setInterval(update, 60000);
-}
-
 function bindCollectionCarousel() {
   document.querySelectorAll("[data-collection-carousel]").forEach((carousel) => {
     const viewport = carousel.querySelector("[data-collection-viewport]");
@@ -1121,7 +1097,6 @@ bindGiftCardForm();
 renderCartPage();
 renderPaymentPage();
 clearCartAfterStripeReturn();
-bindDropProgress();
 bindCollectionCarousel();
 bindReviewCarousel();
 bindRandomPackImage();
