@@ -11,3 +11,4 @@ _render_reglement/
 tmrr-preview.png
 
 .vercel
+.env*
