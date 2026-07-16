@@ -985,11 +985,11 @@ if (countdown) {
 }
 
 const bikeFrames = [
-  "assets/bike/rebel-1.png",
-  "assets/bike/rebel-2.png",
-  "assets/bike/rebel-3.png",
-  "assets/bike/rebel-4.png",
-  "assets/bike/rebel-5.png"
+  "assets/bike/grand-jeu-1.png",
+  "assets/bike/grand-jeu-2.png",
+  "assets/bike/grand-jeu-3.png",
+  "assets/bike/grand-jeu-4.png",
+  "assets/bike/grand-jeu-5.png"
 ];
 const bikeImage = document.querySelector("[data-bike-frame]");
 const bikeSlider = document.querySelector("[data-bike-slider]");

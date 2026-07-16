@@ -839,6 +839,13 @@ body.menu-open {
   box-shadow: 0 28px 100px rgba(0, 0, 0, 0.78);
 }
 
+@media (min-width: 981px) {
+  .hero-art {
+    width: calc(100% - (2 * clamp(1rem, 3vw, 3rem)));
+    max-width: 1668px;
+  }
+}
+
 .hero-base {
   display: block;
   width: 100%;
