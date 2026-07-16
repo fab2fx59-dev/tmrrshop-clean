@@ -1531,11 +1531,8 @@ h3 {
 }
 
 .contest-countdown-strip {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.72fr) minmax(520px, 1.28fr);
-  align-items: center;
-  gap: clamp(1.2rem, 4vw, 4rem);
-  padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem);
+  display: block;
+  padding: clamp(1rem, 2vw, 2rem);
   background:
     linear-gradient(105deg, rgba(255, 90, 0, 0.18), transparent 48%),
     #090909;
@@ -1543,15 +1540,33 @@ h3 {
   border-bottom: 1px solid rgba(255, 90, 0, 0.32);
 }
 
+.contest-countdown-copy {
+  margin-bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+  text-align: center;
+}
+
 .contest-countdown-copy h2 {
-  max-width: 680px;
+  max-width: none;
   margin: 0;
-  font-size: clamp(2.2rem, 4.5vw, 5rem);
+  font-size: clamp(2rem, 3.2vw, 4rem);
 }
 
 .contest-countdown-strip .countdown {
-  width: min(900px, 100%);
+  width: 100%;
   margin: 0;
+}
+
+.contest-countdown-strip .countdown div {
+  min-height: clamp(130px, 14vw, 220px);
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.contest-countdown-strip .countdown strong {
+  font-size: clamp(4rem, 10vw, 11rem);
+}
+
+.contest-countdown-strip .countdown span {
+  font-size: clamp(0.68rem, 1vw, 1rem);
 }
 
 .contest-content > h2 {
@@ -5310,9 +5325,7 @@ body.intro-active {
   }
 
   .contest-countdown-strip {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1.35rem 1rem 1.5rem;
+    padding: 1rem;
   }
 
   .contest-countdown-copy {
@@ -5321,6 +5334,19 @@ body.intro-active {
 
   .contest-countdown-copy h2 {
     font-size: clamp(2.1rem, 11vw, 3.4rem);
+  }
+
+  .contest-countdown-strip .countdown div {
+    min-height: 86px;
+    padding: 0.5rem 0.2rem;
+  }
+
+  .contest-countdown-strip .countdown strong {
+    font-size: clamp(2rem, 10vw, 2.8rem);
+  }
+
+  .contest-countdown-strip .countdown span {
+    font-size: 0.62rem;
   }
 
   .countdown div {
