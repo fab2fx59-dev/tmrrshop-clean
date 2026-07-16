@@ -8,6 +8,18 @@ const SHIPPING_PRICE = 4.9;
 const FREE_SHIPPING_MIN = 60;
 let activePromo = null;
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+const shouldSaveData = Boolean(connection?.saveData || ["slow-2g", "2g"].includes(connection?.effectiveType));
+
+function runWhenIdle(callback, timeout = 1600) {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(callback, { timeout });
+  } else {
+    window.setTimeout(callback, Math.min(timeout, 800));
+  }
+}
+
 function readCart() {
   const readWindowName = () => {
     try {
@@ -112,6 +124,48 @@ function bindHeroVideoSound() {
     toggleSound();
   });
   setSoundState(false);
+}
+
+function setVideoSource(video) {
+  if (!video || video.dataset.videoLoaded === "true") return false;
+  const source = video.dataset.videoSrc;
+  if (!source || shouldSaveData || prefersReducedMotion.matches) return false;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.autoplay = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
+  video.src = source;
+  video.dataset.videoLoaded = "true";
+  video.load();
+  return true;
+}
+
+function playDecorativeVideo(video) {
+  if (!setVideoSource(video) && video.dataset.videoLoaded !== "true") return;
+  video.play?.().catch(() => {});
+}
+
+function bindDeferredVideos() {
+  const heroVideo = document.querySelector("[data-hero-video]");
+  const navVideo = document.querySelector(".nav-video");
+
+  const loadHero = () => {
+    if (!heroVideo) return;
+    window.setTimeout(() => playDecorativeVideo(heroVideo), 250);
+  };
+
+  const loadNav = () => {
+    if (!navVideo || window.innerWidth < 900) return;
+    runWhenIdle(() => playDecorativeVideo(navVideo), 2600);
+  };
+
+  window.addEventListener("tmrr:intro-finished", loadHero, { once: true });
+  window.addEventListener("load", () => window.setTimeout(loadHero, 4800), { once: true });
+  window.addEventListener("load", loadNav, { once: true });
+  if (!document.querySelector(".site-intro")) {
+    loadHero();
+  }
 }
 
 function addToCart(item) {
@@ -395,7 +449,6 @@ function renderPaymentPage() {
 
     const response = await fetch("/api/promo/validate", {
       method: "POST",
-      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json"
       },
@@ -474,12 +527,8 @@ function renderPaymentPage() {
       }
 
       throw new Error("Aucune page de paiement recue.");
-    } catch (error) {
-      if (message) {
-        message.textContent = error?.message
-          ? `Le paiement n'a pas pu demarrer : ${error.message}`
-          : "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
-      }
+    } catch {
+      if (message) message.textContent = "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
       confirmButton.disabled = false;
     }
   };
@@ -722,26 +771,166 @@ function bindRandomPackImage() {
   });
 }
 
+function bindCinematicIntroCanvas(intro) {
+  const canvas = intro.querySelector(".intro-canvas");
+  if (!canvas) return false;
+  const context = canvas.getContext("2d");
+  if (!context) return false;
+
+  const logo = new Image();
+  logo.src = intro.querySelector(".intro-canvas-logo")?.getAttribute("src") || "assets/brand/logo-dragon-white.png";
+
+  const duration = 3600;
+  const smoke = Array.from({ length: 48 }, (_, index) => ({
+    x: ((index * 29) % 100) / 100,
+    y: ((index * 47) % 100) / 100,
+    size: 90 + ((index * 71) % 240),
+    drift: (((index * 17) % 50) - 25) / 100,
+    alpha: 0.045 + ((index * 13) % 60) / 1000
+  }));
+
+  let width = 0;
+  let height = 0;
+  let ratio = 1;
+  let startedAt = 0;
+  let frameId = 0;
+
+  const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const easeIn = (value) => Math.pow(clamp(value), 3);
+  const easeBoth = (value) => {
+    const v = clamp(value);
+    return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+  };
+
+  const resize = () => {
+    ratio = Math.min(window.devicePixelRatio || 1, 1.6);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  };
+
+  const drawSmoke = (time) => {
+    smoke.forEach((cloud, index) => {
+      const pulse = Math.sin(time * 0.0012 + index) * 0.5 + 0.5;
+      const x = cloud.x * width + Math.sin(time * 0.00055 + index) * cloud.size * cloud.drift;
+      const y = cloud.y * height + Math.cos(time * 0.00045 + index * 1.7) * cloud.size * 0.1;
+      const radius = cloud.size * (0.7 + pulse * 0.35);
+      const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, `rgba(190, 190, 190, ${cloud.alpha})`);
+      gradient.addColorStop(0.48, `rgba(90, 90, 90, ${cloud.alpha * 0.7})`);
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      context.fillStyle = gradient;
+      context.beginPath();
+      context.ellipse(x, y, radius * 1.65, radius * 0.72, Math.sin(index) * 0.6, 0, Math.PI * 2);
+      context.fill();
+    });
+  };
+
+  const drawLogoAndText = (elapsed) => {
+    const appear = easeBoth(elapsed / 620);
+    const exit = easeIn((elapsed - 2760) / 620);
+    if (appear <= 0 || !logo.complete) return;
+    const shake = elapsed < 1100 ? Math.sin(elapsed * 0.095) * 8 * (1 - elapsed / 1200) : 0;
+    const pulse = 1 + Math.sin(elapsed * 0.006) * 0.018;
+    const logoWidth = Math.min(width * 0.7, 880) * (0.72 + appear * 0.28) * pulse * (1 + exit * 8);
+    const logoHeight = logoWidth * (logo.naturalHeight / logo.naturalWidth);
+
+    context.save();
+    context.globalAlpha = appear * (1 - exit);
+    context.filter = `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
+    context.drawImage(logo, width / 2 - logoWidth / 2 + shake, height / 2 - logoHeight / 2 - height * 0.06, logoWidth, logoHeight);
+    context.restore();
+
+    const textAlpha = clamp((elapsed - 520) / 420) * (1 - exit);
+    if (textAlpha <= 0) return;
+    context.save();
+    context.globalAlpha = textAlpha;
+    context.textAlign = "center";
+    context.fillStyle = "#fff";
+    context.shadowColor = "rgba(255,90,0,0.95)";
+    context.shadowBlur = 18;
+    const isMobileIntro = width < 620;
+    const mainTextSize = isMobileIntro
+      ? Math.min(34, Math.max(22, width * 0.062))
+      : Math.min(82, Math.max(40, width * 0.055));
+    const subTextSize = isMobileIntro
+      ? Math.min(36, Math.max(24, width * 0.074))
+      : Math.min(44, Math.max(23, width * 0.031));
+    context.font = `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
+    context.fillText("NO RULES. JUST RIDE.", width / 2, height * 0.68);
+    context.fillStyle = "#ff5a00";
+    context.font = `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
+    if (isMobileIntro) {
+      context.fillText("BRISE TES CHAINES,", width / 2, height * 0.738);
+      context.fillText("LIBERE-TOI !", width / 2, height * 0.79);
+    } else {
+      context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.76);
+    }
+    context.restore();
+  };
+
+  const draw = (time) => {
+    if (!startedAt) startedAt = time;
+    const elapsed = time - startedAt;
+    context.clearRect(0, 0, width, height);
+    context.fillStyle = "#000";
+    context.fillRect(0, 0, width, height);
+    const background = context.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, Math.max(width, height) * 0.78);
+    background.addColorStop(0, "rgba(18,18,18,0.68)");
+    background.addColorStop(0.45, "rgba(6,6,6,0.98)");
+    background.addColorStop(1, "#000");
+    context.fillStyle = background;
+    context.fillRect(0, 0, width, height);
+    drawSmoke(elapsed);
+    drawLogoAndText(elapsed);
+    if (elapsed < duration) {
+      frameId = requestAnimationFrame(draw);
+    }
+  };
+
+  resize();
+  window.addEventListener("resize", resize);
+  Promise.allSettled([logo.decode?.().catch(() => {}) || Promise.resolve()]).finally(() => {
+    frameId = requestAnimationFrame(draw);
+  });
+
+  intro.addEventListener("transitionend", () => {
+    cancelAnimationFrame(frameId);
+    window.removeEventListener("resize", resize);
+  }, { once: true });
+
+  return true;
+}
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
-  if (!intro) return;
+  if (!intro) {
+    window.dispatchEvent(new Event("tmrr:intro-finished"));
+    return;
+  }
 
   const finishIntro = () => {
     intro.classList.add("is-finished");
     document.body.classList.remove("intro-active");
+    window.dispatchEvent(new Event("tmrr:intro-finished"));
   };
 
   document.body.classList.add("intro-active");
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (prefersReducedMotion.matches || shouldSaveData) {
     finishIntro();
     return;
   }
 
-  window.setTimeout(finishIntro, 4850);
+  bindCinematicIntroCanvas(intro);
+  window.setTimeout(finishIntro, 3800);
 }
 
-menuButton?.addEventListener("click", () => {
+menuButton?.addEventListener("click", (event) => {
+  event.preventDefault();
   const open = document.body.classList.toggle("menu-open");
   menuButton.setAttribute("aria-expanded", String(open));
 });
@@ -841,9 +1030,26 @@ bikePlay?.addEventListener("click", () => {
   bikePlay.textContent = bikeAuto ? "Pause auto" : "Reprendre auto";
 });
 
-window.setInterval(() => {
-  if (bikeAuto) setBikeFrame(bikeIndex + 1);
-}, 1800);
+function startBikeAutoplay() {
+  if (!bikeImage || bikeImage.dataset.autoplayStarted === "true" || shouldSaveData || prefersReducedMotion.matches) return;
+  bikeImage.dataset.autoplayStarted = "true";
+  window.setInterval(() => {
+    if (bikeAuto) setBikeFrame(bikeIndex + 1);
+  }, 1800);
+}
+
+const bikeViewer = document.querySelector(".bike-viewer");
+if (bikeViewer && "IntersectionObserver" in window) {
+  const bikeObserver = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      bikeObserver.disconnect();
+      startBikeAutoplay();
+    }
+  }, { rootMargin: "220px 0px", threshold: 0.08 });
+  bikeObserver.observe(bikeViewer);
+} else {
+  runWhenIdle(startBikeAutoplay, 2600);
+}
 
 document.querySelectorAll(".magnetic").forEach((button) => {
   button.addEventListener("mousemove", (event) => {
@@ -919,12 +1125,22 @@ bindDropProgress();
 bindCollectionCarousel();
 bindReviewCarousel();
 bindRandomPackImage();
+bindDeferredVideos();
 bindSiteIntro();
 bindAccountPage();
 bindHeroVideoSound();
 updateCartCount();
 
-if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+document.querySelectorAll(".hero-hotspot-collection").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = "tshirts.html";
+  });
+});
+
+function startSparkCanvas() {
+  if (!canvas || !ctx || prefersReducedMotion.matches || shouldSaveData || canvas.dataset.started === "true") return;
+  canvas.dataset.started = "true";
   resizeCanvas();
   seedSparks();
   drawSparks();
@@ -933,4 +1149,8 @@ if (canvas && ctx && !window.matchMedia("(prefers-reduced-motion: reduce)").matc
     seedSparks();
   });
 }
+
+window.addEventListener("tmrr:intro-finished", () => {
+  runWhenIdle(startSparkCanvas, 2200);
+}, { once: true });
 
