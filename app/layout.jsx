@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import "../styles.css";
@@ -17,6 +18,8 @@ export default function RootLayout({ children }) {
         <Script src="/script.js" strategy="afterInteractive" />
 
         <GoogleAnalytics gaId="G-64333P3D88" />
+
+        <Analytics />
       </body>
     </html>
   );
