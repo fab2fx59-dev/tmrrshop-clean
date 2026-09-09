@@ -883,6 +883,7 @@ function bindCinematicIntroCanvas(intro) {
 }
 function bindSiteIntro() {
   const intro = document.querySelector(".site-intro");
+
   if (!intro) {
     window.dispatchEvent(new Event("tmrr:intro-finished"));
     return;
@@ -896,6 +897,13 @@ function bindSiteIntro() {
 
   document.body.classList.add("intro-active");
 
+  // Pas d'animation lorsqu'on arrive directement sur une section
+  // de la page, par exemple avec /#concours
+  if (window.location.hash) {
+    finishIntro();
+    return;
+  }
+
   if (prefersReducedMotion.matches || shouldSaveData) {
     finishIntro();
     return;
@@ -903,6 +911,7 @@ function bindSiteIntro() {
 
   bindCinematicIntroCanvas(intro);
   window.setTimeout(finishIntro, 3800);
+}
 }
 
 menuButton?.addEventListener("click", (event) => {
