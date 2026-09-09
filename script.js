@@ -71,12 +71,18 @@ function calculateOrderTotals(cart) {
   const shippableSubtotal = cart
     .filter((item) => !isGiftCardItem(item))
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = shippableSubtotal > 0 && shippableSubtotal < FREE_SHIPPING_MIN ? SHIPPING_PRICE : 0;
+
+  const shipping =
+    shippableSubtotal > 0 && shippableSubtotal < FREE_SHIPPING_MIN
+      ? SHIPPING_PRICE
+      : 0;
+
   const discount = activePromo
     ? activePromo.type === "gift_card"
       ? Math.min(subtotal + shipping, Number(activePromo.amount || 0))
       : subtotal * (Number(activePromo.discountPercent || 0) / 100)
     : 0;
+
   return {
     subtotal,
     shipping,
@@ -87,6 +93,7 @@ function calculateOrderTotals(cart) {
 
 function updateCartCount() {
   const total = readCart().reduce((sum, item) => sum + item.quantity, 0);
+
   document.querySelectorAll(".cart-pill strong").forEach((element) => {
     element.textContent = String(total);
   });
@@ -96,12 +103,14 @@ function bindHeroVideoSound() {
   const video = document.querySelector("[data-hero-video]");
   const button = document.querySelector("[data-hero-sound]");
   const frame = video?.closest(".hero-art");
+
   if (!video) return;
 
   const setSoundState = (enabled) => {
     video.muted = !enabled;
     video.volume = enabled ? 1 : 0;
     frame?.classList.toggle("is-sound-on", enabled);
+
     if (button) {
       button.textContent = enabled ? "Son on" : "Son off";
       button.setAttribute("aria-pressed", String(enabled));
@@ -111,6 +120,7 @@ function bindHeroVideoSound() {
   const toggleSound = async () => {
     const nextState = video.muted;
     setSoundState(nextState);
+
     try {
       await video.play();
     } catch {
@@ -119,17 +129,22 @@ function bindHeroVideoSound() {
   };
 
   video.addEventListener("click", toggleSound);
+
   button?.addEventListener("click", (event) => {
     event.stopPropagation();
     toggleSound();
   });
+
   setSoundState(false);
 }
 
 function setVideoSource(video) {
   if (!video || video.dataset.videoLoaded === "true") return false;
+
   const source = video.dataset.videoSrc;
+
   if (!source || shouldSaveData || prefersReducedMotion.matches) return false;
+
   video.muted = true;
   video.defaultMuted = true;
   video.autoplay = true;
@@ -138,6 +153,7 @@ function setVideoSource(video) {
   video.src = source;
   video.dataset.videoLoaded = "true";
   video.load();
+
   return true;
 }
 
@@ -152,17 +168,26 @@ function bindDeferredVideos() {
 
   const loadHero = () => {
     if (!heroVideo) return;
+
     window.setTimeout(() => playDecorativeVideo(heroVideo), 250);
   };
 
   const loadNav = () => {
     if (!navVideo || window.innerWidth < 900) return;
+
     runWhenIdle(() => playDecorativeVideo(navVideo), 2600);
   };
 
   window.addEventListener("tmrr:intro-finished", loadHero, { once: true });
-  window.addEventListener("load", () => window.setTimeout(loadHero, 4800), { once: true });
+
+  window.addEventListener(
+    "load",
+    () => window.setTimeout(loadHero, 4800),
+    { once: true }
+  );
+
   window.addEventListener("load", loadNav, { once: true });
+
   if (!document.querySelector(".site-intro")) {
     loadHero();
   }
@@ -171,13 +196,19 @@ function bindDeferredVideos() {
 function addToCart(item) {
   const cart = readCart();
   const existing = cart.find((cartItem) => cartItem.id === item.id);
+
   if (existing) {
     existing.quantity += item.quantity || 1;
   } else {
     cart.push({ ...item, quantity: item.quantity || 1 });
   }
+
   writeCart(cart);
-  window.location.href = window.location.protocol === "file:" ? "panier.html" : "/panier";
+
+  window.location.href =
+    window.location.protocol === "file:"
+      ? "panier.html"
+      : "/panier";
 }
 
 function readJson(key, fallback) {
@@ -195,30 +226,69 @@ function writeJson(key, value) {
 
 function getCurrentUser() {
   const email = localStorage.getItem(SESSION_KEY);
+
   if (!email) return null;
-  return readJson(USERS_KEY, []).find((user) => user.email === email) || null;
+
+  return readJson(USERS_KEY, []).find(
+    (user) => user.email === email
+  ) || null;
 }
 
 function getUserOrders(email) {
-  return readJson(ORDERS_KEY, []).filter((order) => order.email === email);
+  return readJson(ORDERS_KEY, []).filter(
+    (order) => order.email === email
+  );
 }
 
 function bindProductButtons() {
   document.querySelectorAll(".product-card .btn-small").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
+
       const card = button.closest(".product-card");
       if (!card) return;
-      const name = card.querySelector("h3")?.textContent?.trim() || "Article TMRR";
-      const priceText = card.querySelector(".buy-row strong")?.textContent || "0";
-      const image = card.querySelector("img")?.getAttribute("src") || "";
-      const model = card.querySelector('[data-option="model"]')?.value;
-      const size = card.querySelector('[data-option="size"]')?.value;
-      const quantity = Math.max(1, Number(card.querySelector('[data-option="quantity"]')?.value || 1));
-      const baseOption = card.querySelector(".product-label")?.textContent?.trim() || "TMRR";
-      const selectedOptions = [baseOption, model && `Modèle ${model}`, size && `Taille ${size}`].filter(Boolean).join(" · ");
+
+      const name =
+        card.querySelector("h3")?.textContent?.trim() ||
+        "Article TMRR";
+
+      const priceText =
+        card.querySelector(".buy-row strong")?.textContent ||
+        "0";
+
+      const image =
+        card.querySelector("img")?.getAttribute("src") ||
+        "";
+
+      const model =
+        card.querySelector('[data-option="model"]')?.value;
+
+      const size =
+        card.querySelector('[data-option="size"]')?.value;
+
+      const quantity = Math.max(
+        1,
+        Number(
+          card.querySelector('[data-option="quantity"]')?.value || 1
+        )
+      );
+
+      const baseOption =
+        card.querySelector(".product-label")?.textContent?.trim() ||
+        "TMRR";
+
+      const selectedOptions = [
+        baseOption,
+        model && `Modèle ${model}`,
+        size && `Taille ${size}`
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
       addToCart({
-        id: `${name}-${priceText}-${model || ""}-${size || ""}`.toLowerCase().replace(/\s+/g, "-"),
+        id: `${name}-${priceText}-${model || ""}-${size || ""}`
+          .toLowerCase()
+          .replace(/\s+/g, "-"),
         name,
         price: parsePrice(priceText),
         image,
@@ -228,32 +298,65 @@ function bindProductButtons() {
     });
   });
 
-  document.querySelector(".order-box .btn")?.addEventListener("click", (event) => {
-    event.preventDefault();
-    const model = document.querySelector("[data-order-model]")?.value || "Homme";
-    const size = document.querySelector("[data-order-size]")?.value || "M";
-    const quantity = Number(document.querySelector(".order-box input")?.value || 1);
-    addToCart({
-      id: `ticket-rebel-pack-${model}-${size}`,
-      name: "Pack Ticket Rebel",
-      price: 39.9,
-      image: "assets/pack/ticket-shirt-poster.png",
-      quantity,
-      options: `T-shirt concours modèle ${model} taille ${size} · Casquette TMRR · 2 participations`
-    });
-  });
+  document.querySelector(".order-box .btn")?.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+
+      const model =
+        document.querySelector("[data-order-model]")?.value ||
+        "Homme";
+
+      const size =
+        document.querySelector("[data-order-size]")?.value ||
+        "M";
+
+      const quantity = Number(
+        document.querySelector(".order-box input")?.value || 1
+      );
+
+      addToCart({
+        id: `ticket-rebel-pack-${model}-${size}`,
+        name: "Pack Ticket Rebel",
+        price: 39.9,
+        image: "assets/pack/ticket-shirt-poster.png",
+        quantity,
+        options:
+          `T-shirt concours modèle ${model} taille ${size} · ` +
+          `Casquette TMRR · 2 participations`
+      });
+    }
+  );
 
   document.querySelectorAll("[data-pack-choice]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
-      const pack = button.dataset.packChoice || "pack1";
-      const scope = button.closest(".mobile-pack-controls") || button.closest("[data-pack-selector]") || document;
-      const model = scope.querySelector(`[data-pack-model="${pack}"]`)?.value || "Homme";
-      const size = scope.querySelector(`[data-pack-size="${pack}"]`)?.value || "M";
+
+      const pack =
+        button.dataset.packChoice || "pack1";
+
+      const scope =
+        button.closest(".mobile-pack-controls") ||
+        button.closest("[data-pack-selector]") ||
+        document;
+
+      const model =
+        scope.querySelector(`[data-pack-model="${pack}"]`)?.value ||
+        "Homme";
+
+      const size =
+        scope.querySelector(`[data-pack-size="${pack}"]`)?.value ||
+        "M";
+
       const isPackTwo = pack === "pack2";
+
       addToCart({
-        id: `${pack}-${model}-${size}`.toLowerCase().replace(/\s+/g, "-"),
-        name: isPackTwo ? "Pack 2 - Ticket Rebel" : "Pack 1 - T-shirt concours",
+        id: `${pack}-${model}-${size}`
+          .toLowerCase()
+          .replace(/\s+/g, "-"),
+        name: isPackTwo
+          ? "Pack 2 - Ticket Rebel"
+          : "Pack 1 - T-shirt concours",
         price: isPackTwo ? 39.9 : 25.9,
         image: "assets/campaign/packs-horizontal.png",
         quantity: 1,
@@ -266,8 +369,12 @@ function bindProductButtons() {
 
   document.querySelectorAll("[data-club-plan]").forEach((button) => {
     button.addEventListener("click", () => {
-      const name = button.dataset.planName || "Club TMRR";
-      const price = Number(button.dataset.planPrice || 0);
+      const name =
+        button.dataset.planName || "Club TMRR";
+
+      const price =
+        Number(button.dataset.planPrice || 0);
+
       addToCart({
         id: name.toLowerCase().replace(/\s+/g, "-"),
         name,
@@ -281,18 +388,26 @@ function bindProductButtons() {
 
 function bindGiftCardForm() {
   const form = document.querySelector("[data-gift-form]");
+
   if (!form) return;
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+
     const data = new FormData(form);
+
     const amount = Number(data.get("amount"));
     const quantity = Number(data.get("quantity") || 1);
-    const recipientEmail = String(data.get("recipientEmail") || "").trim();
+    const recipientEmail =
+      String(data.get("recipientEmail") || "").trim();
+
     if (![25, 50, 75, 100].includes(amount)) return;
+
     if (!recipientEmail) {
       form.reportValidity();
       return;
     }
+
     addToCart({
       id: `carte-kdo-${amount}`,
       name: "Carte cadeau electronique",
@@ -301,52 +416,104 @@ function bindGiftCardForm() {
       quantity,
       category: "gift_card",
       recipientEmail,
-      recipientName: String(data.get("recipientName") || "").trim(),
-      recipientType: String(data.get("recipientType") || "other"),
-      deliveryDate: String(data.get("sendDate") || ""),
-      giftMessage: String(data.get("message") || "").trim(),
-      options: `${data.get("recipientType") === "self" ? "Pour moi-meme" : "Pour quelqu'un d'autre"} - Envoi a ${recipientEmail}`
+      recipientName:
+        String(data.get("recipientName") || "").trim(),
+      recipientType:
+        String(data.get("recipientType") || "other"),
+      deliveryDate:
+        String(data.get("sendDate") || ""),
+      giftMessage:
+        String(data.get("message") || "").trim(),
+      options:
+        `${data.get("recipientType") === "self"
+          ? "Pour moi-meme"
+          : "Pour quelqu'un d'autre"} - Envoi a ${recipientEmail}`
     });
   });
 }
+
 function renderCartPage() {
   const list = document.querySelector("[data-cart-items]");
-  const totalElement = document.querySelector("[data-cart-total]");
+  const totalElement =
+    document.querySelector("[data-cart-total]");
+
   if (!list || !totalElement) return;
-  const params = new URLSearchParams(window.location.search);
+
+  const params =
+    new URLSearchParams(window.location.search);
+
   const addPayload = params.get("add");
+
   if (addPayload) {
     try {
-      const item = JSON.parse(decodeURIComponent(addPayload));
+      const item =
+        JSON.parse(decodeURIComponent(addPayload));
+
       const cleanUrl = `${window.location.pathname}`;
       const cart = readCart();
-      const existing = cart.find((cartItem) => cartItem.id === item.id);
+
+      const existing =
+        cart.find((cartItem) => cartItem.id === item.id);
+
       if (existing) {
         existing.quantity += item.quantity || 1;
       } else {
-        cart.push({ ...item, quantity: item.quantity || 1 });
+        cart.push({
+          ...item,
+          quantity: item.quantity || 1
+        });
       }
+
       writeCart(cart);
-      window.history.replaceState(null, "", cleanUrl);
+
+      window.history.replaceState(
+        null,
+        "",
+        cleanUrl
+      );
     } catch {
-      window.history.replaceState(null, "", window.location.pathname);
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname
+      );
     }
   }
+
   const cart = readCart();
+
   list.innerHTML = "";
 
   if (!cart.length) {
-    list.innerHTML = `<p class="hero-lead">Ton panier est vide pour le moment.</p>`;
-    document.querySelector("[data-cart-subtotal]")?.replaceChildren(document.createTextNode(formatPrice(0)));
-    document.querySelector("[data-cart-shipping]")?.replaceChildren(document.createTextNode(formatPrice(0)));
-    totalElement.textContent = formatPrice(0);
+    list.innerHTML =
+      `<p class="hero-lead">Ton panier est vide pour le moment.</p>`;
+
+    document
+      .querySelector("[data-cart-subtotal]")
+      ?.replaceChildren(
+        document.createTextNode(formatPrice(0))
+      );
+
+    document
+      .querySelector("[data-cart-shipping]")
+      ?.replaceChildren(
+        document.createTextNode(formatPrice(0))
+      );
+
+    totalElement.textContent =
+      formatPrice(0);
+
     return;
   }
 
   cart.forEach((item, index) => {
     const row = document.createElement("article");
+
     row.className = "cart-item";
-    const lineTotal = item.price * item.quantity;
+
+    const lineTotal =
+      item.price * item.quantity;
+
     row.innerHTML = `
       <img src="${item.image}" alt="">
       <div>
@@ -354,24 +521,60 @@ function renderCartPage() {
         <p>${item.options || ""}</p>
         <p>Prix unitaire : ${formatPrice(item.price)}</p>
         <label class="cart-quantity">Quantite
-          <input type="number" min="1" value="${item.quantity}" data-cart-quantity="${index}">
+          <input
+            type="number"
+            min="1"
+            value="${item.quantity}"
+            data-cart-quantity="${index}"
+          >
         </label>
         <p>Total article : ${formatPrice(lineTotal)}</p>
       </div>
-      <button class="cart-remove" type="button" data-remove="${index}">Retirer</button>
+      <button
+        class="cart-remove"
+        type="button"
+        data-remove="${index}"
+      >
+        Retirer
+      </button>
     `;
+
     list.appendChild(row);
   });
 
-  const totals = calculateOrderTotals(cart);
-  document.querySelector("[data-cart-subtotal]")?.replaceChildren(document.createTextNode(formatPrice(totals.subtotal)));
-  document.querySelector("[data-cart-shipping]")?.replaceChildren(document.createTextNode(totals.shipping ? formatPrice(totals.shipping) : "Offerts"));
-  totalElement.textContent = formatPrice(totals.total);
+  const totals =
+    calculateOrderTotals(cart);
+
+  document
+    .querySelector("[data-cart-subtotal]")
+    ?.replaceChildren(
+      document.createTextNode(
+        formatPrice(totals.subtotal)
+      )
+    );
+
+  document
+    .querySelector("[data-cart-shipping]")
+    ?.replaceChildren(
+      document.createTextNode(
+        totals.shipping
+          ? formatPrice(totals.shipping)
+          : "Offerts"
+      )
+    );
+
+  totalElement.textContent =
+    formatPrice(totals.total);
 
   list.querySelectorAll("[data-remove]").forEach((button) => {
     button.addEventListener("click", () => {
       const next = readCart();
-      next.splice(Number(button.dataset.remove), 1);
+
+      next.splice(
+        Number(button.dataset.remove),
+        1
+      );
+
       writeCart(next);
       renderCartPage();
     });
@@ -380,9 +583,17 @@ function renderCartPage() {
   list.querySelectorAll("[data-cart-quantity]").forEach((input) => {
     input.addEventListener("change", () => {
       const next = readCart();
-      const index = Number(input.dataset.cartQuantity);
-      const quantity = Math.max(1, Number(input.value || 1));
+
+      const index =
+        Number(input.dataset.cartQuantity);
+
+      const quantity = Math.max(
+        1,
+        Number(input.value || 1)
+      );
+
       input.value = String(quantity);
+
       if (next[index]) {
         next[index].quantity = quantity;
         writeCart(next);
@@ -393,165 +604,332 @@ function renderCartPage() {
 }
 
 function renderPaymentPage() {
-  const itemsElement = document.querySelector("[data-payment-items]");
-  const totalElement = document.querySelector("[data-payment-total]");
-  const confirmButton = document.querySelector("[data-confirm-order]");
-  const message = document.querySelector("[data-payment-message]");
-  const promoInput = document.querySelector("[data-promo-code]");
-  const promoButton = document.querySelector("[data-apply-promo]");
-  const discountLine = document.querySelector(".cart-discount");
-  const discountElement = document.querySelector("[data-payment-discount]");
-  if (!itemsElement || !totalElement || !confirmButton) return;
+  const itemsElement =
+    document.querySelector("[data-payment-items]");
+
+  const totalElement =
+    document.querySelector("[data-payment-total]");
+
+  const confirmButton =
+    document.querySelector("[data-confirm-order]");
+
+  const message =
+    document.querySelector("[data-payment-message]");
+
+  const promoInput =
+    document.querySelector("[data-promo-code]");
+
+  const promoButton =
+    document.querySelector("[data-apply-promo]");
+
+  const discountLine =
+    document.querySelector(".cart-discount");
+
+  const discountElement =
+    document.querySelector("[data-payment-discount]");
+
+  if (!itemsElement || !totalElement || !confirmButton) {
+    return;
+  }
 
   const cart = readCart();
+
   itemsElement.innerHTML = "";
 
   if (!cart.length) {
-    itemsElement.innerHTML = `<p>Ton panier est vide pour le moment.</p>`;
-    document.querySelector("[data-payment-subtotal]")?.replaceChildren(document.createTextNode(formatPrice(0)));
-    document.querySelector("[data-payment-shipping]")?.replaceChildren(document.createTextNode(formatPrice(0)));
-    totalElement.textContent = formatPrice(0);
+    itemsElement.innerHTML =
+      `<p>Ton panier est vide pour le moment.</p>`;
+
+    document
+      .querySelector("[data-payment-subtotal]")
+      ?.replaceChildren(
+        document.createTextNode(formatPrice(0))
+      );
+
+    document
+      .querySelector("[data-payment-shipping]")
+      ?.replaceChildren(
+        document.createTextNode(formatPrice(0))
+      );
+
+    totalElement.textContent =
+      formatPrice(0);
+
     confirmButton.disabled = true;
+
     return;
   }
 
   cart.forEach((item) => {
-    const row = document.createElement("div");
+    const row =
+      document.createElement("div");
+
     row.className = "payment-line";
+
     row.innerHTML = `
       <span>
         ${item.quantity} x ${item.name}
-        <small>${item.options || "Article TMRR"} · Prix unitaire : ${formatPrice(item.price)}</small>
+        <small>
+          ${item.options || "Article TMRR"} ·
+          Prix unitaire : ${formatPrice(item.price)}
+        </small>
       </span>
-      <strong>${formatPrice(item.price * item.quantity)}</strong>
+      <strong>
+        ${formatPrice(item.price * item.quantity)}
+      </strong>
     `;
+
     itemsElement.appendChild(row);
   });
 
-  const totals = calculateOrderTotals(cart);
-  document.querySelector("[data-payment-subtotal]")?.replaceChildren(document.createTextNode(formatPrice(totals.subtotal)));
-  document.querySelector("[data-payment-shipping]")?.replaceChildren(document.createTextNode(totals.shipping ? formatPrice(totals.shipping) : "Offerts"));
+  const totals =
+    calculateOrderTotals(cart);
+
+  document
+    .querySelector("[data-payment-subtotal]")
+    ?.replaceChildren(
+      document.createTextNode(
+        formatPrice(totals.subtotal)
+      )
+    );
+
+  document
+    .querySelector("[data-payment-shipping]")
+    ?.replaceChildren(
+      document.createTextNode(
+        totals.shipping
+          ? formatPrice(totals.shipping)
+          : "Offerts"
+      )
+    );
+
   if (discountLine && discountElement) {
     discountLine.hidden = !totals.discount;
-    discountElement.textContent = `-${formatPrice(totals.discount)}`;
+
+    discountElement.textContent =
+      `-${formatPrice(totals.discount)}`;
   }
-  totalElement.textContent = formatPrice(totals.total);
+
+  totalElement.textContent =
+    formatPrice(totals.total);
 
   if (promoButton) {
     promoButton.onclick = async () => {
-    const code = promoInput?.value?.trim();
-    if (!code) {
-      if (message) message.textContent = "Saisis un code promo.";
-      return;
-    }
+      const code =
+        promoInput?.value?.trim();
 
-    if (message) message.textContent = "Vérification du code promo...";
+      if (!code) {
+        if (message) {
+          message.textContent =
+            "Saisis un code promo.";
+        }
+        return;
+      }
 
-    const response = await fetch("/api/promo/validate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ code })
-    });
-    const payload = await response.json();
+      if (message) {
+        message.textContent =
+          "Vérification du code promo...";
+      }
 
-    if (!response.ok) {
-      activePromo = null;
-      if (message) message.textContent = payload.error || "Code promo invalide.";
+      const response = await fetch(
+        "/api/promo/validate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ code })
+        }
+      );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        activePromo = null;
+
+        if (message) {
+          message.textContent =
+            payload.error ||
+            "Code promo invalide.";
+        }
+
+        renderPaymentPage();
+        return;
+      }
+
+      activePromo = {
+        code: payload.code,
+        type: payload.type || "promo",
+        discountPercent:
+          Number(payload.discountPercent || 0),
+        amount:
+          Number(payload.amount || 0)
+      };
+
+      if (promoInput) {
+        promoInput.value =
+          payload.code;
+      }
+
+      if (message) {
+        message.textContent =
+          activePromo.type === "gift_card"
+            ? `Carte cadeau ${payload.code} appliquee : ${formatPrice(activePromo.amount)} de credit disponible.`
+            : `Code ${payload.code} applique : -${activePromo.discountPercent} %.`;
+      }
+
       renderPaymentPage();
-      return;
-    }
-
-    activePromo = {
-      code: payload.code,
-      type: payload.type || "promo",
-      discountPercent: Number(payload.discountPercent || 0),
-      amount: Number(payload.amount || 0)
-    };
-    if (promoInput) promoInput.value = payload.code;
-    if (message) {
-      message.textContent = activePromo.type === "gift_card"
-        ? `Carte cadeau ${payload.code} appliquee : ${formatPrice(activePromo.amount)} de credit disponible.`
-        : `Code ${payload.code} applique : -${activePromo.discountPercent} %.`;
-    }
-    renderPaymentPage();
     };
   }
 
   confirmButton.onclick = async () => {
     confirmButton.disabled = true;
-    if (message) message.textContent = "Preparation du paiement securise...";
+
+    if (message) {
+      message.textContent =
+        "Preparation du paiement securise...";
+    }
 
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          items: cart,
-          promoCode: activePromo?.type === "promo" ? activePromo.code : "",
-          giftCardCode: activePromo?.type === "gift_card" ? activePromo.code : ""
-        })
-      });
-      const responseText = await response.text();
+      const response = await fetch(
+        "/api/checkout",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            items: cart,
+            promoCode:
+              activePromo?.type === "promo"
+                ? activePromo.code
+                : "",
+            giftCardCode:
+              activePromo?.type === "gift_card"
+                ? activePromo.code
+                : ""
+          })
+        }
+      );
+
+      const responseText =
+        await response.text();
+
       let payload = {};
 
       try {
-        payload = responseText ? JSON.parse(responseText) : {};
+        payload = responseText
+          ? JSON.parse(responseText)
+          : {};
       } catch {
-        payload = { error: responseText || "Erreur technique pendant la preparation du paiement." };
+        payload = {
+          error:
+            responseText ||
+            "Erreur technique pendant la preparation du paiement."
+        };
       }
 
       if (!response.ok) {
-        const missingConfig = payload.config
-          ? ` Config: URL Supabase ${payload.config.supabaseUrl ? "OK" : "MANQUANTE"}, anon ${payload.config.supabaseAnon ? "OK" : "MANQUANTE"}, service ${payload.config.supabaseService ? "OK" : "MANQUANTE"}, Stripe ${payload.config.stripeSecret ? "OK" : "MANQUANTE"}.`
-          : "";
-        const errorText = (payload.error || `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`) + missingConfig;
-        if (message) message.textContent = errorText;
-        if (response.status === 401 && errorText.toLowerCase().includes("connecte")) {
+        const missingConfig =
+          payload.config
+            ? ` Config: URL Supabase ${payload.config.supabaseUrl ? "OK" : "MANQUANTE"}, anon ${payload.config.supabaseAnon ? "OK" : "MANQUANTE"}, service ${payload.config.supabaseService ? "OK" : "MANQUANTE"}, Stripe ${payload.config.stripeSecret ? "OK" : "MANQUANTE"}.`
+            : "";
+
+        const errorText =
+          (payload.error ||
+            `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`) +
+          missingConfig;
+
+        if (message) {
+          message.textContent =
+            errorText;
+        }
+
+        if (
+          response.status === 401 &&
+          errorText
+            .toLowerCase()
+            .includes("connecte")
+        ) {
           window.setTimeout(() => {
-            const accountMessage = encodeURIComponent("Connecte-toi ou cree un compte client pour passer commande.");
-            window.location.href = `/compte?redirect=${encodeURIComponent("/paiement")}&message=${accountMessage}`;
+            const accountMessage =
+              encodeURIComponent(
+                "Connecte-toi ou cree un compte client pour passer commande."
+              );
+
+            window.location.href =
+              `/compte?redirect=${encodeURIComponent("/paiement")}&message=${accountMessage}`;
           }, 1200);
         }
+
         confirmButton.disabled = false;
         return;
       }
 
       if (payload.url) {
-        window.location.href = payload.url;
+        window.location.href =
+          payload.url;
         return;
       }
 
-      throw new Error("Aucune page de paiement recue.");
+      throw new Error(
+        "Aucune page de paiement recue."
+      );
     } catch {
-      if (message) message.textContent = "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+      if (message) {
+        message.textContent =
+          "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+      }
+
       confirmButton.disabled = false;
     }
   };
 }
 
 function clearCartAfterStripeReturn() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("paiement") !== "success") return;
+  const params =
+    new URLSearchParams(window.location.search);
+
+  if (params.get("paiement") !== "success") {
+    return;
+  }
+
   writeCart([]);
 }
 
 function bindAccountPage() {
-  const registerForm = document.querySelector("[data-register-form]");
-  const loginForm = document.querySelector("[data-login-form]");
-  const dashboard = document.querySelector("[data-account-dashboard]");
-  const authForms = document.querySelector("[data-auth-forms]");
-  if (!registerForm || !loginForm || !dashboard || !authForms) return;
+  const registerForm =
+    document.querySelector("[data-register-form]");
 
-  const loginMessage = document.querySelector("[data-login-message]");
-  const registerMessage = document.querySelector("[data-register-message]");
+  const loginForm =
+    document.querySelector("[data-login-form]");
+
+  const dashboard =
+    document.querySelector("[data-account-dashboard]");
+
+  const authForms =
+    document.querySelector("[data-auth-forms]");
+
+  if (
+    !registerForm ||
+    !loginForm ||
+    !dashboard ||
+    !authForms
+  ) {
+    return;
+  }
+
+  const loginMessage =
+    document.querySelector("[data-login-message]");
+
+  const registerMessage =
+    document.querySelector("[data-register-message]");
 
   const showDashboard = () => {
     const user = getCurrentUser();
+
     if (!user) {
       authForms.hidden = false;
       dashboard.hidden = true;
@@ -560,210 +938,577 @@ function bindAccountPage() {
 
     authForms.hidden = true;
     dashboard.hidden = false;
-    document.querySelector("[data-account-name]").textContent = user.name;
-    document.querySelector("[data-account-email]").textContent = user.email;
-    document.querySelector("[data-account-phone]").textContent = user.phone || "Non renseigné";
 
-    const orders = getUserOrders(user.email);
-    const orderList = document.querySelector("[data-account-orders]");
-    const contest = document.querySelector("[data-account-contest]");
-    const contestEntries = orders.reduce((sum, order) => {
-      return sum + order.items.reduce((itemSum, item) => {
-        const label = `${item.name} ${item.options || ""}`.toLowerCase();
-        if (label.includes("ticket rebel")) return itemSum + 2 * item.quantity;
-        if (label.includes("concours") || label.includes("no rules")) return itemSum + item.quantity;
-        return itemSum;
+    document.querySelector(
+      "[data-account-name]"
+    ).textContent = user.name;
+
+    document.querySelector(
+      "[data-account-email]"
+    ).textContent = user.email;
+
+    document.querySelector(
+      "[data-account-phone]"
+    ).textContent =
+      user.phone || "Non renseigné";
+
+    const orders =
+      getUserOrders(user.email);
+
+    const orderList =
+      document.querySelector("[data-account-orders]");
+
+    const contest =
+      document.querySelector("[data-account-contest]");
+
+    const contestEntries =
+      orders.reduce((sum, order) => {
+        return (
+          sum +
+          order.items.reduce(
+            (itemSum, item) => {
+              const label =
+                `${item.name} ${item.options || ""}`
+                  .toLowerCase();
+
+              if (label.includes("ticket rebel")) {
+                return (
+                  itemSum +
+                  2 * item.quantity
+                );
+              }
+
+              if (
+                label.includes("concours") ||
+                label.includes("no rules")
+              ) {
+                return (
+                  itemSum +
+                  item.quantity
+                );
+              }
+
+              return itemSum;
+            },
+            0
+          )
+        );
       }, 0);
-    }, 0);
 
     if (contest) {
-      contest.textContent = contestEntries
-        ? `${contestEntries} participation(s) concours associée(s) à tes commandes enregistrées.`
-        : "Aucune participation concours enregistrée pour le moment.";
+      contest.textContent =
+        contestEntries
+          ? `${contestEntries} participation(s) concours associée(s) à tes commandes enregistrées.`
+          : "Aucune participation concours enregistrée pour le moment.";
     }
 
     if (!orderList) return;
+
     if (!orders.length) {
-      orderList.innerHTML = `<p>Aucune commande enregistrée pour le moment. Quand tu valideras un panier, il apparaîtra ici.</p>`;
+      orderList.innerHTML =
+        `<p>Aucune commande enregistrée pour le moment. Quand tu valideras un panier, il apparaîtra ici.</p>`;
+
       return;
     }
 
-    orderList.innerHTML = orders.map((order) => `
+    orderList.innerHTML =
+      orders
+        .map(
+          (order) => `
       <article class="account-order">
-        <div><strong>${order.id}</strong><span>${order.date}</span></div>
-        <p>${order.items.map((item) => `${item.quantity} x ${item.name}`).join(" · ")}</p>
-        <footer><span>${order.status}</span><strong>${formatPrice(order.total)}</strong></footer>
+        <div>
+          <strong>${order.id}</strong>
+          <span>${order.date}</span>
+        </div>
+        <p>
+          ${order.items
+            .map(
+              (item) =>
+                `${item.quantity} x ${item.name}`
+            )
+            .join(" · ")}
+        </p>
+        <footer>
+          <span>${order.status}</span>
+          <strong>${formatPrice(order.total)}</strong>
+        </footer>
       </article>
-    `).join("");
+    `
+        )
+        .join("");
   };
 
-  registerForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(registerForm);
-    const email = String(data.get("email") || "").trim().toLowerCase();
-    const password = String(data.get("password") || "");
-    const name = String(data.get("name") || "").trim();
-    const phone = String(data.get("phone") || "").trim();
-    const users = readJson(USERS_KEY, []);
+  registerForm.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
 
-    if (users.some((user) => user.email === email)) {
-      if (registerMessage) registerMessage.textContent = "Un compte existe déjà avec cet e-mail. Utilise la connexion.";
-      return;
+      const data =
+        new FormData(registerForm);
+
+      const email =
+        String(data.get("email") || "")
+          .trim()
+          .toLowerCase();
+
+      const password =
+        String(data.get("password") || "");
+
+      const name =
+        String(data.get("name") || "")
+          .trim();
+
+      const phone =
+        String(data.get("phone") || "")
+          .trim();
+
+      const users =
+        readJson(USERS_KEY, []);
+
+      if (
+        users.some(
+          (user) => user.email === email
+        )
+      ) {
+        if (registerMessage) {
+          registerMessage.textContent =
+            "Un compte existe déjà avec cet e-mail. Utilise la connexion.";
+        }
+
+        return;
+      }
+
+      users.push({
+        email,
+        password,
+        name,
+        phone,
+        createdAt:
+          new Date().toISOString()
+      });
+
+      writeJson(
+        USERS_KEY,
+        users
+      );
+
+      localStorage.setItem(
+        SESSION_KEY,
+        email
+      );
+
+      if (registerMessage) {
+        registerMessage.textContent =
+          "Compte créé. Bienvenue dans ton espace TMRR.";
+      }
+
+      showDashboard();
     }
+  );
 
-    users.push({ email, password, name, phone, createdAt: new Date().toISOString() });
-    writeJson(USERS_KEY, users);
-    localStorage.setItem(SESSION_KEY, email);
-    if (registerMessage) registerMessage.textContent = "Compte créé. Bienvenue dans ton espace TMRR.";
-    showDashboard();
-  });
+  loginForm.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
 
-  loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(loginForm);
-    const email = String(data.get("email") || "").trim().toLowerCase();
-    const password = String(data.get("password") || "");
-    const user = readJson(USERS_KEY, []).find((entry) => entry.email === email && entry.password === password);
+      const data =
+        new FormData(loginForm);
 
-    if (!user) {
-      if (loginMessage) loginMessage.textContent = "Identifiants introuvables. Vérifie ton e-mail ou ton mot de passe.";
-      return;
+      const email =
+        String(data.get("email") || "")
+          .trim()
+          .toLowerCase();
+
+      const password =
+        String(data.get("password") || "");
+
+      const user =
+        readJson(USERS_KEY, []).find(
+          (entry) =>
+            entry.email === email &&
+            entry.password === password
+        );
+
+      if (!user) {
+        if (loginMessage) {
+          loginMessage.textContent =
+            "Identifiants introuvables. Vérifie ton e-mail ou ton mot de passe.";
+        }
+
+        return;
+      }
+
+      localStorage.setItem(
+        SESSION_KEY,
+        email
+      );
+
+      if (loginMessage) {
+        loginMessage.textContent = "";
+      }
+
+      showDashboard();
     }
+  );
 
-    localStorage.setItem(SESSION_KEY, email);
-    if (loginMessage) loginMessage.textContent = "";
-    showDashboard();
-  });
+  document
+    .querySelector("[data-logout]")
+    ?.addEventListener(
+      "click",
+      () => {
+        localStorage.removeItem(
+          SESSION_KEY
+        );
 
-  document.querySelector("[data-logout]")?.addEventListener("click", () => {
-    localStorage.removeItem(SESSION_KEY);
-    showDashboard();
-  });
+        showDashboard();
+      }
+    );
 
   showDashboard();
 }
 
 function bindCollectionCarousel() {
-  document.querySelectorAll("[data-collection-carousel]").forEach((carousel) => {
-    const viewport = carousel.querySelector("[data-collection-viewport]");
-    const track = carousel.querySelector("[data-collection-track]");
-    const previous = carousel.querySelector('[data-collection-arrow="prev"]');
-    const next = carousel.querySelector('[data-collection-arrow="next"]');
-    if (!viewport || !track) return;
+  document
+    .querySelectorAll("[data-collection-carousel]")
+    .forEach((carousel) => {
+      const viewport =
+        carousel.querySelector(
+          "[data-collection-viewport]"
+        );
 
-    const getCardStep = () => {
-      const firstCard = track.querySelector(".collection-model");
-      if (!firstCard) return viewport.clientWidth;
-      const styles = window.getComputedStyle(track);
-      const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
-      return firstCard.getBoundingClientRect().width + gap;
-    };
+      const track =
+        carousel.querySelector(
+          "[data-collection-track]"
+        );
 
-    const getVisibleCards = () => Math.max(1, Math.round(viewport.clientWidth / getCardStep()));
+      const previous =
+        carousel.querySelector(
+          '[data-collection-arrow="prev"]'
+        );
 
-    const updateArrows = () => {
-      const maxScroll = viewport.scrollWidth - viewport.clientWidth - 2;
-      if (previous) previous.disabled = viewport.scrollLeft <= 2;
-      if (next) next.disabled = viewport.scrollLeft >= maxScroll;
-    };
+      const next =
+        carousel.querySelector(
+          '[data-collection-arrow="next"]'
+        );
 
-    previous?.addEventListener("click", () => {
-      viewport.scrollBy({ left: -getCardStep() * getVisibleCards(), behavior: "smooth" });
+      if (!viewport || !track) return;
+
+      const getCardStep = () => {
+        const firstCard =
+          track.querySelector(
+            ".collection-model"
+          );
+
+        if (!firstCard) {
+          return viewport.clientWidth;
+        }
+
+        const styles =
+          window.getComputedStyle(track);
+
+        const gap =
+          Number.parseFloat(
+            styles.columnGap ||
+            styles.gap ||
+            "0"
+          ) || 0;
+
+        return (
+          firstCard.getBoundingClientRect()
+            .width + gap
+        );
+      };
+
+      const getVisibleCards = () =>
+        Math.max(
+          1,
+          Math.round(
+            viewport.clientWidth /
+            getCardStep()
+          )
+        );
+
+      const updateArrows = () => {
+        const maxScroll =
+          viewport.scrollWidth -
+          viewport.clientWidth -
+          2;
+
+        if (previous) {
+          previous.disabled =
+            viewport.scrollLeft <= 2;
+        }
+
+        if (next) {
+          next.disabled =
+            viewport.scrollLeft >=
+            maxScroll;
+        }
+      };
+
+      previous?.addEventListener(
+        "click",
+        () => {
+          viewport.scrollBy({
+            left:
+              -getCardStep() *
+              getVisibleCards(),
+            behavior: "smooth"
+          });
+        }
+      );
+
+      next?.addEventListener(
+        "click",
+        () => {
+          viewport.scrollBy({
+            left:
+              getCardStep() *
+              getVisibleCards(),
+            behavior: "smooth"
+          });
+        }
+      );
+
+      viewport.addEventListener(
+        "scroll",
+        updateArrows,
+        { passive: true }
+      );
+
+      window.addEventListener(
+        "resize",
+        updateArrows
+      );
+
+      updateArrows();
     });
-
-    next?.addEventListener("click", () => {
-      viewport.scrollBy({ left: getCardStep() * getVisibleCards(), behavior: "smooth" });
-    });
-
-    viewport.addEventListener("scroll", updateArrows, { passive: true });
-    window.addEventListener("resize", updateArrows);
-    updateArrows();
-  });
 }
 
 function bindReviewCarousel() {
-  document.querySelectorAll("[data-review-carousel]").forEach((carousel) => {
-    const viewport = carousel.querySelector("[data-review-viewport]");
-    const track = carousel.querySelector("[data-review-track]");
-    const previous = carousel.querySelector('[data-review-arrow="prev"]');
-    const next = carousel.querySelector('[data-review-arrow="next"]');
-    if (!viewport || !track) return;
+  document
+    .querySelectorAll("[data-review-carousel]")
+    .forEach((carousel) => {
+      const viewport =
+        carousel.querySelector(
+          "[data-review-viewport]"
+        );
 
-    const getCardStep = () => {
-      const firstCard = track.querySelector(".review-card");
-      if (!firstCard) return viewport.clientWidth;
-      const styles = window.getComputedStyle(track);
-      const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
-      return firstCard.getBoundingClientRect().width + gap;
-    };
+      const track =
+        carousel.querySelector(
+          "[data-review-track]"
+        );
 
-    const getVisibleCards = () => Math.max(1, Math.round(viewport.clientWidth / getCardStep()));
+      const previous =
+        carousel.querySelector(
+          '[data-review-arrow="prev"]'
+        );
 
-    const updateArrows = () => {
-      const maxScroll = viewport.scrollWidth - viewport.clientWidth - 2;
-      if (previous) previous.disabled = viewport.scrollLeft <= 2;
-      if (next) next.disabled = viewport.scrollLeft >= maxScroll;
-    };
+      const next =
+        carousel.querySelector(
+          '[data-review-arrow="next"]'
+        );
 
-    previous?.addEventListener("click", () => {
-      viewport.scrollBy({ left: -getCardStep() * getVisibleCards(), behavior: "smooth" });
+      if (!viewport || !track) return;
+
+      const getCardStep = () => {
+        const firstCard =
+          track.querySelector(
+            ".review-card"
+          );
+
+        if (!firstCard) {
+          return viewport.clientWidth;
+        }
+
+        const styles =
+          window.getComputedStyle(track);
+
+        const gap =
+          Number.parseFloat(
+            styles.columnGap ||
+            styles.gap ||
+            "0"
+          ) || 0;
+
+        return (
+          firstCard.getBoundingClientRect()
+            .width + gap
+        );
+      };
+
+      const getVisibleCards = () =>
+        Math.max(
+          1,
+          Math.round(
+            viewport.clientWidth /
+            getCardStep()
+          )
+        );
+
+      const updateArrows = () => {
+        const maxScroll =
+          viewport.scrollWidth -
+          viewport.clientWidth -
+          2;
+
+        if (previous) {
+          previous.disabled =
+            viewport.scrollLeft <= 2;
+        }
+
+        if (next) {
+          next.disabled =
+            viewport.scrollLeft >=
+            maxScroll;
+        }
+      };
+
+      previous?.addEventListener(
+        "click",
+        () => {
+          viewport.scrollBy({
+            left:
+              -getCardStep() *
+              getVisibleCards(),
+            behavior: "smooth"
+          });
+        }
+      );
+
+      next?.addEventListener(
+        "click",
+        () => {
+          viewport.scrollBy({
+            left:
+              getCardStep() *
+              getVisibleCards(),
+            behavior: "smooth"
+          });
+        }
+      );
+
+      viewport.addEventListener(
+        "scroll",
+        updateArrows,
+        { passive: true }
+      );
+
+      window.addEventListener(
+        "resize",
+        updateArrows
+      );
+
+      updateArrows();
     });
-
-    next?.addEventListener("click", () => {
-      viewport.scrollBy({ left: getCardStep() * getVisibleCards(), behavior: "smooth" });
-    });
-
-    viewport.addEventListener("scroll", updateArrows, { passive: true });
-    window.addEventListener("resize", updateArrows);
-    updateArrows();
-  });
 }
 
 function bindRandomPackImage() {
-  document.querySelectorAll("[data-random-pack]").forEach((block) => {
-    const image = block.querySelector("[data-random-pack-image]");
-    const label = block.querySelector("[data-random-pack-label]");
-    if (!image) return;
+  document
+    .querySelectorAll("[data-random-pack]")
+    .forEach((block) => {
+      const image =
+        block.querySelector(
+          "[data-random-pack-image]"
+        );
 
-    const packs = [
-      {
-        src: image.dataset.packOneSrc,
-        alt: image.dataset.packOneAlt,
-        label: image.dataset.packOneLabel
-      },
-      {
-        src: image.dataset.packTwoSrc,
-        alt: image.dataset.packTwoAlt,
-        label: image.dataset.packTwoLabel
+      const label =
+        block.querySelector(
+          "[data-random-pack-label]"
+        );
+
+      if (!image) return;
+
+      const packs = [
+        {
+          src:
+            image.dataset.packOneSrc,
+          alt:
+            image.dataset.packOneAlt,
+          label:
+            image.dataset.packOneLabel
+        },
+        {
+          src:
+            image.dataset.packTwoSrc,
+          alt:
+            image.dataset.packTwoAlt,
+          label:
+            image.dataset.packTwoLabel
+        }
+      ].filter(
+        (pack) => pack.src
+      );
+
+      const selected =
+        packs[
+          Math.floor(
+            Math.random() *
+            packs.length
+          )
+        ];
+
+      if (!selected) return;
+
+      image.src =
+        selected.src;
+
+      image.alt =
+        selected.alt ||
+        image.alt;
+
+      if (label) {
+        label.textContent =
+          selected.label ||
+          label.textContent;
       }
-    ].filter((pack) => pack.src);
-
-    const selected = packs[Math.floor(Math.random() * packs.length)];
-    if (!selected) return;
-
-    image.src = selected.src;
-    image.alt = selected.alt || image.alt;
-    if (label) label.textContent = selected.label || label.textContent;
-  });
+    });
 }
 
 function bindCinematicIntroCanvas(intro) {
-  const canvas = intro.querySelector(".intro-canvas");
+  const canvas =
+    intro.querySelector(".intro-canvas");
+
   if (!canvas) return false;
-  const context = canvas.getContext("2d");
+
+  const context =
+    canvas.getContext("2d");
+
   if (!context) return false;
 
   const logo = new Image();
-  logo.src = intro.querySelector(".intro-canvas-logo")?.getAttribute("src") || "assets/brand/logo-dragon-white.png";
+
+  logo.src =
+    intro
+      .querySelector(".intro-canvas-logo")
+      ?.getAttribute("src") ||
+    "assets/brand/logo-dragon-white.png";
 
   const duration = 3600;
-  const smoke = Array.from({ length: 48 }, (_, index) => ({
-    x: ((index * 29) % 100) / 100,
-    y: ((index * 47) % 100) / 100,
-    size: 90 + ((index * 71) % 240),
-    drift: (((index * 17) % 50) - 25) / 100,
-    alpha: 0.045 + ((index * 13) % 60) / 1000
-  }));
+
+  const smoke =
+    Array.from(
+      { length: 48 },
+      (_, index) => ({
+        x:
+          ((index * 29) % 100) /
+          100,
+        y:
+          ((index * 47) % 100) /
+          100,
+        size:
+          90 +
+          ((index * 71) % 240),
+        drift:
+          (((index * 17) % 50) -
+            25) /
+          100,
+        alpha:
+          0.045 +
+          ((index * 13) % 60) /
+          1000
+      })
+    );
 
   let width = 0;
   let height = 0;
@@ -771,219 +1516,719 @@ function bindCinematicIntroCanvas(intro) {
   let startedAt = 0;
   let frameId = 0;
 
-  const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-  const easeIn = (value) => Math.pow(clamp(value), 3);
+  const clamp = (
+    value,
+    min = 0,
+    max = 1
+  ) =>
+    Math.min(
+      max,
+      Math.max(min, value)
+    );
+
+  const easeIn = (value) =>
+    Math.pow(
+      clamp(value),
+      3
+    );
+
   const easeBoth = (value) => {
     const v = clamp(value);
-    return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+
+    return v < 0.5
+      ? 4 * v * v * v
+      : 1 -
+          Math.pow(
+            -2 * v + 2,
+            3
+          ) /
+            2;
   };
 
   const resize = () => {
-    ratio = Math.min(window.devicePixelRatio || 1, 1.6);
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = Math.floor(width * ratio);
-    canvas.height = Math.floor(height * ratio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ratio = Math.min(
+      window.devicePixelRatio || 1,
+      1.6
+    );
+
+    width =
+      window.innerWidth;
+
+    height =
+      window.innerHeight;
+
+    canvas.width =
+      Math.floor(
+        width * ratio
+      );
+
+    canvas.height =
+      Math.floor(
+        height * ratio
+      );
+
+    canvas.style.width =
+      `${width}px`;
+
+    canvas.style.height =
+      `${height}px`;
+
+    context.setTransform(
+      ratio,
+      0,
+      0,
+      ratio,
+      0,
+      0
+    );
   };
 
   const drawSmoke = (time) => {
-    smoke.forEach((cloud, index) => {
-      const pulse = Math.sin(time * 0.0012 + index) * 0.5 + 0.5;
-      const x = cloud.x * width + Math.sin(time * 0.00055 + index) * cloud.size * cloud.drift;
-      const y = cloud.y * height + Math.cos(time * 0.00045 + index * 1.7) * cloud.size * 0.1;
-      const radius = cloud.size * (0.7 + pulse * 0.35);
-      const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-      gradient.addColorStop(0, `rgba(190, 190, 190, ${cloud.alpha})`);
-      gradient.addColorStop(0.48, `rgba(90, 90, 90, ${cloud.alpha * 0.7})`);
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-      context.fillStyle = gradient;
-      context.beginPath();
-      context.ellipse(x, y, radius * 1.65, radius * 0.72, Math.sin(index) * 0.6, 0, Math.PI * 2);
-      context.fill();
-    });
+    smoke.forEach(
+      (cloud, index) => {
+        const pulse =
+          Math.sin(
+            time * 0.0012 +
+              index
+          ) *
+            0.5 +
+          0.5;
+
+        const x =
+          cloud.x * width +
+          Math.sin(
+            time * 0.00055 +
+              index
+          ) *
+            cloud.size *
+            cloud.drift;
+
+        const y =
+          cloud.y * height +
+          Math.cos(
+            time * 0.00045 +
+              index * 1.7
+          ) *
+            cloud.size *
+            0.1;
+
+        const radius =
+          cloud.size *
+          (0.7 +
+            pulse * 0.35);
+
+        const gradient =
+          context.createRadialGradient(
+            x,
+            y,
+            0,
+            x,
+            y,
+            radius
+          );
+
+        gradient.addColorStop(
+          0,
+          `rgba(190, 190, 190, ${cloud.alpha})`
+        );
+
+        gradient.addColorStop(
+          0.48,
+          `rgba(90, 90, 90, ${cloud.alpha * 0.7})`
+        );
+
+        gradient.addColorStop(
+          1,
+          "rgba(0, 0, 0, 0)"
+        );
+
+        context.fillStyle =
+          gradient;
+
+        context.beginPath();
+
+        context.ellipse(
+          x,
+          y,
+          radius * 1.65,
+          radius * 0.72,
+          Math.sin(index) *
+            0.6,
+          0,
+          Math.PI * 2
+        );
+
+        context.fill();
+      }
+    );
   };
 
-  const drawLogoAndText = (elapsed) => {
-    const appear = easeBoth(elapsed / 620);
-    const exit = easeIn((elapsed - 2760) / 620);
-    if (appear <= 0 || !logo.complete) return;
-    const shake = elapsed < 1100 ? Math.sin(elapsed * 0.095) * 8 * (1 - elapsed / 1200) : 0;
-    const pulse = 1 + Math.sin(elapsed * 0.006) * 0.018;
-    const logoWidth = Math.min(width * 0.7, 880) * (0.72 + appear * 0.28) * pulse * (1 + exit * 8);
-    const logoHeight = logoWidth * (logo.naturalHeight / logo.naturalWidth);
+  const drawLogoAndText = (
+    elapsed
+  ) => {
+    const appear =
+      easeBoth(
+        elapsed / 620
+      );
+
+    const exit =
+      easeIn(
+        (elapsed - 2760) /
+          620
+      );
+
+    if (
+      appear <= 0 ||
+      !logo.complete
+    ) {
+      return;
+    }
+
+    const shake =
+      elapsed < 1100
+        ? Math.sin(
+            elapsed * 0.095
+          ) *
+          8 *
+          (1 -
+            elapsed /
+              1200)
+        : 0;
+
+    const pulse =
+      1 +
+      Math.sin(
+        elapsed * 0.006
+      ) *
+        0.018;
+
+    const logoWidth =
+      Math.min(
+        width * 0.7,
+        880
+      ) *
+      (0.72 +
+        appear * 0.28) *
+      pulse *
+      (1 + exit * 8);
+
+    const logoHeight =
+      logoWidth *
+      (logo.naturalHeight /
+        logo.naturalWidth);
 
     context.save();
-    context.globalAlpha = appear * (1 - exit);
-    context.filter = `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
-    context.drawImage(logo, width / 2 - logoWidth / 2 + shake, height / 2 - logoHeight / 2 - height * 0.06, logoWidth, logoHeight);
+
+    context.globalAlpha =
+      appear *
+      (1 - exit);
+
+    context.filter =
+      `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
+
+    context.drawImage(
+      logo,
+      width / 2 -
+        logoWidth / 2 +
+        shake,
+      height / 2 -
+        logoHeight / 2 -
+        height * 0.06,
+      logoWidth,
+      logoHeight
+    );
+
     context.restore();
 
-    const textAlpha = clamp((elapsed - 520) / 420) * (1 - exit);
+    const textAlpha =
+      clamp(
+        (elapsed - 520) /
+          420
+      ) *
+      (1 - exit);
+
     if (textAlpha <= 0) return;
+
     context.save();
-    context.globalAlpha = textAlpha;
-    context.textAlign = "center";
-    context.fillStyle = "#fff";
-    context.shadowColor = "rgba(255,90,0,0.95)";
-    context.shadowBlur = 18;
-    const isMobileIntro = width < 620;
-    const mainTextSize = isMobileIntro
-      ? Math.min(34, Math.max(22, width * 0.062))
-      : Math.min(82, Math.max(40, width * 0.055));
-    const subTextSize = isMobileIntro
-      ? Math.min(36, Math.max(24, width * 0.074))
-      : Math.min(44, Math.max(23, width * 0.031));
-    context.font = `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
-    context.fillText("NO RULES. JUST RIDE.", width / 2, height * 0.68);
-    context.fillStyle = "#ff5a00";
-    context.font = `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
+
+    context.globalAlpha =
+      textAlpha;
+
+    context.textAlign =
+      "center";
+
+    context.fillStyle =
+      "#fff";
+
+    context.shadowColor =
+      "rgba(255,90,0,0.95)";
+
+    context.shadowBlur =
+      18;
+
+    const isMobileIntro =
+      width < 620;
+
+    const mainTextSize =
+      isMobileIntro
+        ? Math.min(
+            34,
+            Math.max(
+              22,
+              width * 0.062
+            )
+          )
+        : Math.min(
+            82,
+            Math.max(
+              40,
+              width * 0.055
+            )
+          );
+
+    const subTextSize =
+      isMobileIntro
+        ? Math.min(
+            36,
+            Math.max(
+              24,
+              width * 0.074
+            )
+          )
+        : Math.min(
+            44,
+            Math.max(
+              23,
+              width * 0.031
+            )
+          );
+
+    context.font =
+      `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
+
+    context.fillText(
+      "NO RULES. JUST RIDE.",
+      width / 2,
+      height * 0.68
+    );
+
+    context.fillStyle =
+      "#ff5a00";
+
+    context.font =
+      `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
+
     if (isMobileIntro) {
-      context.fillText("BRISE TES CHAINES,", width / 2, height * 0.738);
-      context.fillText("LIBERE-TOI !", width / 2, height * 0.79);
+      context.fillText(
+        "BRISE TES CHAINES,",
+        width / 2,
+        height * 0.738
+      );
+
+      context.fillText(
+        "LIBERE-TOI !",
+        width / 2,
+        height * 0.79
+      );
     } else {
-      context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.76);
+      context.fillText(
+        "BRISE TES CHAINES, LIBERE-TOI !",
+        width / 2,
+        height * 0.76
+      );
     }
+
     context.restore();
   };
 
   const draw = (time) => {
-    if (!startedAt) startedAt = time;
-    const elapsed = time - startedAt;
-    context.clearRect(0, 0, width, height);
-    context.fillStyle = "#000";
-    context.fillRect(0, 0, width, height);
-    const background = context.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, Math.max(width, height) * 0.78);
-    background.addColorStop(0, "rgba(18,18,18,0.68)");
-    background.addColorStop(0.45, "rgba(6,6,6,0.98)");
-    background.addColorStop(1, "#000");
-    context.fillStyle = background;
-    context.fillRect(0, 0, width, height);
+    if (!startedAt) {
+      startedAt = time;
+    }
+
+    const elapsed =
+      time - startedAt;
+
+    context.clearRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+    context.fillStyle =
+      "#000";
+
+    context.fillRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+    const background =
+      context.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        Math.max(
+          width,
+          height
+        ) * 0.78
+      );
+
+    background.addColorStop(
+      0,
+      "rgba(18,18,18,0.68)"
+    );
+
+    background.addColorStop(
+      0.45,
+      "rgba(6,6,6,0.98)"
+    );
+
+    background.addColorStop(
+      1,
+      "#000"
+    );
+
+    context.fillStyle =
+      background;
+
+    context.fillRect(
+      0,
+      0,
+      width,
+      height
+    );
+
     drawSmoke(elapsed);
-    drawLogoAndText(elapsed);
+    drawLogoAndText(
+      elapsed
+    );
+
     if (elapsed < duration) {
-      frameId = requestAnimationFrame(draw);
+      frameId =
+        requestAnimationFrame(
+          draw
+        );
     }
   };
 
   resize();
-  window.addEventListener("resize", resize);
-  Promise.allSettled([logo.decode?.().catch(() => {}) || Promise.resolve()]).finally(() => {
-    frameId = requestAnimationFrame(draw);
+
+  window.addEventListener(
+    "resize",
+    resize
+  );
+
+  Promise.allSettled([
+    logo.decode?.().catch(
+      () => {}
+    ) ||
+      Promise.resolve()
+  ]).finally(() => {
+    frameId =
+      requestAnimationFrame(
+        draw
+      );
   });
 
-  intro.addEventListener("transitionend", () => {
-    cancelAnimationFrame(frameId);
-    window.removeEventListener("resize", resize);
-  }, { once: true });
+  intro.addEventListener(
+    "transitionend",
+    () => {
+      cancelAnimationFrame(
+        frameId
+      );
+
+      window.removeEventListener(
+        "resize",
+        resize
+      );
+    },
+    { once: true }
+  );
 
   return true;
 }
+
+
+/* =========================================================
+   INTRODUCTION TMRR
+   MODIFICATION : LE CONCOURS N'AFFICHE JAMAIS L'INTRO
+   ========================================================= */
+
 function bindSiteIntro() {
-  const intro = document.querySelector(".site-intro");
+  const intro =
+    document.querySelector(
+      ".site-intro"
+    );
 
   if (!intro) {
-    window.dispatchEvent(new Event("tmrr:intro-finished"));
+    window.dispatchEvent(
+      new Event(
+        "tmrr:intro-finished"
+      )
+    );
+
     return;
   }
 
   const finishIntro = () => {
-    intro.classList.add("is-finished");
-    document.body.classList.remove("intro-active");
-    window.dispatchEvent(new Event("tmrr:intro-finished"));
+    intro.classList.add(
+      "is-finished"
+    );
+
+    document.body.classList.remove(
+      "intro-active"
+    );
+
+    window.dispatchEvent(
+      new Event(
+        "tmrr:intro-finished"
+      )
+    );
   };
 
-  document.body.classList.add("intro-active");
-
-  // Pas d'animation lorsqu'on arrive sur le concours
+  /*
+   * IMPORTANT :
+   * Le concours ne doit JAMAIS afficher l'introduction.
+   *
+   * On vérifie :
+   * - #concours dans l'URL
+   * - concours dans le chemin
+   * - concours dans le titre
+   */
   const isConcours =
-    window.location.hash === "#concours" ||
-    window.location.pathname.includes("concours") ||
-    document.title.toLowerCase().includes("concours");
+    window.location.hash
+      .toLowerCase()
+      .includes("concours") ||
+    window.location.pathname
+      .toLowerCase()
+      .includes("concours") ||
+    document.title
+      .toLowerCase()
+      .includes("concours");
 
   if (isConcours) {
     finishIntro();
     return;
   }
 
-  if (prefersReducedMotion.matches || shouldSaveData) {
+  document.body.classList.add(
+    "intro-active"
+  );
+
+  if (
+    prefersReducedMotion.matches ||
+    shouldSaveData
+  ) {
     finishIntro();
     return;
   }
 
-  bindCinematicIntroCanvas(intro);
-  window.setTimeout(finishIntro, 3800);
+  bindCinematicIntroCanvas(
+    intro
+  );
+
+  window.setTimeout(
+    finishIntro,
+    3800
+  );
 }
 
 
-menuButton?.addEventListener("click", (event) => {
-  event.preventDefault();
-  const open = document.body.classList.toggle("menu-open");
-  menuButton.setAttribute("aria-expanded", String(open));
-});
+/* =========================================================
+   NAVIGATION
+   MODIFICATION : CLIC SUR JEUX CONCOURS = INTRO SUPPRIMÉE
+   ========================================================= */
 
-nav?.addEventListener("click", (event) => {
-  if (!(event.target instanceof HTMLAnchorElement)) return;
+nav?.addEventListener(
+  "click",
+  (event) => {
+    const link =
+      event.target.closest("a");
 
-  document.body.classList.remove("menu-open");
-  menuButton?.setAttribute("aria-expanded", "false");
+    if (!link) return;
 
-  // Si on clique sur "Jeux concours TMRR",
-  // on supprime immédiatement l'introduction animée.
-  const href = event.target.getAttribute("href") || "";
+    document.body.classList.remove(
+      "menu-open"
+    );
 
-  if (href.includes("#concours")) {
-    const intro = document.querySelector(".site-intro");
+    menuButton?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
-    if (intro) {
-      intro.classList.add("is-finished");
-      document.body.classList.remove("intro-active");
+    const href =
+      link.getAttribute("href") ||
+      "";
+
+    const text =
+      link.textContent
+        ?.trim()
+        .toLowerCase() ||
+      "";
+
+    const isConcours =
+      href
+        .toLowerCase()
+        .includes("concours") ||
+      text.includes(
+        "jeux concours"
+      ) ||
+      text.includes(
+        "concours tmrr"
+      );
+
+    if (isConcours) {
+      const intro =
+        document.querySelector(
+          ".site-intro"
+        );
+
+      /*
+       * Suppression immédiate de l'introduction.
+       * Ainsi le clic vers #concours ne peut pas
+       * laisser l'animation apparaître.
+       */
+      if (intro) {
+        intro.classList.add(
+          "is-finished"
+        );
+
+        document.body.classList.remove(
+          "intro-active"
+        );
+      }
     }
   }
-});
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.14 }
 );
 
-document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
 
-const countdown = document.querySelector(".countdown");
+const revealObserver =
+  new IntersectionObserver(
+    (entries) => {
+      entries.forEach(
+        (entry) => {
+          if (
+            entry.isIntersecting
+          ) {
+            entry.target.classList.add(
+              "is-visible"
+            );
+
+            revealObserver.unobserve(
+              entry.target
+            );
+          }
+        }
+      );
+    },
+    {
+      threshold: 0.14
+    }
+  );
+
+document
+  .querySelectorAll(".reveal")
+  .forEach((element) =>
+    revealObserver.observe(
+      element
+    )
+  );
+
+
+const countdown =
+  document.querySelector(
+    ".countdown"
+  );
+
 if (countdown) {
-  const deadline = new Date(countdown.dataset.deadline || "").getTime();
+  const deadline =
+    new Date(
+      countdown.dataset.deadline ||
+        ""
+    ).getTime();
+
   const parts = {
-    days: countdown.querySelector("[data-days]"),
-    hours: countdown.querySelector("[data-hours]"),
-    minutes: countdown.querySelector("[data-minutes]"),
-    seconds: countdown.querySelector("[data-seconds]")
+    days:
+      countdown.querySelector(
+        "[data-days]"
+      ),
+    hours:
+      countdown.querySelector(
+        "[data-hours]"
+      ),
+    minutes:
+      countdown.querySelector(
+        "[data-minutes]"
+      ),
+    seconds:
+      countdown.querySelector(
+        "[data-seconds]"
+      )
   };
 
-  const pad = (value) => String(value).padStart(2, "0");
-  const updateCountdown = () => {
-    const diff = Math.max(0, deadline - Date.now());
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
+  const pad = (value) =>
+    String(value).padStart(
+      2,
+      "0"
+    );
 
-    parts.days.textContent = pad(days);
-    parts.hours.textContent = pad(hours);
-    parts.minutes.textContent = pad(minutes);
-    parts.seconds.textContent = pad(seconds);
+  const updateCountdown = () => {
+    const diff =
+      Math.max(
+        0,
+        deadline - Date.now()
+      );
+
+    const days =
+      Math.floor(
+        diff / 86400000
+      );
+
+    const hours =
+      Math.floor(
+        (diff % 86400000) /
+          3600000
+      );
+
+    const minutes =
+      Math.floor(
+        (diff % 3600000) /
+          60000
+      );
+
+    const seconds =
+      Math.floor(
+        (diff % 60000) /
+          1000
+      );
+
+    parts.days.textContent =
+      pad(days);
+
+    parts.hours.textContent =
+      pad(hours);
+
+    parts.minutes.textContent =
+      pad(minutes);
+
+    parts.seconds.textContent =
+      pad(seconds);
   };
 
   updateCountdown();
-  setInterval(updateCountdown, 1000);
+
+  setInterval(
+    updateCountdown,
+    1000
+  );
 }
+
 
 const bikeFrames = [
   "assets/bike/grand-jeu-1.png",
@@ -992,130 +2237,395 @@ const bikeFrames = [
   "assets/bike/grand-jeu-4.png",
   "assets/bike/grand-jeu-5.png"
 ];
-const bikeImage = document.querySelector("[data-bike-frame]");
-const bikeSlider = document.querySelector("[data-bike-slider]");
-const bikePlay = document.querySelector("[data-bike-play]");
-const bikeStage = document.querySelector(".viewer-stage");
+
+const bikeImage =
+  document.querySelector(
+    "[data-bike-frame]"
+  );
+
+const bikeSlider =
+  document.querySelector(
+    "[data-bike-slider]"
+  );
+
+const bikePlay =
+  document.querySelector(
+    "[data-bike-play]"
+  );
+
+const bikeStage =
+  document.querySelector(
+    ".viewer-stage"
+  );
+
 let bikeIndex = 0;
 let bikeAuto = true;
 
 function setBikeFrame(index) {
-  if (!bikeImage || !bikeSlider) return;
-  bikeIndex = (index + bikeFrames.length) % bikeFrames.length;
-  bikeStage?.classList.add("is-changing");
-  bikeImage.src = bikeFrames[bikeIndex];
-  bikeSlider.value = String(bikeIndex);
-  window.setTimeout(() => bikeStage?.classList.remove("is-changing"), 180);
+  if (!bikeImage || !bikeSlider) {
+    return;
+  }
+
+  bikeIndex =
+    (index +
+      bikeFrames.length) %
+    bikeFrames.length;
+
+  bikeStage?.classList.add(
+    "is-changing"
+  );
+
+  bikeImage.src =
+    bikeFrames[bikeIndex];
+
+  bikeSlider.value =
+    String(bikeIndex);
+
+  window.setTimeout(
+    () =>
+      bikeStage?.classList.remove(
+        "is-changing"
+      ),
+    180
+  );
 }
 
-document.querySelector(".viewer-control.prev")?.addEventListener("click", () => {
-  bikeAuto = false;
-  if (bikePlay) bikePlay.textContent = "Reprendre auto";
-  setBikeFrame(bikeIndex - 1);
-});
+document
+  .querySelector(
+    ".viewer-control.prev"
+  )
+  ?.addEventListener(
+    "click",
+    () => {
+      bikeAuto = false;
 
-document.querySelector(".viewer-control.next")?.addEventListener("click", () => {
-  bikeAuto = false;
-  if (bikePlay) bikePlay.textContent = "Reprendre auto";
-  setBikeFrame(bikeIndex + 1);
-});
+      if (bikePlay) {
+        bikePlay.textContent =
+          "Reprendre auto";
+      }
 
-bikeSlider?.addEventListener("input", () => {
-  bikeAuto = false;
-  if (bikePlay) bikePlay.textContent = "Reprendre auto";
-  setBikeFrame(Number(bikeSlider.value));
-});
+      setBikeFrame(
+        bikeIndex - 1
+      );
+    }
+  );
 
-bikePlay?.addEventListener("click", () => {
-  bikeAuto = !bikeAuto;
-  bikePlay.textContent = bikeAuto ? "Pause auto" : "Reprendre auto";
-});
+document
+  .querySelector(
+    ".viewer-control.next"
+  )
+  ?.addEventListener(
+    "click",
+    () => {
+      bikeAuto = false;
+
+      if (bikePlay) {
+        bikePlay.textContent =
+          "Reprendre auto";
+      }
+
+      setBikeFrame(
+        bikeIndex + 1
+      );
+    }
+  );
+
+bikeSlider?.addEventListener(
+  "input",
+  () => {
+    bikeAuto = false;
+
+    if (bikePlay) {
+      bikePlay.textContent =
+        "Reprendre auto";
+    }
+
+    setBikeFrame(
+      Number(
+        bikeSlider.value
+      )
+    );
+  }
+);
+
+bikePlay?.addEventListener(
+  "click",
+  () => {
+    bikeAuto = !bikeAuto;
+
+    bikePlay.textContent =
+      bikeAuto
+        ? "Pause auto"
+        : "Reprendre auto";
+  }
+);
 
 function startBikeAutoplay() {
-  if (!bikeImage || bikeImage.dataset.autoplayStarted === "true" || shouldSaveData || prefersReducedMotion.matches) return;
-  bikeImage.dataset.autoplayStarted = "true";
-  window.setInterval(() => {
-    if (bikeAuto) setBikeFrame(bikeIndex + 1);
-  }, 1800);
+  if (
+    !bikeImage ||
+    bikeImage.dataset
+      .autoplayStarted ===
+      "true" ||
+    shouldSaveData ||
+    prefersReducedMotion.matches
+  ) {
+    return;
+  }
+
+  bikeImage.dataset.autoplayStarted =
+    "true";
+
+  window.setInterval(
+    () => {
+      if (bikeAuto) {
+        setBikeFrame(
+          bikeIndex + 1
+        );
+      }
+    },
+    1800
+  );
 }
 
-const bikeViewer = document.querySelector(".bike-viewer");
-if (bikeViewer && "IntersectionObserver" in window) {
-  const bikeObserver = new IntersectionObserver((entries) => {
-    if (entries.some((entry) => entry.isIntersecting)) {
-      bikeObserver.disconnect();
-      startBikeAutoplay();
-    }
-  }, { rootMargin: "220px 0px", threshold: 0.08 });
-  bikeObserver.observe(bikeViewer);
+const bikeViewer =
+  document.querySelector(
+    ".bike-viewer"
+  );
+
+if (
+  bikeViewer &&
+  "IntersectionObserver" in
+    window
+) {
+  const bikeObserver =
+    new IntersectionObserver(
+      (entries) => {
+        if (
+          entries.some(
+            (entry) =>
+              entry.isIntersecting
+          )
+        ) {
+          bikeObserver.disconnect();
+          startBikeAutoplay();
+        }
+      },
+      {
+        rootMargin:
+          "220px 0px",
+        threshold: 0.08
+      }
+    );
+
+  bikeObserver.observe(
+    bikeViewer
+  );
 } else {
-  runWhenIdle(startBikeAutoplay, 2600);
+  runWhenIdle(
+    startBikeAutoplay,
+    2600
+  );
 }
 
-document.querySelectorAll(".magnetic").forEach((button) => {
-  button.addEventListener("mousemove", (event) => {
-    const rect = button.getBoundingClientRect();
-    const x = event.clientX - rect.left - rect.width / 2;
-    const y = event.clientY - rect.top - rect.height / 2;
-    button.style.transform = `translate(${x * 0.08}px, ${y * 0.14}px)`;
+
+document
+  .querySelectorAll(
+    ".magnetic"
+  )
+  .forEach((button) => {
+    button.addEventListener(
+      "mousemove",
+      (event) => {
+        const rect =
+          button.getBoundingClientRect();
+
+        const x =
+          event.clientX -
+          rect.left -
+          rect.width / 2;
+
+        const y =
+          event.clientY -
+          rect.top -
+          rect.height / 2;
+
+        button.style.transform =
+          `translate(${x * 0.08}px, ${y * 0.14}px)`;
+      }
+    );
+
+    button.addEventListener(
+      "mouseleave",
+      () => {
+        button.style.transform =
+          "";
+      }
+    );
   });
 
-  button.addEventListener("mouseleave", () => {
-    button.style.transform = "";
-  });
-});
 
-const canvas = document.querySelector(".spark-canvas");
-const ctx = canvas?.getContext("2d");
+const canvas =
+  document.querySelector(
+    ".spark-canvas"
+  );
+
+const ctx =
+  canvas?.getContext("2d");
+
 let sparks = [];
 let width = 0;
 let height = 0;
 
 function resizeCanvas() {
-  if (!canvas || !ctx) return;
-  const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  width = window.innerWidth;
-  height = window.innerHeight;
-  canvas.width = width * ratio;
-  canvas.height = height * ratio;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  if (!canvas || !ctx) {
+    return;
+  }
+
+  const ratio =
+    Math.min(
+      window.devicePixelRatio || 1,
+      2
+    );
+
+  width =
+    window.innerWidth;
+
+  height =
+    window.innerHeight;
+
+  canvas.width =
+    width * ratio;
+
+  canvas.height =
+    height * ratio;
+
+  canvas.style.width =
+    `${width}px`;
+
+  canvas.style.height =
+    `${height}px`;
+
+  ctx.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
 }
 
 function seedSparks() {
-  sparks = Array.from({ length: 48 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    vx: 0.35 + Math.random() * 1.4,
-    vy: -0.8 - Math.random() * 1.8,
-    size: 1 + Math.random() * 2.4,
-    life: 0.25 + Math.random() * 0.75
-  }));
+  sparks =
+    Array.from(
+      { length: 48 },
+      () => ({
+        x:
+          Math.random() *
+          width,
+
+        y:
+          Math.random() *
+          height,
+
+        vx:
+          0.35 +
+          Math.random() *
+            1.4,
+
+        vy:
+          -0.8 -
+          Math.random() *
+            1.8,
+
+        size:
+          1 +
+          Math.random() *
+            2.4,
+
+        life:
+          0.25 +
+          Math.random() *
+            0.75
+      })
+    );
 }
 
 function drawSparks() {
   if (!ctx) return;
-  ctx.clearRect(0, 0, width, height);
-  sparks.forEach((spark) => {
-    spark.x += spark.vx;
-    spark.y += spark.vy;
-    spark.life -= 0.002;
-    if (spark.y < -20 || spark.x > width + 20 || spark.life <= 0) {
-      spark.x = Math.random() * width * 0.9;
-      spark.y = height + Math.random() * 120;
-      spark.life = 0.25 + Math.random() * 0.75;
-    }
 
-    ctx.globalAlpha = Math.max(0, spark.life);
-    ctx.fillStyle = "#ff6a00";
-    ctx.beginPath();
-    ctx.ellipse(spark.x, spark.y, spark.size * 0.55, spark.size * 2.2, -0.65, 0, Math.PI * 2);
-    ctx.fill();
-  });
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  sparks.forEach(
+    (spark) => {
+      spark.x +=
+        spark.vx;
+
+      spark.y +=
+        spark.vy;
+
+      spark.life -=
+        0.002;
+
+      if (
+        spark.y < -20 ||
+        spark.x >
+          width + 20 ||
+        spark.life <= 0
+      ) {
+        spark.x =
+          Math.random() *
+          width *
+          0.9;
+
+        spark.y =
+          height +
+          Math.random() *
+            120;
+
+        spark.life =
+          0.25 +
+          Math.random() *
+            0.75;
+      }
+
+      ctx.globalAlpha =
+        Math.max(
+          0,
+          spark.life
+        );
+
+      ctx.fillStyle =
+        "#ff6a00";
+
+      ctx.beginPath();
+
+      ctx.ellipse(
+        spark.x,
+        spark.y,
+        spark.size * 0.55,
+        spark.size * 2.2,
+        -0.65,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fill();
+    }
+  );
+
   ctx.globalAlpha = 1;
-  requestAnimationFrame(drawSparks);
+
+  requestAnimationFrame(
+    drawSparks
+  );
 }
+
 
 bindProductButtons();
 bindGiftCardForm();
@@ -1131,26 +2641,59 @@ bindAccountPage();
 bindHeroVideoSound();
 updateCartCount();
 
-document.querySelectorAll(".hero-hotspot-collection").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    window.location.href = "tshirts.html";
+
+document
+  .querySelectorAll(
+    ".hero-hotspot-collection"
+  )
+  .forEach((link) => {
+    link.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+
+        window.location.href =
+          "tshirts.html";
+      }
+    );
   });
-});
+
 
 function startSparkCanvas() {
-  if (!canvas || !ctx || prefersReducedMotion.matches || shouldSaveData || canvas.dataset.started === "true") return;
-  canvas.dataset.started = "true";
+  if (
+    !canvas ||
+    !ctx ||
+    prefersReducedMotion.matches ||
+    shouldSaveData ||
+    canvas.dataset.started ===
+      "true"
+  ) {
+    return;
+  }
+
+  canvas.dataset.started =
+    "true";
+
   resizeCanvas();
   seedSparks();
   drawSparks();
-  window.addEventListener("resize", () => {
-    resizeCanvas();
-    seedSparks();
-  });
+
+  window.addEventListener(
+    "resize",
+    () => {
+      resizeCanvas();
+      seedSparks();
+    }
+  );
 }
 
-window.addEventListener("tmrr:intro-finished", () => {
-  runWhenIdle(startSparkCanvas, 2200);
-}, { once: true });
-
+window.addEventListener(
+  "tmrr:intro-finished",
+  () => {
+    runWhenIdle(
+      startSparkCanvas,
+      2200
+    );
+  },
+  { once: true }
+);
