@@ -11,8 +11,13 @@ const FREE_SHIPPING_MIN = 60;
 
 let activePromo = null;
 
-const prefersReducedMotion =
-  window.matchMedia("(prefers-reduced-motion: reduce)");
+/* =========================================================
+   PREFERENCES / PERFORMANCE
+   ========================================================= */
+
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+);
 
 const connection =
   navigator.connection ||
@@ -32,6 +37,98 @@ function runWhenIdle(callback, timeout = 1600) {
   }
 }
 
+/* =========================================================
+   INTRO TMRR — DÉTECTION CONCOURS
+   ========================================================= */
+
+/*
+ * IMPORTANT :
+ * Le concours doit JAMAIS lancer l'introduction.
+ *
+ * On détecte :
+ * - #concours
+ * - #concours-...
+ * - /concours
+ * - /index.html#concours
+ */
+function isConcoursLocation() {
+  const hash =
+    window.location.hash.toLowerCase();
+
+  const path =
+    window.location.pathname.toLowerCase();
+
+  return (
+    hash === "#concours" ||
+    hash.startsWith("#concours-") ||
+    path.includes("/concours") ||
+    path.endsWith("concours")
+  );
+}
+
+/*
+ * Suppression TOTALE de l'intro.
+ *
+ * On la retire du DOM afin qu'aucune animation CSS/canvas
+ * ne puisse continuer à l'afficher.
+ */
+function removeIntroCompletely() {
+  const intro =
+    document.querySelector(".site-intro");
+
+  document.body.classList.remove(
+    "intro-active"
+  );
+
+  if (!intro) return;
+
+  /*
+   * Stop éventuel timer de fin.
+   */
+  if (intro.__tmrrFinishTimeout) {
+    clearTimeout(
+      intro.__tmrrFinishTimeout
+    );
+    intro.__tmrrFinishTimeout = null;
+  }
+
+  /*
+   * Stop éventuelle animation canvas.
+   */
+  if (intro.__tmrrCancelAnimation) {
+    intro.__tmrrCancelAnimation();
+    intro.__tmrrCancelAnimation = null;
+  }
+
+  /*
+   * Stop éventuelles vidéos.
+   */
+  intro
+    .querySelectorAll("video")
+    .forEach((video) => {
+      try {
+        video.pause();
+        video.removeAttribute("autoplay");
+        video.removeAttribute("src");
+        video.load();
+      } catch {}
+    });
+
+  /*
+   * Suppression réelle du DOM.
+   */
+  intro.remove();
+}
+
+/*
+ * TRÈS IMPORTANT :
+ * Ce test est effectué immédiatement au chargement du script.
+ *
+ * Comme script.js est placé en bas du HTML, le DOM existe déjà.
+ */
+if (isConcoursLocation()) {
+  removeIntroCompletely();
+}
 
 /* =========================================================
    PANIER
@@ -40,8 +137,14 @@ function runWhenIdle(callback, timeout = 1600) {
 function readCart() {
   const readWindowName = () => {
     try {
-      const state = JSON.parse(window.name || "{}");
-      return Array.isArray(state[CART_KEY])
+      const state =
+        JSON.parse(
+          window.name || "{}"
+        );
+
+      return Array.isArray(
+        state[CART_KEY]
+      )
         ? state[CART_KEY]
         : [];
     } catch {
@@ -50,9 +153,12 @@ function readCart() {
   };
 
   try {
-    const stored = JSON.parse(
-      localStorage.getItem(CART_KEY) || "[]"
-    );
+    const stored =
+      JSON.parse(
+        localStorage.getItem(
+          CART_KEY
+        ) || "[]"
+      );
 
     return Array.isArray(stored)
       ? stored
@@ -70,16 +176,20 @@ function writeCart(cart) {
     );
   } catch {
     try {
-      const state = JSON.parse(
-        window.name || "{}"
-      );
+      const state =
+        JSON.parse(
+          window.name || "{}"
+        );
 
       state[CART_KEY] = cart;
-      window.name = JSON.stringify(state);
+
+      window.name =
+        JSON.stringify(state);
     } catch {
-      window.name = JSON.stringify({
-        [CART_KEY]: cart
-      });
+      window.name =
+        JSON.stringify({
+          [CART_KEY]: cart
+        });
     }
   }
 
@@ -92,7 +202,11 @@ function parsePrice(text) {
       .replace(",", ".")
       .replace(/[^\d.]/g, "");
 
-  return Number.parseFloat(normalized) || 0;
+  return (
+    Number.parseFloat(
+      normalized
+    ) || 0
+  );
 }
 
 function formatPrice(value) {
@@ -114,7 +228,9 @@ function calculateOrderTotals(cart) {
   const subtotal =
     cart.reduce(
       (sum, item) =>
-        sum + item.price * item.quantity,
+        sum +
+        item.price *
+          item.quantity,
       0
     );
 
@@ -126,25 +242,32 @@ function calculateOrderTotals(cart) {
       )
       .reduce(
         (sum, item) =>
-          sum + item.price * item.quantity,
+          sum +
+          item.price *
+            item.quantity,
         0
       );
 
   const shipping =
     shippableSubtotal > 0 &&
-    shippableSubtotal < FREE_SHIPPING_MIN
+    shippableSubtotal <
+      FREE_SHIPPING_MIN
       ? SHIPPING_PRICE
       : 0;
 
   const discount = activePromo
-    ? activePromo.type === "gift_card"
+    ? activePromo.type ===
+      "gift_card"
       ? Math.min(
           subtotal + shipping,
-          Number(activePromo.amount || 0)
+          Number(
+            activePromo.amount || 0
+          )
         )
       : subtotal *
         (Number(
-          activePromo.discountPercent || 0
+          activePromo.discountPercent ||
+            0
         ) / 100)
     : 0;
 
@@ -154,7 +277,9 @@ function calculateOrderTotals(cart) {
     discount,
     total: Math.max(
       0,
-      subtotal + shipping - discount
+      subtotal +
+        shipping -
+        discount
     )
   };
 }
@@ -168,16 +293,17 @@ function updateCartCount() {
     );
 
   document
-    .querySelectorAll(".cart-pill strong")
+    .querySelectorAll(
+      ".cart-pill strong"
+    )
     .forEach((element) => {
       element.textContent =
         String(total);
     });
 }
 
-
 /* =========================================================
-   VIDEO HERO
+   VIDÉO HERO
    ========================================================= */
 
 function bindHeroVideoSound() {
@@ -192,7 +318,9 @@ function bindHeroVideoSound() {
     );
 
   const frame =
-    video?.closest(".hero-art");
+    video?.closest(
+      ".hero-art"
+    );
 
   if (!video) return;
 
@@ -220,18 +348,21 @@ function bindHeroVideoSound() {
     }
   };
 
-  const toggleSound = async () => {
-    const nextState =
-      video.muted;
+  const toggleSound =
+    async () => {
+      const nextState =
+        video.muted;
 
-    setSoundState(nextState);
+      setSoundState(
+        nextState
+      );
 
-    try {
-      await video.play();
-    } catch {
-      setSoundState(false);
-    }
-  };
+      try {
+        await video.play();
+      } catch {
+        setSoundState(false);
+      }
+    };
 
   video.addEventListener(
     "click",
@@ -252,7 +383,8 @@ function bindHeroVideoSound() {
 function setVideoSource(video) {
   if (
     !video ||
-    video.dataset.videoLoaded === "true"
+    video.dataset.videoLoaded ===
+      "true"
   ) {
     return false;
   }
@@ -283,6 +415,7 @@ function setVideoSource(video) {
   );
 
   video.src = source;
+
   video.dataset.videoLoaded =
     "true";
 
@@ -294,12 +427,15 @@ function setVideoSource(video) {
 function playDecorativeVideo(video) {
   if (
     !setVideoSource(video) &&
-    video.dataset.videoLoaded !== "true"
+    video.dataset.videoLoaded !==
+      "true"
   ) {
     return;
   }
 
-  video.play?.().catch(() => {});
+  video.play?.().catch(
+    () => {}
+  );
 }
 
 function bindDeferredVideos() {
@@ -314,7 +450,16 @@ function bindDeferredVideos() {
     );
 
   const loadHero = () => {
-    if (!heroVideo) return;
+    /*
+     * Ne pas charger la vidéo hero
+     * si on est actuellement sur le concours.
+     */
+    if (
+      isConcoursLocation() ||
+      !heroVideo
+    ) {
+      return;
+    }
 
     window.setTimeout(
       () =>
@@ -373,7 +518,6 @@ function bindDeferredVideos() {
   }
 }
 
-
 /* =========================================================
    AJOUT PANIER
    ========================================================= */
@@ -407,9 +551,8 @@ function addToCart(item) {
       : "/panier";
 }
 
-
 /* =========================================================
-   COMPTES
+   UTILISATEURS
    ========================================================= */
 
 function readJson(
@@ -424,7 +567,9 @@ function readJson(
         ) || "null"
       );
 
-    return value ?? fallback;
+    return (
+      value ?? fallback
+    );
   } catch {
     return fallback;
   }
@@ -469,7 +614,6 @@ function getUserOrders(email) {
   );
 }
 
-
 /* =========================================================
    PRODUITS
    ========================================================= */
@@ -493,48 +637,60 @@ function bindProductButtons() {
           if (!card) return;
 
           const name =
-            card.querySelector(
-              "h3"
-            )?.textContent?.trim() ||
+            card
+              .querySelector("h3")
+              ?.textContent?.trim() ||
             "Article TMRR";
 
           const priceText =
-            card.querySelector(
-              ".buy-row strong"
-            )?.textContent ||
+            card
+              .querySelector(
+                ".buy-row strong"
+              )
+              ?.textContent ||
             "0";
 
           const image =
-            card.querySelector(
-              "img"
-            )?.getAttribute(
-              "src"
-            ) || "";
+            card
+              .querySelector(
+                "img"
+              )
+              ?.getAttribute(
+                "src"
+              ) || "";
 
           const model =
-            card.querySelector(
-              '[data-option="model"]'
-            )?.value;
+            card
+              .querySelector(
+                '[data-option="model"]'
+              )
+              ?.value;
 
           const size =
-            card.querySelector(
-              '[data-option="size"]'
-            )?.value;
+            card
+              .querySelector(
+                '[data-option="size"]'
+              )
+              ?.value;
 
           const quantity =
             Math.max(
               1,
               Number(
-                card.querySelector(
-                  '[data-option="quantity"]'
-                )?.value || 1
+                card
+                  .querySelector(
+                    '[data-option="quantity"]'
+                  )
+                  ?.value || 1
               )
             );
 
           const baseOption =
-            card.querySelector(
-              ".product-label"
-            )?.textContent?.trim() ||
+            card
+              .querySelector(
+                ".product-label"
+              )
+              ?.textContent?.trim() ||
             "TMRR";
 
           const selectedOptions = [
@@ -637,15 +793,19 @@ function bindProductButtons() {
             document;
 
           const model =
-            scope.querySelector(
-              `[data-pack-model="${pack}"]`
-            )?.value ||
+            scope
+              .querySelector(
+                `[data-pack-model="${pack}"]`
+              )
+              ?.value ||
             "Homme";
 
           const size =
-            scope.querySelector(
-              `[data-pack-size="${pack}"]`
-            )?.value ||
+            scope
+              .querySelector(
+                `[data-pack-size="${pack}"]`
+              )
+              ?.value ||
             "M";
 
           const isPackTwo =
@@ -659,21 +819,18 @@ function bindProductButtons() {
                   /\s+/g,
                   "-"
                 ),
-            name:
-              isPackTwo
-                ? "Pack 2 - Ticket Rebel"
-                : "Pack 1 - T-shirt concours",
-            price:
-              isPackTwo
-                ? 39.9
-                : 25.9,
+            name: isPackTwo
+              ? "Pack 2 - Ticket Rebel"
+              : "Pack 1 - T-shirt concours",
+            price: isPackTwo
+              ? 39.9
+              : 25.9,
             image:
               "assets/campaign/packs-horizontal.png",
             quantity: 1,
-            options:
-              isPackTwo
-                ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
-                : `T-shirt concours modele ${model} taille ${size} - 1 participation`
+            options: isPackTwo
+              ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
+              : `T-shirt concours modele ${model} taille ${size} - 1 participation`
           });
         }
       );
@@ -717,7 +874,6 @@ function bindProductButtons() {
     });
 }
 
-
 /* =========================================================
    CARTE CADEAU
    ========================================================= */
@@ -745,7 +901,9 @@ function bindGiftCardForm() {
 
       const quantity =
         Number(
-          data.get("quantity") || 1
+          data.get(
+            "quantity"
+          ) || 1
         );
 
       const recipientEmail =
@@ -756,9 +914,12 @@ function bindGiftCardForm() {
         ).trim();
 
       if (
-        ![25, 50, 75, 100].includes(
-          amount
-        )
+        ![
+          25,
+          50,
+          75,
+          100
+        ].includes(amount)
       ) {
         return;
       }
@@ -817,7 +978,6 @@ function bindGiftCardForm() {
   );
 }
 
-
 /* =========================================================
    PAGE PANIER
    ========================================================= */
@@ -866,8 +1026,7 @@ function renderCartPage() {
       const existing =
         cart.find(
           (cartItem) =>
-            cartItem.id ===
-            item.id
+            cartItem.id === item.id
         );
 
       if (existing) {
@@ -900,7 +1059,8 @@ function renderCartPage() {
   const cart =
     readCart();
 
-  list.innerHTML = "";
+  list.innerHTML =
+    "";
 
   if (!cart.length) {
     list.innerHTML =
@@ -947,12 +1107,14 @@ function renderCartPage() {
         item.quantity;
 
       row.innerHTML = `
-        <img src="${item.image}" alt="">
+        <img
+          src="${item.image}"
+          alt=""
+        >
         <div>
           <h3>${item.name}</h3>
           <p>${item.options || ""}</p>
           <p>Prix unitaire : ${formatPrice(item.price)}</p>
-
           <label class="cart-quantity">
             Quantite
             <input
@@ -962,10 +1124,8 @@ function renderCartPage() {
               data-cart-quantity="${index}"
             >
           </label>
-
           <p>Total article : ${formatPrice(lineTotal)}</p>
         </div>
-
         <button
           class="cart-remove"
           type="button"
@@ -975,9 +1135,7 @@ function renderCartPage() {
         </button>
       `;
 
-      list.appendChild(
-        row
-      );
+      list.appendChild(row);
     }
   );
 
@@ -1021,69 +1179,72 @@ function renderCartPage() {
     .querySelectorAll(
       "[data-remove]"
     )
-    .forEach((button) => {
-      button.addEventListener(
-        "click",
-        () => {
-          const next =
-            readCart();
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const next =
+              readCart();
 
-          next.splice(
-            Number(
-              button.dataset
-                .remove
-            ),
-            1
-          );
+            next.splice(
+              Number(
+                button.dataset.remove
+              ),
+              1
+            );
 
-          writeCart(next);
-          renderCartPage();
-        }
-      );
-    });
+            writeCart(next);
+            renderCartPage();
+          }
+        );
+      }
+    );
 
   list
     .querySelectorAll(
       "[data-cart-quantity]"
     )
-    .forEach((input) => {
-      input.addEventListener(
-        "change",
-        () => {
-          const next =
-            readCart();
+    .forEach(
+      (input) => {
+        input.addEventListener(
+          "change",
+          () => {
+            const next =
+              readCart();
 
-          const index =
-            Number(
-              input.dataset
-                .cartQuantity
-            );
-
-          const quantity =
-            Math.max(
-              1,
+            const index =
               Number(
-                input.value || 1
-              )
-            );
+                input.dataset
+                  .cartQuantity
+              );
 
-          input.value =
-            String(
-              quantity
-            );
+            const quantity =
+              Math.max(
+                1,
+                Number(
+                  input.value ||
+                    1
+                )
+              );
 
-          if (next[index]) {
-            next[index].quantity =
-              quantity;
+            input.value =
+              String(
+                quantity
+              );
 
-            writeCart(next);
-            renderCartPage();
+            if (next[index]) {
+              next[index].quantity =
+                quantity;
+
+              writeCart(next);
+              renderCartPage();
+            }
           }
-        }
-      );
-    });
+        );
+      }
+    );
 }
-
 
 /* =========================================================
    PAIEMENT
@@ -1190,13 +1351,11 @@ function renderPaymentPage() {
       row.innerHTML = `
         <span>
           ${item.quantity} x ${item.name}
-
           <small>
             ${item.options || "Article TMRR"} ·
             Prix unitaire : ${formatPrice(item.price)}
           </small>
         </span>
-
         <strong>
           ${formatPrice(
             item.price *
@@ -1348,6 +1507,8 @@ function renderPaymentPage() {
 
           renderPaymentPage();
         } catch {
+          activePromo = null;
+
           if (message) {
             message.textContent =
               "Impossible de vérifier le code promo.";
@@ -1466,7 +1627,6 @@ function renderPaymentPage() {
         if (payload.url) {
           window.location.href =
             payload.url;
-
           return;
         }
 
@@ -1484,7 +1644,6 @@ function renderPaymentPage() {
       }
     };
 }
-
 
 /* =========================================================
    RETOUR STRIPE
@@ -1507,9 +1666,8 @@ function clearCartAfterStripeReturn() {
   writeCart([]);
 }
 
-
 /* =========================================================
-   COMPTE CLIENT
+   COMPTE
    ========================================================= */
 
 function bindAccountPage() {
@@ -1573,21 +1731,36 @@ function bindAccountPage() {
       dashboard.hidden =
         false;
 
-      document.querySelector(
-        "[data-account-name]"
-      ).textContent =
-        user.name;
+      const accountName =
+        document.querySelector(
+          "[data-account-name]"
+        );
 
-      document.querySelector(
-        "[data-account-email]"
-      ).textContent =
-        user.email;
+      const accountEmail =
+        document.querySelector(
+          "[data-account-email]"
+        );
 
-      document.querySelector(
-        "[data-account-phone]"
-      ).textContent =
-        user.phone ||
-        "Non renseigné";
+      const accountPhone =
+        document.querySelector(
+          "[data-account-phone]"
+        );
+
+      if (accountName) {
+        accountName.textContent =
+          user.name;
+      }
+
+      if (accountEmail) {
+        accountEmail.textContent =
+          user.email;
+      }
+
+      if (accountPhone) {
+        accountPhone.textContent =
+          user.phone ||
+          "Non renseigné";
+      }
 
       const orders =
         getUserOrders(
@@ -1618,7 +1791,10 @@ function bindAccountPage() {
                   item
                 ) => {
                   const label =
-                    `${item.name} ${item.options || ""}`
+                    `${item.name} ${
+                      item.options ||
+                      ""
+                    }`
                       .toLowerCase();
 
                   if (
@@ -1663,8 +1839,9 @@ function bindAccountPage() {
             : "Aucune participation concours enregistrée pour le moment.";
       }
 
-      if (!orderList)
+      if (!orderList) {
         return;
+      }
 
       if (!orders.length) {
         orderList.innerHTML =
@@ -1677,29 +1854,27 @@ function bindAccountPage() {
         orders
           .map(
             (order) => `
-          <article class="account-order">
-            <div>
-              <strong>${order.id}</strong>
-              <span>${order.date}</span>
-            </div>
-
-            <p>
-              ${order.items
-                .map(
-                  (item) =>
-                    `${item.quantity} x ${item.name}`
-                )
-                .join(" · ")}
-            </p>
-
-            <footer>
-              <span>${order.status}</span>
-              <strong>${formatPrice(
-                order.total
-              )}</strong>
-            </footer>
-          </article>
-        `
+        <article class="account-order">
+          <div>
+            <strong>${order.id}</strong>
+            <span>${order.date}</span>
+          </div>
+          <p>
+            ${order.items
+              .map(
+                (item) =>
+                  `${item.quantity} x ${item.name}`
+              )
+              .join(" · ")}
+          </p>
+          <footer>
+            <span>${order.status}</span>
+            <strong>${formatPrice(
+              order.total
+            )}</strong>
+          </footer>
+        </article>
+      `
           )
           .join("");
     };
@@ -1716,9 +1891,8 @@ function bindAccountPage() {
 
       const email =
         String(
-          data.get(
-            "email"
-          ) || ""
+          data.get("email") ||
+            ""
         )
           .trim()
           .toLowerCase();
@@ -1732,16 +1906,14 @@ function bindAccountPage() {
 
       const name =
         String(
-          data.get(
-            "name"
-          ) || ""
+          data.get("name") ||
+            ""
         ).trim();
 
       const phone =
         String(
-          data.get(
-            "phone"
-          ) || ""
+          data.get("phone") ||
+            ""
         ).trim();
 
       const users =
@@ -1753,13 +1925,10 @@ function bindAccountPage() {
       if (
         users.some(
           (user) =>
-            user.email ===
-            email
+            user.email === email
         )
       ) {
-        if (
-          registerMessage
-        ) {
+        if (registerMessage) {
           registerMessage.textContent =
             "Un compte existe déjà avec cet e-mail. Utilise la connexion.";
         }
@@ -1786,9 +1955,7 @@ function bindAccountPage() {
         email
       );
 
-      if (
-        registerMessage
-      ) {
+      if (registerMessage) {
         registerMessage.textContent =
           "Compte créé. Bienvenue dans ton espace TMRR.";
       }
@@ -1809,9 +1976,8 @@ function bindAccountPage() {
 
       const email =
         String(
-          data.get(
-            "email"
-          ) || ""
+          data.get("email") ||
+            ""
         )
           .trim()
           .toLowerCase();
@@ -1836,9 +2002,7 @@ function bindAccountPage() {
         );
 
       if (!user) {
-        if (
-          loginMessage
-        ) {
+        if (loginMessage) {
           loginMessage.textContent =
             "Identifiants introuvables. Vérifie ton e-mail ou ton mot de passe.";
         }
@@ -1851,9 +2015,7 @@ function bindAccountPage() {
         email
       );
 
-      if (
-        loginMessage
-      ) {
+      if (loginMessage) {
         loginMessage.textContent =
           "";
       }
@@ -1879,7 +2041,6 @@ function bindAccountPage() {
 
   showDashboard();
 }
-
 
 /* =========================================================
    CARROUSEL COLLECTION
@@ -1944,8 +2105,7 @@ function bindCollectionCarousel() {
 
             return (
               firstCard.getBoundingClientRect()
-                .width +
-              gap
+                .width + gap
             );
           };
 
@@ -2022,7 +2182,6 @@ function bindCollectionCarousel() {
       }
     );
 }
-
 
 /* =========================================================
    CARROUSEL AVIS
@@ -2087,8 +2246,7 @@ function bindReviewCarousel() {
 
             return (
               firstCard.getBoundingClientRect()
-                .width +
-              gap
+                .width + gap
             );
           };
 
@@ -2166,9 +2324,8 @@ function bindReviewCarousel() {
     );
 }
 
-
 /* =========================================================
-   PACK ALEATOIRE
+   PACK ALÉATOIRE
    ========================================================= */
 
 function bindRandomPackImage() {
@@ -2188,7 +2345,9 @@ function bindRandomPackImage() {
             "[data-random-pack-label]"
           );
 
-        if (!image) return;
+        if (!image) {
+          return;
+        }
 
         const packs = [
           {
@@ -2220,8 +2379,9 @@ function bindRandomPackImage() {
             )
           ];
 
-        if (!selected)
+        if (!selected) {
           return;
+        }
 
         image.src =
           selected.src;
@@ -2239,9 +2399,8 @@ function bindRandomPackImage() {
     );
 }
 
-
 /* =========================================================
-   INTRO CINEMATIQUE
+   ANIMATION INTRO CANVAS
    ========================================================= */
 
 function bindCinematicIntroCanvas(
@@ -2252,16 +2411,18 @@ function bindCinematicIntroCanvas(
       ".intro-canvas"
     );
 
-  if (!canvas)
+  if (!canvas) {
     return false;
+  }
 
   const context =
     canvas.getContext(
       "2d"
     );
 
-  if (!context)
+  if (!context) {
     return false;
+  }
 
   const logo =
     new Image();
@@ -2345,57 +2506,61 @@ function bindCinematicIntroCanvas(
 
       return v < 0.5
         ? 4 *
-            v *
-            v *
-            v
+          v *
+          v *
+          v
         : 1 -
-            Math.pow(
-              -2 * v +
-                2,
-              3
-            ) /
-              2;
+          Math.pow(
+            -2 *
+              v +
+              2,
+            3
+          ) /
+            2;
     };
 
-  const resize = () => {
-    ratio =
-      Math.min(
-        window.devicePixelRatio ||
-          1,
-        1.6
+  const resize =
+    () => {
+      ratio =
+        Math.min(
+          window.devicePixelRatio ||
+            1,
+          1.6
+        );
+
+      width =
+        window.innerWidth;
+
+      height =
+        window.innerHeight;
+
+      canvas.width =
+        Math.floor(
+          width *
+            ratio
+        );
+
+      canvas.height =
+        Math.floor(
+          height *
+            ratio
+        );
+
+      canvas.style.width =
+        `${width}px`;
+
+      canvas.style.height =
+        `${height}px`;
+
+      context.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
       );
-
-    width =
-      window.innerWidth;
-
-    height =
-      window.innerHeight;
-
-    canvas.width =
-      Math.floor(
-        width * ratio
-      );
-
-    canvas.height =
-      Math.floor(
-        height * ratio
-      );
-
-    canvas.style.width =
-      `${width}px`;
-
-    canvas.style.height =
-      `${height}px`;
-
-    context.setTransform(
-      ratio,
-      0,
-      0,
-      ratio,
-      0,
-      0
-    );
-  };
+    };
 
   const drawSmoke =
     (time) => {
@@ -2535,8 +2700,7 @@ function bindCinematicIntroCanvas(
 
       const logoWidth =
         Math.min(
-          width *
-            0.7,
+          width * 0.7,
           880
         ) *
         (0.72 +
@@ -2555,7 +2719,8 @@ function bindCinematicIntroCanvas(
 
       context.globalAlpha =
         appear *
-        (1 - exit);
+        (1 -
+          exit);
 
       context.filter =
         `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
@@ -2563,10 +2728,12 @@ function bindCinematicIntroCanvas(
       context.drawImage(
         logo,
         width / 2 -
-          logoWidth / 2 +
+          logoWidth /
+            2 +
           shake,
         height / 2 -
-          logoHeight / 2 -
+          logoHeight /
+            2 -
           height *
             0.06,
         logoWidth,
@@ -2581,7 +2748,8 @@ function bindCinematicIntroCanvas(
             520) /
             420
         ) *
-        (1 - exit);
+        (1 -
+          exit);
 
       if (
         textAlpha <= 0
@@ -2691,112 +2859,123 @@ function bindCinematicIntroCanvas(
       context.restore();
     };
 
-  const draw = (
-    time
-  ) => {
-    if (!startedAt) {
-      startedAt = time;
-    }
+  const draw =
+    (time) => {
+      /*
+       * Si l'intro a été retirée entre-temps,
+       * on arrête définitivement.
+       */
+      if (
+        !document.body.contains(
+          intro
+        ) ||
+        isConcoursLocation()
+      ) {
+        cancelAnimationFrame(
+          frameId
+        );
+        return;
+      }
 
-    const elapsed =
-      time -
-      startedAt;
+      if (!startedAt) {
+        startedAt =
+          time;
+      }
 
-    context.clearRect(
-      0,
-      0,
-      width,
-      height
-    );
+      const elapsed =
+        time -
+        startedAt;
 
-    context.fillStyle =
-      "#000";
-
-    context.fillRect(
-      0,
-      0,
-      width,
-      height
-    );
-
-    const background =
-      context.createRadialGradient(
-        width / 2,
-        height / 2,
+      context.clearRect(
         0,
-        width / 2,
-        height / 2,
-        Math.max(
-          width,
-          height
-        ) * 0.78
+        0,
+        width,
+        height
       );
 
-    background.addColorStop(
-      0,
-      "rgba(18,18,18,0.68)"
-    );
+      context.fillStyle =
+        "#000";
 
-    background.addColorStop(
-      0.45,
-      "rgba(6,6,6,0.98)"
-    );
+      context.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
 
-    background.addColorStop(
-      1,
-      "#000"
-    );
-
-    context.fillStyle =
-      background;
-
-    context.fillRect(
-      0,
-      0,
-      width,
-      height
-    );
-
-    drawSmoke(
-      elapsed
-    );
-
-    drawLogoAndText(
-      elapsed
-    );
-
-    if (
-      elapsed <
-      duration
-    ) {
-      frameId =
-        requestAnimationFrame(
-          draw
+      const background =
+        context.createRadialGradient(
+          width / 2,
+          height / 2,
+          0,
+          width / 2,
+          height / 2,
+          Math.max(
+            width,
+            height
+          ) * 0.78
         );
-    }
-  };
+
+      background.addColorStop(
+        0,
+        "rgba(18,18,18,0.68)"
+      );
+
+      background.addColorStop(
+        0.45,
+        "rgba(6,6,6,0.98)"
+      );
+
+      background.addColorStop(
+        1,
+        "#000"
+      );
+
+      context.fillStyle =
+        background;
+
+      context.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      drawSmoke(
+        elapsed
+      );
+
+      drawLogoAndText(
+        elapsed
+      );
+
+      if (
+        elapsed < duration
+      ) {
+        frameId =
+          requestAnimationFrame(
+            draw
+          );
+      }
+    };
 
   resize();
 
+  const resizeHandler =
+    () => {
+      resize();
+    };
+
   window.addEventListener(
     "resize",
-    resize
+    resizeHandler
   );
 
-  Promise.allSettled([
-    logo.decode?.().catch(
-      () => {}
-    ) ||
-      Promise.resolve()
-  ]).finally(() => {
-    frameId =
-      requestAnimationFrame(
-        draw
-      );
-  });
-
-  intro.addEventListener(
-    "transitionend",
+  /*
+   * Fonction permettant de tuer complètement
+   * l'animation depuis removeIntroCompletely().
+   */
+  intro.__tmrrCancelAnimation =
     () => {
       cancelAnimationFrame(
         frameId
@@ -2804,30 +2983,66 @@ function bindCinematicIntroCanvas(
 
       window.removeEventListener(
         "resize",
-        resize
+        resizeHandler
       );
-    },
-    { once: true }
-  );
+
+      try {
+        context.clearRect(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+      } catch {}
+    };
+
+  Promise.allSettled([
+    logo.decode?.().catch(
+      () => {}
+    ) ||
+      Promise.resolve()
+  ]).finally(() => {
+    /*
+     * Pendant le chargement du logo,
+     * l'utilisateur peut déjà avoir navigué vers le concours.
+     */
+    if (
+      isConcoursLocation() ||
+      !document.body.contains(
+        intro
+      )
+    ) {
+      return;
+    }
+
+    frameId =
+      requestAnimationFrame(
+        draw
+      );
+  });
 
   return true;
 }
 
-
 /* =========================================================
-   INTRO TMRR — VERSION FINALE
+   INTRODUCTION TMRR
    ========================================================= */
 
 function bindSiteIntro() {
+  /*
+   * Sécurité numéro 1 :
+   * concours = aucune intro.
+   */
+  if (isConcoursLocation()) {
+    removeIntroCompletely();
+    return;
+  }
+
   const intro =
     document.querySelector(
       ".site-intro"
     );
 
-  /*
-   * S'il n'y a pas d'intro sur cette page,
-   * on signale simplement qu'elle est terminée.
-   */
   if (!intro) {
     window.dispatchEvent(
       new Event(
@@ -2840,12 +3055,20 @@ function bindSiteIntro() {
 
   const finishIntro =
     () => {
+      /*
+       * Ne jamais finir/lancer l'intro
+       * si l'utilisateur est sur le concours.
+       */
+      if (
+        isConcoursLocation()
+      ) {
+        removeIntroCompletely();
+        return;
+      }
+
       intro.classList.add(
         "is-finished"
       );
-
-      intro.style.display =
-        "none";
 
       document.body.classList.remove(
         "intro-active"
@@ -2858,48 +3081,6 @@ function bindSiteIntro() {
       );
     };
 
-  /*
-   * IMPORTANT :
-   * Si l'URL contient #concours,
-   * l'intro est supprimée AVANT
-   * d'être lancée.
-   */
-  const hash =
-    window.location.hash
-      .toLowerCase();
-
-  const isConcours =
-    hash === "#concours" ||
-    hash.startsWith(
-      "#concours-"
-    );
-
-  if (isConcours) {
-    finishIntro();
-
-    window.requestAnimationFrame(
-      () => {
-        const target =
-          document.getElementById(
-            "concours"
-          );
-
-        if (target) {
-          target.scrollIntoView({
-            behavior: "auto",
-            block: "start"
-          });
-        }
-      }
-    );
-
-    return;
-  }
-
-  /*
-   * Accueil normal :
-   * l'intro fonctionne comme avant.
-   */
   document.body.classList.add(
     "intro-active"
   );
@@ -2912,39 +3093,64 @@ function bindSiteIntro() {
     return;
   }
 
-  bindCinematicIntroCanvas(
-    intro
-  );
+  /*
+   * On ne lance le canvas
+   * que si on n'est PAS dans le concours.
+   */
+  if (
+    !isConcoursLocation()
+  ) {
+    bindCinematicIntroCanvas(
+      intro
+    );
+  }
 
-  window.setTimeout(
-    finishIntro,
-    3800
-  );
+  /*
+   * Timer mémorisé afin de pouvoir
+   * être annulé en cas de navigation.
+   */
+  intro.__tmrrFinishTimeout =
+    window.setTimeout(
+      finishIntro,
+      3800
+    );
 }
 
-
 /* =========================================================
-   NAVIGATION — CONCOURS DIRECT
+   NAVIGATION
    ========================================================= */
 
-nav?.addEventListener(
+/*
+ * On utilise document au lieu de nav uniquement.
+ *
+ * Ainsi :
+ * - menu principal
+ * - footer
+ * - autres liens
+ *
+ * sont tous traités.
+ */
+document.addEventListener(
   "click",
   (event) => {
+    const target =
+      event.target;
+
+    if (
+      !(target instanceof
+        Element)
+    ) {
+      return;
+    }
+
     const link =
-      event.target.closest(
+      target.closest(
         "a"
       );
 
-    if (!link) return;
-
-    document.body.classList.remove(
-      "menu-open"
-    );
-
-    menuButton?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
+    if (!link) {
+      return;
+    }
 
     const href =
       link.getAttribute(
@@ -2957,90 +3163,260 @@ nav?.addEventListener(
         .toLowerCase() ||
       "";
 
-    const isConcours =
-      href
-        .toLowerCase()
-        .includes(
-          "concours"
-        ) ||
+    const normalizedHref =
+      href.toLowerCase();
+
+    const isConcoursLink =
+      normalizedHref.includes(
+        "concours"
+      ) ||
+      text.includes(
+        "jeu concours"
+      ) ||
       text.includes(
         "jeux concours"
       ) ||
       text.includes(
         "concours tmrr"
+      ) ||
+      text.includes(
+        "honda rebel"
       );
 
-    if (!isConcours) {
+    /*
+     * Menu général
+     */
+    document.body.classList.remove(
+      "menu-open"
+    );
+
+    menuButton?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    if (
+      !isConcoursLink
+    ) {
       return;
     }
 
     /*
-     * BLOQUE complètement la navigation.
-     * Pas de rechargement de la page.
+     * On regarde si la destination
+     * est le concours sur la page actuelle.
      */
-    event.preventDefault();
-    event.stopPropagation();
+    let destination;
 
-    /*
-     * Supprime immédiatement l'intro.
-     */
-    const intro =
-      document.querySelector(
-        ".site-intro"
-      );
-
-    if (intro) {
-      intro.classList.add(
-        "is-finished"
-      );
-
-      intro.style.display =
-        "none";
+    try {
+      destination =
+        new URL(
+          href,
+          window.location.href
+        );
+    } catch {
+      destination =
+        null;
     }
 
-    document.body.classList.remove(
-      "intro-active"
-    );
+    const sameOrigin =
+      !destination ||
+      destination.origin ===
+        window.location.origin;
+
+    const samePath =
+      destination
+        ? (
+            destination.pathname ===
+              window.location.pathname ||
+            (
+              (
+                destination.pathname.endsWith(
+                  "/index.html"
+                ) ||
+                destination.pathname ===
+                  "/"
+              ) &&
+              (
+                window.location.pathname.endsWith(
+                  "/index.html"
+                ) ||
+                window.location.pathname ===
+                  "/"
+              )
+            )
+          )
+        : true;
+
+    const pointsToConcours =
+      normalizedHref.includes(
+        "#concours"
+      ) ||
+      (
+        destination &&
+        destination.hash
+          .toLowerCase()
+          .startsWith(
+            "#concours"
+          )
+      );
 
     /*
-     * Change l'adresse sans
-     * provoquer de rechargement.
+     * CAS 1 :
+     * concours sur la page actuelle.
+     *
+     * On BLOQUE le chargement normal,
+     * supprime l'intro et scroll directement.
      */
     if (
-      window.history &&
-      window.history.pushState
+      sameOrigin &&
+      samePath &&
+      pointsToConcours
     ) {
-      window.history.pushState(
+      event.preventDefault();
+
+      removeIntroCompletely();
+
+      /*
+       * On met simplement le hash.
+       */
+      history.replaceState(
         null,
         "",
         "#concours"
       );
-    } else {
-      window.location.hash =
-        "concours";
+
+      window.requestAnimationFrame(
+        () => {
+          const concours =
+            document.getElementById(
+              "concours"
+            );
+
+          if (
+            concours
+          ) {
+            concours.scrollIntoView(
+              {
+                behavior:
+                  "smooth",
+                block:
+                  "start"
+              }
+            );
+          }
+        }
+      );
+
+      return;
     }
 
     /*
-     * Va directement au concours.
+     * CAS 2 :
+     * on vient d'une autre page
+     * vers index.html#concours.
+     *
+     * Le hash sera détecté dès le chargement
+     * et l'intro sera supprimée immédiatement.
      */
-    window.requestAnimationFrame(
-      () => {
-        const concours =
-          document.getElementById(
-            "concours"
-          );
-
-        if (concours) {
-          concours.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }
-      }
-    );
+    if (
+      pointsToConcours &&
+      destination
+    ) {
+      sessionStorage.setItem(
+        "tmrr_skip_intro",
+        "1"
+      );
+    }
   }
 );
 
+/* =========================================================
+   HASH CHANGE
+   ========================================================= */
+
+window.addEventListener(
+  "hashchange",
+  () => {
+    if (
+      isConcoursLocation()
+    ) {
+      removeIntroCompletely();
+
+      window.requestAnimationFrame(
+        () => {
+          const concours =
+            document.getElementById(
+              "concours"
+            );
+
+          if (
+            concours
+          ) {
+            concours.scrollIntoView(
+              {
+                behavior:
+                  "auto",
+                block:
+                  "start"
+              }
+            );
+          }
+        }
+      );
+    }
+  }
+);
+
+/* =========================================================
+   PAGESHOW
+   ========================================================= */
+
+/*
+ * Correction du problème "je change d'onglet/page
+ * puis je reviens et l'intro réapparaît".
+ *
+ * pageshow est également déclenché lors d'un retour
+ * depuis le cache navigateur (bfcache).
+ */
+window.addEventListener(
+  "pageshow",
+  () => {
+    if (
+      isConcoursLocation() ||
+      sessionStorage.getItem(
+        "tmrr_skip_intro"
+      ) === "1"
+    ) {
+      sessionStorage.removeItem(
+        "tmrr_skip_intro"
+      );
+
+      removeIntroCompletely();
+
+      window.requestAnimationFrame(
+        () => {
+          const concours =
+            document.getElementById(
+              "concours"
+            );
+
+          if (
+            concours
+          ) {
+            concours.scrollIntoView(
+              {
+                behavior:
+                  "auto",
+                block:
+                  "start"
+              }
+            );
+          }
+        }
+      );
+    }
+  }
+);
 
 /* =========================================================
    REVEAL
@@ -3081,9 +3457,8 @@ document
       )
   );
 
-
 /* =========================================================
-   COMPTE A REBOURS
+   COUNTDOWN
    ========================================================= */
 
 const countdown =
@@ -3094,8 +3469,8 @@ const countdown =
 if (countdown) {
   const deadline =
     new Date(
-      countdown.dataset
-        .deadline || ""
+      countdown.dataset.deadline ||
+        ""
     ).getTime();
 
   const parts = {
@@ -3103,17 +3478,14 @@ if (countdown) {
       countdown.querySelector(
         "[data-days]"
       ),
-
     hours:
       countdown.querySelector(
         "[data-hours]"
       ),
-
     minutes:
       countdown.querySelector(
         "[data-minutes]"
       ),
-
     seconds:
       countdown.querySelector(
         "[data-seconds]"
@@ -3165,17 +3537,25 @@ if (countdown) {
             1000
         );
 
-      parts.days.textContent =
-        pad(days);
+      if (parts.days) {
+        parts.days.textContent =
+          pad(days);
+      }
 
-      parts.hours.textContent =
-        pad(hours);
+      if (parts.hours) {
+        parts.hours.textContent =
+          pad(hours);
+      }
 
-      parts.minutes.textContent =
-        pad(minutes);
+      if (parts.minutes) {
+        parts.minutes.textContent =
+          pad(minutes);
+      }
 
-      parts.seconds.textContent =
-        pad(seconds);
+      if (parts.seconds) {
+        parts.seconds.textContent =
+          pad(seconds);
+      }
     };
 
   updateCountdown();
@@ -3186,9 +3566,8 @@ if (countdown) {
   );
 }
 
-
 /* =========================================================
-   MOTO
+   VIEWER HONDA REBEL
    ========================================================= */
 
 const bikeFrames = [
@@ -3276,8 +3655,7 @@ document
       }
 
       setBikeFrame(
-        bikeIndex -
-          1
+        bikeIndex - 1
       );
     }
   );
@@ -3298,8 +3676,7 @@ document
       }
 
       setBikeFrame(
-        bikeIndex +
-          1
+        bikeIndex + 1
       );
     }
   );
@@ -3353,10 +3730,11 @@ function startBikeAutoplay() {
 
   window.setInterval(
     () => {
-      if (bikeAuto) {
+      if (
+        bikeAuto
+      ) {
         setBikeFrame(
-          bikeIndex +
-            1
+          bikeIndex + 1
         );
       }
     },
@@ -3384,6 +3762,7 @@ if (
           )
         ) {
           bikeObserver.disconnect();
+
           startBikeAutoplay();
         }
       },
@@ -3403,7 +3782,6 @@ if (
     2600
   );
 }
-
 
 /* =========================================================
    BOUTONS MAGNETIQUES
@@ -3448,9 +3826,8 @@ document
     }
   );
 
-
 /* =========================================================
-   ETINCELLES
+   SPARK CANVAS
    ========================================================= */
 
 const canvas =
@@ -3468,7 +3845,10 @@ let width = 0;
 let height = 0;
 
 function resizeCanvas() {
-  if (!canvas || !ctx) {
+  if (
+    !canvas ||
+    !ctx
+  ) {
     return;
   }
 
@@ -3510,7 +3890,9 @@ function resizeCanvas() {
 function seedSparks() {
   sparks =
     Array.from(
-      { length: 48 },
+      {
+        length: 48
+      },
       () => ({
         x:
           Math.random() *
@@ -3544,7 +3926,9 @@ function seedSparks() {
 }
 
 function drawSparks() {
-  if (!ctx) return;
+  if (!ctx) {
+    return;
+  }
 
   ctx.clearRect(
     0,
@@ -3622,14 +4006,12 @@ function drawSparks() {
   );
 }
 
-
 /* =========================================================
    INITIALISATION
    ========================================================= */
 
 bindProductButtons();
 bindGiftCardForm();
-
 renderCartPage();
 renderPaymentPage();
 clearCartAfterStripeReturn();
@@ -3646,9 +4028,8 @@ bindHeroVideoSound();
 
 updateCartCount();
 
-
 /* =========================================================
-   HOTSPOT COLLECTION
+   LIEN COLLECTION HERO
    ========================================================= */
 
 document
@@ -3669,9 +4050,8 @@ document
     }
   );
 
-
 /* =========================================================
-   DEMARRAGE ETINCELLES
+   SPARKS
    ========================================================= */
 
 function startSparkCanvas() {
@@ -3710,5 +4090,7 @@ window.addEventListener(
       2200
     );
   },
-  { once: true }
+  {
+    once: true
+  }
 );
