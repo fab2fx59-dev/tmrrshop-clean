@@ -1,16 +1,28 @@
 const menuButton = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".nav");
+
 const CART_KEY = "tmrrCart";
 const USERS_KEY = "tmrrUsers";
 const SESSION_KEY = "tmrrSession";
 const ORDERS_KEY = "tmrrOrders";
+
 const SHIPPING_PRICE = 4.9;
 const FREE_SHIPPING_MIN = 60;
+
 let activePromo = null;
 
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-const shouldSaveData = Boolean(connection?.saveData || ["slow-2g", "2g"].includes(connection?.effectiveType));
+const prefersReducedMotion =
+  window.matchMedia("(prefers-reduced-motion: reduce)");
+
+const connection =
+  navigator.connection ||
+  navigator.mozConnection ||
+  navigator.webkitConnection;
+
+const shouldSaveData = Boolean(
+  connection?.saveData ||
+  ["slow-2g", "2g"].includes(connection?.effectiveType)
+);
 
 function runWhenIdle(callback, timeout = 1600) {
   if ("requestIdleCallback" in window) {
@@ -20,19 +32,31 @@ function runWhenIdle(callback, timeout = 1600) {
   }
 }
 
+
+/* =========================================================
+   PANIER
+   ========================================================= */
+
 function readCart() {
   const readWindowName = () => {
     try {
       const state = JSON.parse(window.name || "{}");
-      return Array.isArray(state[CART_KEY]) ? state[CART_KEY] : [];
+      return Array.isArray(state[CART_KEY])
+        ? state[CART_KEY]
+        : [];
     } catch {
       return [];
     }
   };
 
   try {
-    const stored = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-    return Array.isArray(stored) ? stored : [];
+    const stored = JSON.parse(
+      localStorage.getItem(CART_KEY) || "[]"
+    );
+
+    return Array.isArray(stored)
+      ? stored
+      : [];
   } catch {
     return readWindowName();
   }
@@ -40,85 +64,166 @@ function readCart() {
 
 function writeCart(cart) {
   try {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    localStorage.setItem(
+      CART_KEY,
+      JSON.stringify(cart)
+    );
   } catch {
     try {
-      const state = JSON.parse(window.name || "{}");
+      const state = JSON.parse(
+        window.name || "{}"
+      );
+
       state[CART_KEY] = cart;
       window.name = JSON.stringify(state);
     } catch {
-      window.name = JSON.stringify({ [CART_KEY]: cart });
+      window.name = JSON.stringify({
+        [CART_KEY]: cart
+      });
     }
   }
+
   updateCartCount();
 }
 
 function parsePrice(text) {
-  const normalized = text.replace(",", ".").replace(/[^\d.]/g, "");
+  const normalized =
+    text
+      .replace(",", ".")
+      .replace(/[^\d.]/g, "");
+
   return Number.parseFloat(normalized) || 0;
 }
 
 function formatPrice(value) {
-  return `${value.toFixed(2).replace(".", ",")} EUR`;
+  return `${value
+    .toFixed(2)
+    .replace(".", ",")} EUR`;
 }
 
 function isGiftCardItem(item) {
-  return item.category === "gift_card" || String(item.name || "").toLowerCase().includes("carte cadeau");
+  return (
+    item.category === "gift_card" ||
+    String(item.name || "")
+      .toLowerCase()
+      .includes("carte cadeau")
+  );
 }
 
 function calculateOrderTotals(cart) {
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippableSubtotal = cart
-    .filter((item) => !isGiftCardItem(item))
-    .reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal =
+    cart.reduce(
+      (sum, item) =>
+        sum + item.price * item.quantity,
+      0
+    );
+
+  const shippableSubtotal =
+    cart
+      .filter(
+        (item) =>
+          !isGiftCardItem(item)
+      )
+      .reduce(
+        (sum, item) =>
+          sum + item.price * item.quantity,
+        0
+      );
 
   const shipping =
-    shippableSubtotal > 0 && shippableSubtotal < FREE_SHIPPING_MIN
+    shippableSubtotal > 0 &&
+    shippableSubtotal < FREE_SHIPPING_MIN
       ? SHIPPING_PRICE
       : 0;
 
   const discount = activePromo
     ? activePromo.type === "gift_card"
-      ? Math.min(subtotal + shipping, Number(activePromo.amount || 0))
-      : subtotal * (Number(activePromo.discountPercent || 0) / 100)
+      ? Math.min(
+          subtotal + shipping,
+          Number(activePromo.amount || 0)
+        )
+      : subtotal *
+        (Number(
+          activePromo.discountPercent || 0
+        ) / 100)
     : 0;
 
   return {
     subtotal,
     shipping,
     discount,
-    total: Math.max(0, subtotal + shipping - discount)
+    total: Math.max(
+      0,
+      subtotal + shipping - discount
+    )
   };
 }
 
 function updateCartCount() {
-  const total = readCart().reduce((sum, item) => sum + item.quantity, 0);
+  const total =
+    readCart().reduce(
+      (sum, item) =>
+        sum + item.quantity,
+      0
+    );
 
-  document.querySelectorAll(".cart-pill strong").forEach((element) => {
-    element.textContent = String(total);
-  });
+  document
+    .querySelectorAll(".cart-pill strong")
+    .forEach((element) => {
+      element.textContent =
+        String(total);
+    });
 }
 
+
+/* =========================================================
+   VIDEO HERO
+   ========================================================= */
+
 function bindHeroVideoSound() {
-  const video = document.querySelector("[data-hero-video]");
-  const button = document.querySelector("[data-hero-sound]");
-  const frame = video?.closest(".hero-art");
+  const video =
+    document.querySelector(
+      "[data-hero-video]"
+    );
+
+  const button =
+    document.querySelector(
+      "[data-hero-sound]"
+    );
+
+  const frame =
+    video?.closest(".hero-art");
 
   if (!video) return;
 
-  const setSoundState = (enabled) => {
+  const setSoundState = (
+    enabled
+  ) => {
     video.muted = !enabled;
     video.volume = enabled ? 1 : 0;
-    frame?.classList.toggle("is-sound-on", enabled);
+
+    frame?.classList.toggle(
+      "is-sound-on",
+      enabled
+    );
 
     if (button) {
-      button.textContent = enabled ? "Son on" : "Son off";
-      button.setAttribute("aria-pressed", String(enabled));
+      button.textContent =
+        enabled
+          ? "Son on"
+          : "Son off";
+
+      button.setAttribute(
+        "aria-pressed",
+        String(enabled)
+      );
     }
   };
 
   const toggleSound = async () => {
-    const nextState = video.muted;
+    const nextState =
+      video.muted;
+
     setSoundState(nextState);
 
     try {
@@ -128,339 +233,651 @@ function bindHeroVideoSound() {
     }
   };
 
-  video.addEventListener("click", toggleSound);
+  video.addEventListener(
+    "click",
+    toggleSound
+  );
 
-  button?.addEventListener("click", (event) => {
-    event.stopPropagation();
-    toggleSound();
-  });
+  button?.addEventListener(
+    "click",
+    (event) => {
+      event.stopPropagation();
+      toggleSound();
+    }
+  );
 
   setSoundState(false);
 }
 
 function setVideoSource(video) {
-  if (!video || video.dataset.videoLoaded === "true") return false;
+  if (
+    !video ||
+    video.dataset.videoLoaded === "true"
+  ) {
+    return false;
+  }
 
-  const source = video.dataset.videoSrc;
+  const source =
+    video.dataset.videoSrc;
 
-  if (!source || shouldSaveData || prefersReducedMotion.matches) return false;
+  if (
+    !source ||
+    shouldSaveData ||
+    prefersReducedMotion.matches
+  ) {
+    return false;
+  }
 
   video.muted = true;
   video.defaultMuted = true;
   video.autoplay = true;
-  video.setAttribute("muted", "");
-  video.setAttribute("autoplay", "");
+
+  video.setAttribute(
+    "muted",
+    ""
+  );
+
+  video.setAttribute(
+    "autoplay",
+    ""
+  );
+
   video.src = source;
-  video.dataset.videoLoaded = "true";
+  video.dataset.videoLoaded =
+    "true";
+
   video.load();
 
   return true;
 }
 
 function playDecorativeVideo(video) {
-  if (!setVideoSource(video) && video.dataset.videoLoaded !== "true") return;
+  if (
+    !setVideoSource(video) &&
+    video.dataset.videoLoaded !== "true"
+  ) {
+    return;
+  }
+
   video.play?.().catch(() => {});
 }
 
 function bindDeferredVideos() {
-  const heroVideo = document.querySelector("[data-hero-video]");
-  const navVideo = document.querySelector(".nav-video");
+  const heroVideo =
+    document.querySelector(
+      "[data-hero-video]"
+    );
+
+  const navVideo =
+    document.querySelector(
+      ".nav-video"
+    );
 
   const loadHero = () => {
     if (!heroVideo) return;
 
-    window.setTimeout(() => playDecorativeVideo(heroVideo), 250);
+    window.setTimeout(
+      () =>
+        playDecorativeVideo(
+          heroVideo
+        ),
+      250
+    );
   };
 
   const loadNav = () => {
-    if (!navVideo || window.innerWidth < 900) return;
+    if (
+      !navVideo ||
+      window.innerWidth < 900
+    ) {
+      return;
+    }
 
-    runWhenIdle(() => playDecorativeVideo(navVideo), 2600);
+    runWhenIdle(
+      () =>
+        playDecorativeVideo(
+          navVideo
+        ),
+      2600
+    );
   };
 
-  window.addEventListener("tmrr:intro-finished", loadHero, { once: true });
-
   window.addEventListener(
-    "load",
-    () => window.setTimeout(loadHero, 4800),
+    "tmrr:intro-finished",
+    loadHero,
     { once: true }
   );
 
-  window.addEventListener("load", loadNav, { once: true });
+  window.addEventListener(
+    "load",
+    () =>
+      window.setTimeout(
+        loadHero,
+        4800
+      ),
+    { once: true }
+  );
 
-  if (!document.querySelector(".site-intro")) {
+  window.addEventListener(
+    "load",
+    loadNav,
+    { once: true }
+  );
+
+  if (
+    !document.querySelector(
+      ".site-intro"
+    )
+  ) {
     loadHero();
   }
 }
 
+
+/* =========================================================
+   AJOUT PANIER
+   ========================================================= */
+
 function addToCart(item) {
   const cart = readCart();
-  const existing = cart.find((cartItem) => cartItem.id === item.id);
+
+  const existing =
+    cart.find(
+      (cartItem) =>
+        cartItem.id === item.id
+    );
 
   if (existing) {
-    existing.quantity += item.quantity || 1;
+    existing.quantity +=
+      item.quantity || 1;
   } else {
-    cart.push({ ...item, quantity: item.quantity || 1 });
+    cart.push({
+      ...item,
+      quantity:
+        item.quantity || 1
+    });
   }
 
   writeCart(cart);
 
   window.location.href =
-    window.location.protocol === "file:"
+    window.location.protocol ===
+    "file:"
       ? "panier.html"
       : "/panier";
 }
 
-function readJson(key, fallback) {
+
+/* =========================================================
+   COMPTES
+   ========================================================= */
+
+function readJson(
+  key,
+  fallback
+) {
   try {
-    const value = JSON.parse(localStorage.getItem(key) || "null");
+    const value =
+      JSON.parse(
+        localStorage.getItem(
+          key
+        ) || "null"
+      );
+
     return value ?? fallback;
   } catch {
     return fallback;
   }
 }
 
-function writeJson(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+function writeJson(
+  key,
+  value
+) {
+  localStorage.setItem(
+    key,
+    JSON.stringify(value)
+  );
 }
 
 function getCurrentUser() {
-  const email = localStorage.getItem(SESSION_KEY);
+  const email =
+    localStorage.getItem(
+      SESSION_KEY
+    );
 
   if (!email) return null;
 
-  return readJson(USERS_KEY, []).find(
-    (user) => user.email === email
-  ) || null;
+  return (
+    readJson(
+      USERS_KEY,
+      []
+    ).find(
+      (user) =>
+        user.email === email
+    ) || null
+  );
 }
 
 function getUserOrders(email) {
-  return readJson(ORDERS_KEY, []).filter(
-    (order) => order.email === email
+  return readJson(
+    ORDERS_KEY,
+    []
+  ).filter(
+    (order) =>
+      order.email === email
   );
 }
+
+
+/* =========================================================
+   PRODUITS
+   ========================================================= */
 
 function bindProductButtons() {
-  document.querySelectorAll(".product-card .btn-small").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
+  document
+    .querySelectorAll(
+      ".product-card .btn-small"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
 
-      const card = button.closest(".product-card");
-      if (!card) return;
+          const card =
+            button.closest(
+              ".product-card"
+            );
 
-      const name =
-        card.querySelector("h3")?.textContent?.trim() ||
-        "Article TMRR";
+          if (!card) return;
 
-      const priceText =
-        card.querySelector(".buy-row strong")?.textContent ||
-        "0";
+          const name =
+            card.querySelector(
+              "h3"
+            )?.textContent?.trim() ||
+            "Article TMRR";
 
-      const image =
-        card.querySelector("img")?.getAttribute("src") ||
-        "";
+          const priceText =
+            card.querySelector(
+              ".buy-row strong"
+            )?.textContent ||
+            "0";
 
-      const model =
-        card.querySelector('[data-option="model"]')?.value;
+          const image =
+            card.querySelector(
+              "img"
+            )?.getAttribute(
+              "src"
+            ) || "";
 
-      const size =
-        card.querySelector('[data-option="size"]')?.value;
+          const model =
+            card.querySelector(
+              '[data-option="model"]'
+            )?.value;
 
-      const quantity = Math.max(
-        1,
-        Number(
-          card.querySelector('[data-option="quantity"]')?.value || 1
-        )
+          const size =
+            card.querySelector(
+              '[data-option="size"]'
+            )?.value;
+
+          const quantity =
+            Math.max(
+              1,
+              Number(
+                card.querySelector(
+                  '[data-option="quantity"]'
+                )?.value || 1
+              )
+            );
+
+          const baseOption =
+            card.querySelector(
+              ".product-label"
+            )?.textContent?.trim() ||
+            "TMRR";
+
+          const selectedOptions = [
+            baseOption,
+            model &&
+              `Modèle ${model}`,
+            size &&
+              `Taille ${size}`
+          ]
+            .filter(Boolean)
+            .join(" · ");
+
+          addToCart({
+            id:
+              `${name}-${priceText}-${model || ""}-${size || ""}`
+                .toLowerCase()
+                .replace(
+                  /\s+/g,
+                  "-"
+                ),
+            name,
+            price:
+              parsePrice(
+                priceText
+              ),
+            image,
+            quantity,
+            options:
+              selectedOptions
+          });
+        }
       );
-
-      const baseOption =
-        card.querySelector(".product-label")?.textContent?.trim() ||
-        "TMRR";
-
-      const selectedOptions = [
-        baseOption,
-        model && `Modèle ${model}`,
-        size && `Taille ${size}`
-      ]
-        .filter(Boolean)
-        .join(" · ");
-
-      addToCart({
-        id: `${name}-${priceText}-${model || ""}-${size || ""}`
-          .toLowerCase()
-          .replace(/\s+/g, "-"),
-        name,
-        price: parsePrice(priceText),
-        image,
-        quantity,
-        options: selectedOptions
-      });
     });
-  });
 
-  document.querySelector(".order-box .btn")?.addEventListener(
-    "click",
-    (event) => {
-      event.preventDefault();
+  document
+    .querySelector(
+      ".order-box .btn"
+    )
+    ?.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
 
-      const model =
-        document.querySelector("[data-order-model]")?.value ||
-        "Homme";
+        const model =
+          document.querySelector(
+            "[data-order-model]"
+          )?.value ||
+          "Homme";
 
-      const size =
-        document.querySelector("[data-order-size]")?.value ||
-        "M";
+        const size =
+          document.querySelector(
+            "[data-order-size]"
+          )?.value ||
+          "M";
 
-      const quantity = Number(
-        document.querySelector(".order-box input")?.value || 1
+        const quantity =
+          Number(
+            document.querySelector(
+              ".order-box input"
+            )?.value || 1
+          );
+
+        addToCart({
+          id:
+            `ticket-rebel-pack-${model}-${size}`,
+          name:
+            "Pack Ticket Rebel",
+          price: 39.9,
+          image:
+            "assets/pack/ticket-shirt-poster.png",
+          quantity,
+          options:
+            `T-shirt concours modèle ${model} taille ${size} · ` +
+            `Casquette TMRR · 2 participations`
+        });
+      }
+    );
+
+  document
+    .querySelectorAll(
+      "[data-pack-choice]"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+
+          const pack =
+            button.dataset.packChoice ||
+            "pack1";
+
+          const scope =
+            button.closest(
+              ".mobile-pack-controls"
+            ) ||
+            button.closest(
+              "[data-pack-selector]"
+            ) ||
+            document;
+
+          const model =
+            scope.querySelector(
+              `[data-pack-model="${pack}"]`
+            )?.value ||
+            "Homme";
+
+          const size =
+            scope.querySelector(
+              `[data-pack-size="${pack}"]`
+            )?.value ||
+            "M";
+
+          const isPackTwo =
+            pack === "pack2";
+
+          addToCart({
+            id:
+              `${pack}-${model}-${size}`
+                .toLowerCase()
+                .replace(
+                  /\s+/g,
+                  "-"
+                ),
+            name:
+              isPackTwo
+                ? "Pack 2 - Ticket Rebel"
+                : "Pack 1 - T-shirt concours",
+            price:
+              isPackTwo
+                ? 39.9
+                : 25.9,
+            image:
+              "assets/campaign/packs-horizontal.png",
+            quantity: 1,
+            options:
+              isPackTwo
+                ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
+                : `T-shirt concours modele ${model} taille ${size} - 1 participation`
+          });
+        }
       );
-
-      addToCart({
-        id: `ticket-rebel-pack-${model}-${size}`,
-        name: "Pack Ticket Rebel",
-        price: 39.9,
-        image: "assets/pack/ticket-shirt-poster.png",
-        quantity,
-        options:
-          `T-shirt concours modèle ${model} taille ${size} · ` +
-          `Casquette TMRR · 2 participations`
-      });
-    }
-  );
-
-  document.querySelectorAll("[data-pack-choice]").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-
-      const pack =
-        button.dataset.packChoice || "pack1";
-
-      const scope =
-        button.closest(".mobile-pack-controls") ||
-        button.closest("[data-pack-selector]") ||
-        document;
-
-      const model =
-        scope.querySelector(`[data-pack-model="${pack}"]`)?.value ||
-        "Homme";
-
-      const size =
-        scope.querySelector(`[data-pack-size="${pack}"]`)?.value ||
-        "M";
-
-      const isPackTwo = pack === "pack2";
-
-      addToCart({
-        id: `${pack}-${model}-${size}`
-          .toLowerCase()
-          .replace(/\s+/g, "-"),
-        name: isPackTwo
-          ? "Pack 2 - Ticket Rebel"
-          : "Pack 1 - T-shirt concours",
-        price: isPackTwo ? 39.9 : 25.9,
-        image: "assets/campaign/packs-horizontal.png",
-        quantity: 1,
-        options: isPackTwo
-          ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
-          : `T-shirt concours modele ${model} taille ${size} - 1 participation`
-      });
     });
-  });
 
-  document.querySelectorAll("[data-club-plan]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const name =
-        button.dataset.planName || "Club TMRR";
+  document
+    .querySelectorAll(
+      "[data-club-plan]"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        () => {
+          const name =
+            button.dataset.planName ||
+            "Club TMRR";
 
-      const price =
-        Number(button.dataset.planPrice || 0);
+          const price =
+            Number(
+              button.dataset.planPrice ||
+                0
+            );
 
-      addToCart({
-        id: name.toLowerCase().replace(/\s+/g, "-"),
-        name,
-        price,
-        image: "assets/brand/logo-dragon-white.png",
-        options: "Abonnement Club TMRR"
-      });
+          addToCart({
+            id:
+              name
+                .toLowerCase()
+                .replace(
+                  /\s+/g,
+                  "-"
+                ),
+            name,
+            price,
+            image:
+              "assets/brand/logo-dragon-white.png",
+            options:
+              "Abonnement Club TMRR"
+          });
+        }
+      );
     });
-  });
 }
 
+
+/* =========================================================
+   CARTE CADEAU
+   ========================================================= */
+
 function bindGiftCardForm() {
-  const form = document.querySelector("[data-gift-form]");
+  const form =
+    document.querySelector(
+      "[data-gift-form]"
+    );
 
   if (!form) return;
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  form.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
 
-    const data = new FormData(form);
+      const data =
+        new FormData(form);
 
-    const amount = Number(data.get("amount"));
-    const quantity = Number(data.get("quantity") || 1);
-    const recipientEmail =
-      String(data.get("recipientEmail") || "").trim();
+      const amount =
+        Number(
+          data.get("amount")
+        );
 
-    if (![25, 50, 75, 100].includes(amount)) return;
+      const quantity =
+        Number(
+          data.get("quantity") || 1
+        );
 
-    if (!recipientEmail) {
-      form.reportValidity();
-      return;
+      const recipientEmail =
+        String(
+          data.get(
+            "recipientEmail"
+          ) || ""
+        ).trim();
+
+      if (
+        ![25, 50, 75, 100].includes(
+          amount
+        )
+      ) {
+        return;
+      }
+
+      if (!recipientEmail) {
+        form.reportValidity();
+        return;
+      }
+
+      addToCart({
+        id:
+          `carte-kdo-${amount}`,
+        name:
+          "Carte cadeau electronique",
+        price: amount,
+        image:
+          "assets/gift/gift-card.png",
+        quantity,
+        category:
+          "gift_card",
+        recipientEmail,
+        recipientName:
+          String(
+            data.get(
+              "recipientName"
+            ) || ""
+          ).trim(),
+        recipientType:
+          String(
+            data.get(
+              "recipientType"
+            ) || "other"
+          ),
+        deliveryDate:
+          String(
+            data.get(
+              "sendDate"
+            ) || ""
+          ),
+        giftMessage:
+          String(
+            data.get(
+              "message"
+            ) || ""
+          ).trim(),
+        options:
+          `${
+            data.get(
+              "recipientType"
+            ) === "self"
+              ? "Pour moi-meme"
+              : "Pour quelqu'un d'autre"
+          } - Envoi a ${recipientEmail}`
+      });
     }
-
-    addToCart({
-      id: `carte-kdo-${amount}`,
-      name: "Carte cadeau electronique",
-      price: amount,
-      image: "assets/gift/gift-card.png",
-      quantity,
-      category: "gift_card",
-      recipientEmail,
-      recipientName:
-        String(data.get("recipientName") || "").trim(),
-      recipientType:
-        String(data.get("recipientType") || "other"),
-      deliveryDate:
-        String(data.get("sendDate") || ""),
-      giftMessage:
-        String(data.get("message") || "").trim(),
-      options:
-        `${data.get("recipientType") === "self"
-          ? "Pour moi-meme"
-          : "Pour quelqu'un d'autre"} - Envoi a ${recipientEmail}`
-    });
-  });
+  );
 }
 
-function renderCartPage() {
-  const list = document.querySelector("[data-cart-items]");
-  const totalElement =
-    document.querySelector("[data-cart-total]");
 
-  if (!list || !totalElement) return;
+/* =========================================================
+   PAGE PANIER
+   ========================================================= */
+
+function renderCartPage() {
+  const list =
+    document.querySelector(
+      "[data-cart-items]"
+    );
+
+  const totalElement =
+    document.querySelector(
+      "[data-cart-total]"
+    );
+
+  if (
+    !list ||
+    !totalElement
+  ) {
+    return;
+  }
 
   const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+      window.location.search
+    );
 
-  const addPayload = params.get("add");
+  const addPayload =
+    params.get("add");
 
   if (addPayload) {
     try {
       const item =
-        JSON.parse(decodeURIComponent(addPayload));
+        JSON.parse(
+          decodeURIComponent(
+            addPayload
+          )
+        );
 
-      const cleanUrl = `${window.location.pathname}`;
-      const cart = readCart();
+      const cleanUrl =
+        `${window.location.pathname}`;
+
+      const cart =
+        readCart();
 
       const existing =
-        cart.find((cartItem) => cartItem.id === item.id);
+        cart.find(
+          (cartItem) =>
+            cartItem.id ===
+            item.id
+        );
 
       if (existing) {
-        existing.quantity += item.quantity || 1;
+        existing.quantity +=
+          item.quantity || 1;
       } else {
         cart.push({
           ...item,
-          quantity: item.quantity || 1
+          quantity:
+            item.quantity || 1
         });
       }
 
@@ -480,7 +897,8 @@ function renderCartPage() {
     }
   }
 
-  const cart = readCart();
+  const cart =
+    readCart();
 
   list.innerHTML = "";
 
@@ -489,15 +907,23 @@ function renderCartPage() {
       `<p class="hero-lead">Ton panier est vide pour le moment.</p>`;
 
     document
-      .querySelector("[data-cart-subtotal]")
+      .querySelector(
+        "[data-cart-subtotal]"
+      )
       ?.replaceChildren(
-        document.createTextNode(formatPrice(0))
+        document.createTextNode(
+          formatPrice(0)
+        )
       );
 
     document
-      .querySelector("[data-cart-shipping]")
+      .querySelector(
+        "[data-cart-shipping]"
+      )
       ?.replaceChildren(
-        document.createTextNode(formatPrice(0))
+        document.createTextNode(
+          formatPrice(0)
+        )
       );
 
     totalElement.textContent =
@@ -506,411 +932,606 @@ function renderCartPage() {
     return;
   }
 
-  cart.forEach((item, index) => {
-    const row = document.createElement("article");
+  cart.forEach(
+    (item, index) => {
+      const row =
+        document.createElement(
+          "article"
+        );
 
-    row.className = "cart-item";
+      row.className =
+        "cart-item";
 
-    const lineTotal =
-      item.price * item.quantity;
+      const lineTotal =
+        item.price *
+        item.quantity;
 
-    row.innerHTML = `
-      <img src="${item.image}" alt="">
-      <div>
-        <h3>${item.name}</h3>
-        <p>${item.options || ""}</p>
-        <p>Prix unitaire : ${formatPrice(item.price)}</p>
-        <label class="cart-quantity">Quantite
-          <input
-            type="number"
-            min="1"
-            value="${item.quantity}"
-            data-cart-quantity="${index}"
-          >
-        </label>
-        <p>Total article : ${formatPrice(lineTotal)}</p>
-      </div>
-      <button
-        class="cart-remove"
-        type="button"
-        data-remove="${index}"
-      >
-        Retirer
-      </button>
-    `;
+      row.innerHTML = `
+        <img src="${item.image}" alt="">
+        <div>
+          <h3>${item.name}</h3>
+          <p>${item.options || ""}</p>
+          <p>Prix unitaire : ${formatPrice(item.price)}</p>
 
-    list.appendChild(row);
-  });
+          <label class="cart-quantity">
+            Quantite
+            <input
+              type="number"
+              min="1"
+              value="${item.quantity}"
+              data-cart-quantity="${index}"
+            >
+          </label>
+
+          <p>Total article : ${formatPrice(lineTotal)}</p>
+        </div>
+
+        <button
+          class="cart-remove"
+          type="button"
+          data-remove="${index}"
+        >
+          Retirer
+        </button>
+      `;
+
+      list.appendChild(
+        row
+      );
+    }
+  );
 
   const totals =
-    calculateOrderTotals(cart);
+    calculateOrderTotals(
+      cart
+    );
 
   document
-    .querySelector("[data-cart-subtotal]")
+    .querySelector(
+      "[data-cart-subtotal]"
+    )
     ?.replaceChildren(
       document.createTextNode(
-        formatPrice(totals.subtotal)
+        formatPrice(
+          totals.subtotal
+        )
       )
     );
 
   document
-    .querySelector("[data-cart-shipping]")
+    .querySelector(
+      "[data-cart-shipping]"
+    )
     ?.replaceChildren(
       document.createTextNode(
         totals.shipping
-          ? formatPrice(totals.shipping)
+          ? formatPrice(
+              totals.shipping
+            )
           : "Offerts"
       )
     );
 
   totalElement.textContent =
-    formatPrice(totals.total);
+    formatPrice(
+      totals.total
+    );
 
-  list.querySelectorAll("[data-remove]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const next = readCart();
+  list
+    .querySelectorAll(
+      "[data-remove]"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        () => {
+          const next =
+            readCart();
 
-      next.splice(
-        Number(button.dataset.remove),
-        1
+          next.splice(
+            Number(
+              button.dataset
+                .remove
+            ),
+            1
+          );
+
+          writeCart(next);
+          renderCartPage();
+        }
       );
-
-      writeCart(next);
-      renderCartPage();
     });
-  });
 
-  list.querySelectorAll("[data-cart-quantity]").forEach((input) => {
-    input.addEventListener("change", () => {
-      const next = readCart();
+  list
+    .querySelectorAll(
+      "[data-cart-quantity]"
+    )
+    .forEach((input) => {
+      input.addEventListener(
+        "change",
+        () => {
+          const next =
+            readCart();
 
-      const index =
-        Number(input.dataset.cartQuantity);
+          const index =
+            Number(
+              input.dataset
+                .cartQuantity
+            );
 
-      const quantity = Math.max(
-        1,
-        Number(input.value || 1)
+          const quantity =
+            Math.max(
+              1,
+              Number(
+                input.value || 1
+              )
+            );
+
+          input.value =
+            String(
+              quantity
+            );
+
+          if (next[index]) {
+            next[index].quantity =
+              quantity;
+
+            writeCart(next);
+            renderCartPage();
+          }
+        }
       );
-
-      input.value = String(quantity);
-
-      if (next[index]) {
-        next[index].quantity = quantity;
-        writeCart(next);
-        renderCartPage();
-      }
     });
-  });
 }
+
+
+/* =========================================================
+   PAIEMENT
+   ========================================================= */
 
 function renderPaymentPage() {
   const itemsElement =
-    document.querySelector("[data-payment-items]");
+    document.querySelector(
+      "[data-payment-items]"
+    );
 
   const totalElement =
-    document.querySelector("[data-payment-total]");
+    document.querySelector(
+      "[data-payment-total]"
+    );
 
   const confirmButton =
-    document.querySelector("[data-confirm-order]");
+    document.querySelector(
+      "[data-confirm-order]"
+    );
 
   const message =
-    document.querySelector("[data-payment-message]");
+    document.querySelector(
+      "[data-payment-message]"
+    );
 
   const promoInput =
-    document.querySelector("[data-promo-code]");
+    document.querySelector(
+      "[data-promo-code]"
+    );
 
   const promoButton =
-    document.querySelector("[data-apply-promo]");
+    document.querySelector(
+      "[data-apply-promo]"
+    );
 
   const discountLine =
-    document.querySelector(".cart-discount");
+    document.querySelector(
+      ".cart-discount"
+    );
 
   const discountElement =
-    document.querySelector("[data-payment-discount]");
+    document.querySelector(
+      "[data-payment-discount]"
+    );
 
-  if (!itemsElement || !totalElement || !confirmButton) {
+  if (
+    !itemsElement ||
+    !totalElement ||
+    !confirmButton
+  ) {
     return;
   }
 
-  const cart = readCart();
+  const cart =
+    readCart();
 
-  itemsElement.innerHTML = "";
+  itemsElement.innerHTML =
+    "";
 
   if (!cart.length) {
     itemsElement.innerHTML =
       `<p>Ton panier est vide pour le moment.</p>`;
 
     document
-      .querySelector("[data-payment-subtotal]")
+      .querySelector(
+        "[data-payment-subtotal]"
+      )
       ?.replaceChildren(
-        document.createTextNode(formatPrice(0))
+        document.createTextNode(
+          formatPrice(0)
+        )
       );
 
     document
-      .querySelector("[data-payment-shipping]")
+      .querySelector(
+        "[data-payment-shipping]"
+      )
       ?.replaceChildren(
-        document.createTextNode(formatPrice(0))
+        document.createTextNode(
+          formatPrice(0)
+        )
       );
 
     totalElement.textContent =
       formatPrice(0);
 
-    confirmButton.disabled = true;
+    confirmButton.disabled =
+      true;
 
     return;
   }
 
-  cart.forEach((item) => {
-    const row =
-      document.createElement("div");
+  cart.forEach(
+    (item) => {
+      const row =
+        document.createElement(
+          "div"
+        );
 
-    row.className = "payment-line";
+      row.className =
+        "payment-line";
 
-    row.innerHTML = `
-      <span>
-        ${item.quantity} x ${item.name}
-        <small>
-          ${item.options || "Article TMRR"} ·
-          Prix unitaire : ${formatPrice(item.price)}
-        </small>
-      </span>
-      <strong>
-        ${formatPrice(item.price * item.quantity)}
-      </strong>
-    `;
+      row.innerHTML = `
+        <span>
+          ${item.quantity} x ${item.name}
 
-    itemsElement.appendChild(row);
-  });
+          <small>
+            ${item.options || "Article TMRR"} ·
+            Prix unitaire : ${formatPrice(item.price)}
+          </small>
+        </span>
+
+        <strong>
+          ${formatPrice(
+            item.price *
+              item.quantity
+          )}
+        </strong>
+      `;
+
+      itemsElement.appendChild(
+        row
+      );
+    }
+  );
 
   const totals =
-    calculateOrderTotals(cart);
+    calculateOrderTotals(
+      cart
+    );
 
   document
-    .querySelector("[data-payment-subtotal]")
+    .querySelector(
+      "[data-payment-subtotal]"
+    )
     ?.replaceChildren(
       document.createTextNode(
-        formatPrice(totals.subtotal)
+        formatPrice(
+          totals.subtotal
+        )
       )
     );
 
   document
-    .querySelector("[data-payment-shipping]")
+    .querySelector(
+      "[data-payment-shipping]"
+    )
     ?.replaceChildren(
       document.createTextNode(
         totals.shipping
-          ? formatPrice(totals.shipping)
+          ? formatPrice(
+              totals.shipping
+            )
           : "Offerts"
       )
     );
 
-  if (discountLine && discountElement) {
-    discountLine.hidden = !totals.discount;
+  if (
+    discountLine &&
+    discountElement
+  ) {
+    discountLine.hidden =
+      !totals.discount;
 
     discountElement.textContent =
-      `-${formatPrice(totals.discount)}`;
+      `-${formatPrice(
+        totals.discount
+      )}`;
   }
 
   totalElement.textContent =
-    formatPrice(totals.total);
+    formatPrice(
+      totals.total
+    );
 
   if (promoButton) {
-    promoButton.onclick = async () => {
-      const code =
-        promoInput?.value?.trim();
+    promoButton.onclick =
+      async () => {
+        const code =
+          promoInput?.value?.trim();
 
-      if (!code) {
-        if (message) {
-          message.textContent =
-            "Saisis un code promo.";
+        if (!code) {
+          if (message) {
+            message.textContent =
+              "Saisis un code promo.";
+          }
+
+          return;
         }
-        return;
-      }
-
-      if (message) {
-        message.textContent =
-          "Vérification du code promo...";
-      }
-
-      const response = await fetch(
-        "/api/promo/validate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ code })
-        }
-      );
-
-      const payload =
-        await response.json();
-
-      if (!response.ok) {
-        activePromo = null;
 
         if (message) {
           message.textContent =
-            payload.error ||
-            "Code promo invalide.";
+            "Vérification du code promo...";
         }
 
-        renderPaymentPage();
-        return;
-      }
+        try {
+          const response =
+            await fetch(
+              "/api/promo/validate",
+              {
+                method:
+                  "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+                body:
+                  JSON.stringify({
+                    code
+                  })
+              }
+            );
 
-      activePromo = {
-        code: payload.code,
-        type: payload.type || "promo",
-        discountPercent:
-          Number(payload.discountPercent || 0),
-        amount:
-          Number(payload.amount || 0)
+          const payload =
+            await response.json();
+
+          if (!response.ok) {
+            activePromo =
+              null;
+
+            if (message) {
+              message.textContent =
+                payload.error ||
+                "Code promo invalide.";
+            }
+
+            renderPaymentPage();
+            return;
+          }
+
+          activePromo = {
+            code:
+              payload.code,
+            type:
+              payload.type ||
+              "promo",
+            discountPercent:
+              Number(
+                payload.discountPercent ||
+                  0
+              ),
+            amount:
+              Number(
+                payload.amount ||
+                  0
+              )
+          };
+
+          if (promoInput) {
+            promoInput.value =
+              payload.code;
+          }
+
+          if (message) {
+            message.textContent =
+              activePromo.type ===
+              "gift_card"
+                ? `Carte cadeau ${payload.code} appliquee : ${formatPrice(activePromo.amount)} de credit disponible.`
+                : `Code ${payload.code} applique : -${activePromo.discountPercent} %.`;
+          }
+
+          renderPaymentPage();
+        } catch {
+          if (message) {
+            message.textContent =
+              "Impossible de vérifier le code promo.";
+          }
+        }
       };
-
-      if (promoInput) {
-        promoInput.value =
-          payload.code;
-      }
-
-      if (message) {
-        message.textContent =
-          activePromo.type === "gift_card"
-            ? `Carte cadeau ${payload.code} appliquee : ${formatPrice(activePromo.amount)} de credit disponible.`
-            : `Code ${payload.code} applique : -${activePromo.discountPercent} %.`;
-      }
-
-      renderPaymentPage();
-    };
   }
 
-  confirmButton.onclick = async () => {
-    confirmButton.disabled = true;
+  confirmButton.onclick =
+    async () => {
+      confirmButton.disabled =
+        true;
 
-    if (message) {
-      message.textContent =
-        "Preparation du paiement securise...";
-    }
-
-    try {
-      const response = await fetch(
-        "/api/checkout",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            items: cart,
-            promoCode:
-              activePromo?.type === "promo"
-                ? activePromo.code
-                : "",
-            giftCardCode:
-              activePromo?.type === "gift_card"
-                ? activePromo.code
-                : ""
-          })
-        }
-      );
-
-      const responseText =
-        await response.text();
-
-      let payload = {};
-
-      try {
-        payload = responseText
-          ? JSON.parse(responseText)
-          : {};
-      } catch {
-        payload = {
-          error:
-            responseText ||
-            "Erreur technique pendant la preparation du paiement."
-        };
-      }
-
-      if (!response.ok) {
-        const missingConfig =
-          payload.config
-            ? ` Config: URL Supabase ${payload.config.supabaseUrl ? "OK" : "MANQUANTE"}, anon ${payload.config.supabaseAnon ? "OK" : "MANQUANTE"}, service ${payload.config.supabaseService ? "OK" : "MANQUANTE"}, Stripe ${payload.config.stripeSecret ? "OK" : "MANQUANTE"}.`
-            : "";
-
-        const errorText =
-          (payload.error ||
-            `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`) +
-          missingConfig;
-
-        if (message) {
-          message.textContent =
-            errorText;
-        }
-
-        if (
-          response.status === 401 &&
-          errorText
-            .toLowerCase()
-            .includes("connecte")
-        ) {
-          window.setTimeout(() => {
-            const accountMessage =
-              encodeURIComponent(
-                "Connecte-toi ou cree un compte client pour passer commande."
-              );
-
-            window.location.href =
-              `/compte?redirect=${encodeURIComponent("/paiement")}&message=${accountMessage}`;
-          }, 1200);
-        }
-
-        confirmButton.disabled = false;
-        return;
-      }
-
-      if (payload.url) {
-        window.location.href =
-          payload.url;
-        return;
-      }
-
-      throw new Error(
-        "Aucune page de paiement recue."
-      );
-    } catch {
       if (message) {
         message.textContent =
-          "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+          "Preparation du paiement securise...";
       }
 
-      confirmButton.disabled = false;
-    }
-  };
+      try {
+        const response =
+          await fetch(
+            "/api/checkout",
+            {
+              method:
+                "POST",
+              credentials:
+                "same-origin",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+              body:
+                JSON.stringify({
+                  items: cart,
+                  promoCode:
+                    activePromo?.type ===
+                    "promo"
+                      ? activePromo.code
+                      : "",
+                  giftCardCode:
+                    activePromo?.type ===
+                    "gift_card"
+                      ? activePromo.code
+                      : ""
+                })
+            }
+          );
+
+        const responseText =
+          await response.text();
+
+        let payload = {};
+
+        try {
+          payload =
+            responseText
+              ? JSON.parse(
+                  responseText
+                )
+              : {};
+        } catch {
+          payload = {
+            error:
+              responseText ||
+              "Erreur technique pendant la preparation du paiement."
+          };
+        }
+
+        if (!response.ok) {
+          const missingConfig =
+            payload.config
+              ? ` Config: URL Supabase ${payload.config.supabaseUrl ? "OK" : "MANQUANTE"}, anon ${payload.config.supabaseAnon ? "OK" : "MANQUANTE"}, service ${payload.config.supabaseService ? "OK" : "MANQUANTE"}, Stripe ${payload.config.stripeSecret ? "OK" : "MANQUANTE"}.`
+              : "";
+
+          const errorText =
+            (payload.error ||
+              `Le paiement n'a pas pu demarrer. Erreur ${response.status}.`) +
+            missingConfig;
+
+          if (message) {
+            message.textContent =
+              errorText;
+          }
+
+          if (
+            response.status ===
+              401 &&
+            errorText
+              .toLowerCase()
+              .includes(
+                "connecte"
+              )
+          ) {
+            window.setTimeout(
+              () => {
+                const accountMessage =
+                  encodeURIComponent(
+                    "Connecte-toi ou cree un compte client pour passer commande."
+                  );
+
+                window.location.href =
+                  `/compte?redirect=${encodeURIComponent(
+                    "/paiement"
+                  )}&message=${accountMessage}`;
+              },
+              1200
+            );
+          }
+
+          confirmButton.disabled =
+            false;
+
+          return;
+        }
+
+        if (payload.url) {
+          window.location.href =
+            payload.url;
+
+          return;
+        }
+
+        throw new Error(
+          "Aucune page de paiement recue."
+        );
+      } catch {
+        if (message) {
+          message.textContent =
+            "Le paiement n'a pas pu demarrer. Reessaie dans un instant.";
+        }
+
+        confirmButton.disabled =
+          false;
+      }
+    };
 }
+
+
+/* =========================================================
+   RETOUR STRIPE
+   ========================================================= */
 
 function clearCartAfterStripeReturn() {
   const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+      window.location.search
+    );
 
-  if (params.get("paiement") !== "success") {
+  if (
+    params.get(
+      "paiement"
+    ) !== "success"
+  ) {
     return;
   }
 
   writeCart([]);
 }
 
+
+/* =========================================================
+   COMPTE CLIENT
+   ========================================================= */
+
 function bindAccountPage() {
   const registerForm =
-    document.querySelector("[data-register-form]");
+    document.querySelector(
+      "[data-register-form]"
+    );
 
   const loginForm =
-    document.querySelector("[data-login-form]");
+    document.querySelector(
+      "[data-login-form]"
+    );
 
   const dashboard =
-    document.querySelector("[data-account-dashboard]");
+    document.querySelector(
+      "[data-account-dashboard]"
+    );
 
   const authForms =
-    document.querySelector("[data-auth-forms]");
+    document.querySelector(
+      "[data-auth-forms]"
+    );
 
   if (
     !registerForm ||
@@ -922,121 +1543,166 @@ function bindAccountPage() {
   }
 
   const loginMessage =
-    document.querySelector("[data-login-message]");
+    document.querySelector(
+      "[data-login-message]"
+    );
 
   const registerMessage =
-    document.querySelector("[data-register-message]");
-
-  const showDashboard = () => {
-    const user = getCurrentUser();
-
-    if (!user) {
-      authForms.hidden = false;
-      dashboard.hidden = true;
-      return;
-    }
-
-    authForms.hidden = true;
-    dashboard.hidden = false;
-
     document.querySelector(
-      "[data-account-name]"
-    ).textContent = user.name;
+      "[data-register-message]"
+    );
 
-    document.querySelector(
-      "[data-account-email]"
-    ).textContent = user.email;
+  const showDashboard =
+    () => {
+      const user =
+        getCurrentUser();
 
-    document.querySelector(
-      "[data-account-phone]"
-    ).textContent =
-      user.phone || "Non renseigné";
+      if (!user) {
+        authForms.hidden =
+          false;
 
-    const orders =
-      getUserOrders(user.email);
+        dashboard.hidden =
+          true;
 
-    const orderList =
-      document.querySelector("[data-account-orders]");
+        return;
+      }
 
-    const contest =
-      document.querySelector("[data-account-contest]");
+      authForms.hidden =
+        true;
 
-    const contestEntries =
-      orders.reduce((sum, order) => {
-        return (
-          sum +
-          order.items.reduce(
-            (itemSum, item) => {
-              const label =
-                `${item.name} ${item.options || ""}`
-                  .toLowerCase();
+      dashboard.hidden =
+        false;
 
-              if (label.includes("ticket rebel")) {
-                return (
-                  itemSum +
-                  2 * item.quantity
-                );
-              }
+      document.querySelector(
+        "[data-account-name]"
+      ).textContent =
+        user.name;
 
-              if (
-                label.includes("concours") ||
-                label.includes("no rules")
-              ) {
-                return (
-                  itemSum +
-                  item.quantity
-                );
-              }
+      document.querySelector(
+        "[data-account-email]"
+      ).textContent =
+        user.email;
 
-              return itemSum;
-            },
-            0
-          )
+      document.querySelector(
+        "[data-account-phone]"
+      ).textContent =
+        user.phone ||
+        "Non renseigné";
+
+      const orders =
+        getUserOrders(
+          user.email
         );
-      }, 0);
 
-    if (contest) {
-      contest.textContent =
-        contestEntries
-          ? `${contestEntries} participation(s) concours associée(s) à tes commandes enregistrées.`
-          : "Aucune participation concours enregistrée pour le moment.";
-    }
+      const orderList =
+        document.querySelector(
+          "[data-account-orders]"
+        );
 
-    if (!orderList) return;
+      const contest =
+        document.querySelector(
+          "[data-account-contest]"
+        );
 
-    if (!orders.length) {
+      const contestEntries =
+        orders.reduce(
+          (
+            sum,
+            order
+          ) => {
+            return (
+              sum +
+              order.items.reduce(
+                (
+                  itemSum,
+                  item
+                ) => {
+                  const label =
+                    `${item.name} ${item.options || ""}`
+                      .toLowerCase();
+
+                  if (
+                    label.includes(
+                      "ticket rebel"
+                    )
+                  ) {
+                    return (
+                      itemSum +
+                      2 *
+                        item.quantity
+                    );
+                  }
+
+                  if (
+                    label.includes(
+                      "concours"
+                    ) ||
+                    label.includes(
+                      "no rules"
+                    )
+                  ) {
+                    return (
+                      itemSum +
+                      item.quantity
+                    );
+                  }
+
+                  return itemSum;
+                },
+                0
+              )
+            );
+          },
+          0
+        );
+
+      if (contest) {
+        contest.textContent =
+          contestEntries
+            ? `${contestEntries} participation(s) concours associée(s) à tes commandes enregistrées.`
+            : "Aucune participation concours enregistrée pour le moment.";
+      }
+
+      if (!orderList)
+        return;
+
+      if (!orders.length) {
+        orderList.innerHTML =
+          `<p>Aucune commande enregistrée pour le moment. Quand tu valideras un panier, il apparaîtra ici.</p>`;
+
+        return;
+      }
+
       orderList.innerHTML =
-        `<p>Aucune commande enregistrée pour le moment. Quand tu valideras un panier, il apparaîtra ici.</p>`;
+        orders
+          .map(
+            (order) => `
+          <article class="account-order">
+            <div>
+              <strong>${order.id}</strong>
+              <span>${order.date}</span>
+            </div>
 
-      return;
-    }
+            <p>
+              ${order.items
+                .map(
+                  (item) =>
+                    `${item.quantity} x ${item.name}`
+                )
+                .join(" · ")}
+            </p>
 
-    orderList.innerHTML =
-      orders
-        .map(
-          (order) => `
-      <article class="account-order">
-        <div>
-          <strong>${order.id}</strong>
-          <span>${order.date}</span>
-        </div>
-        <p>
-          ${order.items
-            .map(
-              (item) =>
-                `${item.quantity} x ${item.name}`
-            )
-            .join(" · ")}
-        </p>
-        <footer>
-          <span>${order.status}</span>
-          <strong>${formatPrice(order.total)}</strong>
-        </footer>
-      </article>
-    `
-        )
-        .join("");
-  };
+            <footer>
+              <span>${order.status}</span>
+              <strong>${formatPrice(
+                order.total
+              )}</strong>
+            </footer>
+          </article>
+        `
+          )
+          .join("");
+    };
 
   registerForm.addEventListener(
     "submit",
@@ -1044,33 +1710,56 @@ function bindAccountPage() {
       event.preventDefault();
 
       const data =
-        new FormData(registerForm);
+        new FormData(
+          registerForm
+        );
 
       const email =
-        String(data.get("email") || "")
+        String(
+          data.get(
+            "email"
+          ) || ""
+        )
           .trim()
           .toLowerCase();
 
       const password =
-        String(data.get("password") || "");
+        String(
+          data.get(
+            "password"
+          ) || ""
+        );
 
       const name =
-        String(data.get("name") || "")
-          .trim();
+        String(
+          data.get(
+            "name"
+          ) || ""
+        ).trim();
 
       const phone =
-        String(data.get("phone") || "")
-          .trim();
+        String(
+          data.get(
+            "phone"
+          ) || ""
+        ).trim();
 
       const users =
-        readJson(USERS_KEY, []);
+        readJson(
+          USERS_KEY,
+          []
+        );
 
       if (
         users.some(
-          (user) => user.email === email
+          (user) =>
+            user.email ===
+            email
         )
       ) {
-        if (registerMessage) {
+        if (
+          registerMessage
+        ) {
           registerMessage.textContent =
             "Un compte existe déjà avec cet e-mail. Utilise la connexion.";
         }
@@ -1097,7 +1786,9 @@ function bindAccountPage() {
         email
       );
 
-      if (registerMessage) {
+      if (
+        registerMessage
+      ) {
         registerMessage.textContent =
           "Compte créé. Bienvenue dans ton espace TMRR.";
       }
@@ -1112,25 +1803,42 @@ function bindAccountPage() {
       event.preventDefault();
 
       const data =
-        new FormData(loginForm);
+        new FormData(
+          loginForm
+        );
 
       const email =
-        String(data.get("email") || "")
+        String(
+          data.get(
+            "email"
+          ) || ""
+        )
           .trim()
           .toLowerCase();
 
       const password =
-        String(data.get("password") || "");
+        String(
+          data.get(
+            "password"
+          ) || ""
+        );
 
       const user =
-        readJson(USERS_KEY, []).find(
+        readJson(
+          USERS_KEY,
+          []
+        ).find(
           (entry) =>
-            entry.email === email &&
-            entry.password === password
+            entry.email ===
+              email &&
+            entry.password ===
+              password
         );
 
       if (!user) {
-        if (loginMessage) {
+        if (
+          loginMessage
+        ) {
           loginMessage.textContent =
             "Identifiants introuvables. Vérifie ton e-mail ou ton mot de passe.";
         }
@@ -1143,8 +1851,11 @@ function bindAccountPage() {
         email
       );
 
-      if (loginMessage) {
-        loginMessage.textContent = "";
+      if (
+        loginMessage
+      ) {
+        loginMessage.textContent =
+          "";
       }
 
       showDashboard();
@@ -1152,7 +1863,9 @@ function bindAccountPage() {
   );
 
   document
-    .querySelector("[data-logout]")
+    .querySelector(
+      "[data-logout]"
+    )
     ?.addEventListener(
       "click",
       () => {
@@ -1167,345 +1880,434 @@ function bindAccountPage() {
   showDashboard();
 }
 
+
+/* =========================================================
+   CARROUSEL COLLECTION
+   ========================================================= */
+
 function bindCollectionCarousel() {
   document
-    .querySelectorAll("[data-collection-carousel]")
-    .forEach((carousel) => {
-      const viewport =
-        carousel.querySelector(
-          "[data-collection-viewport]"
-        );
-
-      const track =
-        carousel.querySelector(
-          "[data-collection-track]"
-        );
-
-      const previous =
-        carousel.querySelector(
-          '[data-collection-arrow="prev"]'
-        );
-
-      const next =
-        carousel.querySelector(
-          '[data-collection-arrow="next"]'
-        );
-
-      if (!viewport || !track) return;
-
-      const getCardStep = () => {
-        const firstCard =
-          track.querySelector(
-            ".collection-model"
+    .querySelectorAll(
+      "[data-collection-carousel]"
+    )
+    .forEach(
+      (carousel) => {
+        const viewport =
+          carousel.querySelector(
+            "[data-collection-viewport]"
           );
 
-        if (!firstCard) {
-          return viewport.clientWidth;
+        const track =
+          carousel.querySelector(
+            "[data-collection-track]"
+          );
+
+        const previous =
+          carousel.querySelector(
+            '[data-collection-arrow="prev"]'
+          );
+
+        const next =
+          carousel.querySelector(
+            '[data-collection-arrow="next"]'
+          );
+
+        if (
+          !viewport ||
+          !track
+        ) {
+          return;
         }
 
-        const styles =
-          window.getComputedStyle(track);
+        const getCardStep =
+          () => {
+            const firstCard =
+              track.querySelector(
+                ".collection-model"
+              );
 
-        const gap =
-          Number.parseFloat(
-            styles.columnGap ||
-            styles.gap ||
-            "0"
-          ) || 0;
+            if (!firstCard) {
+              return viewport.clientWidth;
+            }
 
-        return (
-          firstCard.getBoundingClientRect()
-            .width + gap
+            const styles =
+              window.getComputedStyle(
+                track
+              );
+
+            const gap =
+              Number.parseFloat(
+                styles.columnGap ||
+                  styles.gap ||
+                  "0"
+              ) || 0;
+
+            return (
+              firstCard.getBoundingClientRect()
+                .width +
+              gap
+            );
+          };
+
+        const getVisibleCards =
+          () =>
+            Math.max(
+              1,
+              Math.round(
+                viewport.clientWidth /
+                  getCardStep()
+              )
+            );
+
+        const updateArrows =
+          () => {
+            const maxScroll =
+              viewport.scrollWidth -
+              viewport.clientWidth -
+              2;
+
+            if (previous) {
+              previous.disabled =
+                viewport.scrollLeft <=
+                2;
+            }
+
+            if (next) {
+              next.disabled =
+                viewport.scrollLeft >=
+                maxScroll;
+            }
+          };
+
+        previous?.addEventListener(
+          "click",
+          () => {
+            viewport.scrollBy({
+              left:
+                -getCardStep() *
+                getVisibleCards(),
+              behavior:
+                "smooth"
+            });
+          }
         );
-      };
 
-      const getVisibleCards = () =>
-        Math.max(
-          1,
-          Math.round(
-            viewport.clientWidth /
-            getCardStep()
-          )
+        next?.addEventListener(
+          "click",
+          () => {
+            viewport.scrollBy({
+              left:
+                getCardStep() *
+                getVisibleCards(),
+              behavior:
+                "smooth"
+            });
+          }
         );
 
-      const updateArrows = () => {
-        const maxScroll =
-          viewport.scrollWidth -
-          viewport.clientWidth -
-          2;
+        viewport.addEventListener(
+          "scroll",
+          updateArrows,
+          {
+            passive: true
+          }
+        );
 
-        if (previous) {
-          previous.disabled =
-            viewport.scrollLeft <= 2;
-        }
+        window.addEventListener(
+          "resize",
+          updateArrows
+        );
 
-        if (next) {
-          next.disabled =
-            viewport.scrollLeft >=
-            maxScroll;
-        }
-      };
-
-      previous?.addEventListener(
-        "click",
-        () => {
-          viewport.scrollBy({
-            left:
-              -getCardStep() *
-              getVisibleCards(),
-            behavior: "smooth"
-          });
-        }
-      );
-
-      next?.addEventListener(
-        "click",
-        () => {
-          viewport.scrollBy({
-            left:
-              getCardStep() *
-              getVisibleCards(),
-            behavior: "smooth"
-          });
-        }
-      );
-
-      viewport.addEventListener(
-        "scroll",
-        updateArrows,
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "resize",
-        updateArrows
-      );
-
-      updateArrows();
-    });
+        updateArrows();
+      }
+    );
 }
+
+
+/* =========================================================
+   CARROUSEL AVIS
+   ========================================================= */
 
 function bindReviewCarousel() {
   document
-    .querySelectorAll("[data-review-carousel]")
-    .forEach((carousel) => {
-      const viewport =
-        carousel.querySelector(
-          "[data-review-viewport]"
-        );
-
-      const track =
-        carousel.querySelector(
-          "[data-review-track]"
-        );
-
-      const previous =
-        carousel.querySelector(
-          '[data-review-arrow="prev"]'
-        );
-
-      const next =
-        carousel.querySelector(
-          '[data-review-arrow="next"]'
-        );
-
-      if (!viewport || !track) return;
-
-      const getCardStep = () => {
-        const firstCard =
-          track.querySelector(
-            ".review-card"
+    .querySelectorAll(
+      "[data-review-carousel]"
+    )
+    .forEach(
+      (carousel) => {
+        const viewport =
+          carousel.querySelector(
+            "[data-review-viewport]"
           );
 
-        if (!firstCard) {
-          return viewport.clientWidth;
+        const track =
+          carousel.querySelector(
+            "[data-review-track]"
+          );
+
+        const previous =
+          carousel.querySelector(
+            '[data-review-arrow="prev"]'
+          );
+
+        const next =
+          carousel.querySelector(
+            '[data-review-arrow="next"]'
+          );
+
+        if (
+          !viewport ||
+          !track
+        ) {
+          return;
         }
 
-        const styles =
-          window.getComputedStyle(track);
+        const getCardStep =
+          () => {
+            const firstCard =
+              track.querySelector(
+                ".review-card"
+              );
 
-        const gap =
-          Number.parseFloat(
-            styles.columnGap ||
-            styles.gap ||
-            "0"
-          ) || 0;
+            if (!firstCard) {
+              return viewport.clientWidth;
+            }
 
-        return (
-          firstCard.getBoundingClientRect()
-            .width + gap
+            const styles =
+              window.getComputedStyle(
+                track
+              );
+
+            const gap =
+              Number.parseFloat(
+                styles.columnGap ||
+                  styles.gap ||
+                  "0"
+              ) || 0;
+
+            return (
+              firstCard.getBoundingClientRect()
+                .width +
+              gap
+            );
+          };
+
+        const getVisibleCards =
+          () =>
+            Math.max(
+              1,
+              Math.round(
+                viewport.clientWidth /
+                  getCardStep()
+              )
+            );
+
+        const updateArrows =
+          () => {
+            const maxScroll =
+              viewport.scrollWidth -
+              viewport.clientWidth -
+              2;
+
+            if (previous) {
+              previous.disabled =
+                viewport.scrollLeft <=
+                2;
+            }
+
+            if (next) {
+              next.disabled =
+                viewport.scrollLeft >=
+                maxScroll;
+            }
+          };
+
+        previous?.addEventListener(
+          "click",
+          () => {
+            viewport.scrollBy({
+              left:
+                -getCardStep() *
+                getVisibleCards(),
+              behavior:
+                "smooth"
+            });
+          }
         );
-      };
 
-      const getVisibleCards = () =>
-        Math.max(
-          1,
-          Math.round(
-            viewport.clientWidth /
-            getCardStep()
-          )
+        next?.addEventListener(
+          "click",
+          () => {
+            viewport.scrollBy({
+              left:
+                getCardStep() *
+                getVisibleCards(),
+              behavior:
+                "smooth"
+            });
+          }
         );
 
-      const updateArrows = () => {
-        const maxScroll =
-          viewport.scrollWidth -
-          viewport.clientWidth -
-          2;
+        viewport.addEventListener(
+          "scroll",
+          updateArrows,
+          {
+            passive: true
+          }
+        );
 
-        if (previous) {
-          previous.disabled =
-            viewport.scrollLeft <= 2;
-        }
+        window.addEventListener(
+          "resize",
+          updateArrows
+        );
 
-        if (next) {
-          next.disabled =
-            viewport.scrollLeft >=
-            maxScroll;
-        }
-      };
-
-      previous?.addEventListener(
-        "click",
-        () => {
-          viewport.scrollBy({
-            left:
-              -getCardStep() *
-              getVisibleCards(),
-            behavior: "smooth"
-          });
-        }
-      );
-
-      next?.addEventListener(
-        "click",
-        () => {
-          viewport.scrollBy({
-            left:
-              getCardStep() *
-              getVisibleCards(),
-            behavior: "smooth"
-          });
-        }
-      );
-
-      viewport.addEventListener(
-        "scroll",
-        updateArrows,
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "resize",
-        updateArrows
-      );
-
-      updateArrows();
-    });
+        updateArrows();
+      }
+    );
 }
+
+
+/* =========================================================
+   PACK ALEATOIRE
+   ========================================================= */
 
 function bindRandomPackImage() {
   document
-    .querySelectorAll("[data-random-pack]")
-    .forEach((block) => {
-      const image =
-        block.querySelector(
-          "[data-random-pack-image]"
+    .querySelectorAll(
+      "[data-random-pack]"
+    )
+    .forEach(
+      (block) => {
+        const image =
+          block.querySelector(
+            "[data-random-pack-image]"
+          );
+
+        const label =
+          block.querySelector(
+            "[data-random-pack-label]"
+          );
+
+        if (!image) return;
+
+        const packs = [
+          {
+            src:
+              image.dataset.packOneSrc,
+            alt:
+              image.dataset.packOneAlt,
+            label:
+              image.dataset.packOneLabel
+          },
+          {
+            src:
+              image.dataset.packTwoSrc,
+            alt:
+              image.dataset.packTwoAlt,
+            label:
+              image.dataset.packTwoLabel
+          }
+        ].filter(
+          (pack) =>
+            pack.src
         );
 
-      const label =
-        block.querySelector(
-          "[data-random-pack-label]"
-        );
+        const selected =
+          packs[
+            Math.floor(
+              Math.random() *
+                packs.length
+            )
+          ];
 
-      if (!image) return;
+        if (!selected)
+          return;
 
-      const packs = [
-        {
-          src:
-            image.dataset.packOneSrc,
-          alt:
-            image.dataset.packOneAlt,
-          label:
-            image.dataset.packOneLabel
-        },
-        {
-          src:
-            image.dataset.packTwoSrc,
-          alt:
-            image.dataset.packTwoAlt,
-          label:
-            image.dataset.packTwoLabel
+        image.src =
+          selected.src;
+
+        image.alt =
+          selected.alt ||
+          image.alt;
+
+        if (label) {
+          label.textContent =
+            selected.label ||
+            label.textContent;
         }
-      ].filter(
-        (pack) => pack.src
-      );
-
-      const selected =
-        packs[
-          Math.floor(
-            Math.random() *
-            packs.length
-          )
-        ];
-
-      if (!selected) return;
-
-      image.src =
-        selected.src;
-
-      image.alt =
-        selected.alt ||
-        image.alt;
-
-      if (label) {
-        label.textContent =
-          selected.label ||
-          label.textContent;
       }
-    });
+    );
 }
 
-function bindCinematicIntroCanvas(intro) {
-  const canvas =
-    intro.querySelector(".intro-canvas");
 
-  if (!canvas) return false;
+/* =========================================================
+   INTRO CINEMATIQUE
+   ========================================================= */
+
+function bindCinematicIntroCanvas(
+  intro
+) {
+  const canvas =
+    intro.querySelector(
+      ".intro-canvas"
+    );
+
+  if (!canvas)
+    return false;
 
   const context =
-    canvas.getContext("2d");
+    canvas.getContext(
+      "2d"
+    );
 
-  if (!context) return false;
+  if (!context)
+    return false;
 
-  const logo = new Image();
+  const logo =
+    new Image();
 
   logo.src =
     intro
-      .querySelector(".intro-canvas-logo")
-      ?.getAttribute("src") ||
+      .querySelector(
+        ".intro-canvas-logo"
+      )
+      ?.getAttribute(
+        "src"
+      ) ||
     "assets/brand/logo-dragon-white.png";
 
-  const duration = 3600;
+  const duration =
+    3600;
 
   const smoke =
     Array.from(
       { length: 48 },
       (_, index) => ({
         x:
-          ((index * 29) % 100) /
+          ((index * 29) %
+            100) /
           100,
+
         y:
-          ((index * 47) % 100) /
+          ((index * 47) %
+            100) /
           100,
+
         size:
           90 +
-          ((index * 71) % 240),
+          ((index * 71) %
+            240),
+
         drift:
-          (((index * 17) % 50) -
+          (((index * 17) %
+            50) -
             25) /
           100,
+
         alpha:
           0.045 +
-          ((index * 13) % 60) /
+          ((index * 13) %
+            60) /
           1000
       })
     );
@@ -1523,33 +2325,45 @@ function bindCinematicIntroCanvas(intro) {
   ) =>
     Math.min(
       max,
-      Math.max(min, value)
+      Math.max(
+        min,
+        value
+      )
     );
 
-  const easeIn = (value) =>
-    Math.pow(
-      clamp(value),
-      3
-    );
+  const easeIn =
+    (value) =>
+      Math.pow(
+        clamp(value),
+        3
+      );
 
-  const easeBoth = (value) => {
-    const v = clamp(value);
+  const easeBoth =
+    (value) => {
+      const v =
+        clamp(value);
 
-    return v < 0.5
-      ? 4 * v * v * v
-      : 1 -
-          Math.pow(
-            -2 * v + 2,
-            3
-          ) /
-            2;
-  };
+      return v < 0.5
+        ? 4 *
+            v *
+            v *
+            v
+        : 1 -
+            Math.pow(
+              -2 * v +
+                2,
+              3
+            ) /
+              2;
+    };
 
   const resize = () => {
-    ratio = Math.min(
-      window.devicePixelRatio || 1,
-      1.6
-    );
+    ratio =
+      Math.min(
+        window.devicePixelRatio ||
+          1,
+        1.6
+      );
 
     width =
       window.innerWidth;
@@ -1583,271 +2397,310 @@ function bindCinematicIntroCanvas(intro) {
     );
   };
 
-  const drawSmoke = (time) => {
-    smoke.forEach(
-      (cloud, index) => {
-        const pulse =
-          Math.sin(
-            time * 0.0012 +
-              index
-          ) *
-            0.5 +
-          0.5;
+  const drawSmoke =
+    (time) => {
+      smoke.forEach(
+        (
+          cloud,
+          index
+        ) => {
+          const pulse =
+            Math.sin(
+              time *
+                0.0012 +
+                index
+            ) *
+              0.5 +
+            0.5;
 
-        const x =
-          cloud.x * width +
-          Math.sin(
-            time * 0.00055 +
-              index
-          ) *
+          const x =
+            cloud.x *
+              width +
+            Math.sin(
+              time *
+                0.00055 +
+                index
+            ) *
+              cloud.size *
+              cloud.drift;
+
+          const y =
+            cloud.y *
+              height +
+            Math.cos(
+              time *
+                0.00045 +
+                index *
+                  1.7
+            ) *
+              cloud.size *
+              0.1;
+
+          const radius =
             cloud.size *
-            cloud.drift;
+            (0.7 +
+              pulse *
+                0.35);
 
-        const y =
-          cloud.y * height +
-          Math.cos(
-            time * 0.00045 +
-              index * 1.7
-          ) *
-            cloud.size *
-            0.1;
+          const gradient =
+            context.createRadialGradient(
+              x,
+              y,
+              0,
+              x,
+              y,
+              radius
+            );
 
-        const radius =
-          cloud.size *
-          (0.7 +
-            pulse * 0.35);
-
-        const gradient =
-          context.createRadialGradient(
-            x,
-            y,
+          gradient.addColorStop(
             0,
+            `rgba(190, 190, 190, ${cloud.alpha})`
+          );
+
+          gradient.addColorStop(
+            0.48,
+            `rgba(90, 90, 90, ${cloud.alpha * 0.7})`
+          );
+
+          gradient.addColorStop(
+            1,
+            "rgba(0, 0, 0, 0)"
+          );
+
+          context.fillStyle =
+            gradient;
+
+          context.beginPath();
+
+          context.ellipse(
             x,
             y,
-            radius
+            radius *
+              1.65,
+            radius *
+              0.72,
+            Math.sin(
+              index
+            ) * 0.6,
+            0,
+            Math.PI *
+              2
           );
 
-        gradient.addColorStop(
-          0,
-          `rgba(190, 190, 190, ${cloud.alpha})`
+          context.fill();
+        }
+      );
+    };
+
+  const drawLogoAndText =
+    (elapsed) => {
+      const appear =
+        easeBoth(
+          elapsed / 620
         );
 
-        gradient.addColorStop(
-          0.48,
-          `rgba(90, 90, 90, ${cloud.alpha * 0.7})`
+      const exit =
+        easeIn(
+          (elapsed -
+            2760) /
+            620
         );
 
-        gradient.addColorStop(
-          1,
-          "rgba(0, 0, 0, 0)"
-        );
-
-        context.fillStyle =
-          gradient;
-
-        context.beginPath();
-
-        context.ellipse(
-          x,
-          y,
-          radius * 1.65,
-          radius * 0.72,
-          Math.sin(index) *
-            0.6,
-          0,
-          Math.PI * 2
-        );
-
-        context.fill();
+      if (
+        appear <= 0 ||
+        !logo.complete
+      ) {
+        return;
       }
-    );
-  };
 
-  const drawLogoAndText = (
-    elapsed
+      const shake =
+        elapsed < 1100
+          ? Math.sin(
+              elapsed *
+                0.095
+            ) *
+            8 *
+            (1 -
+              elapsed /
+                1200)
+          : 0;
+
+      const pulse =
+        1 +
+        Math.sin(
+          elapsed *
+            0.006
+        ) *
+          0.018;
+
+      const logoWidth =
+        Math.min(
+          width *
+            0.7,
+          880
+        ) *
+        (0.72 +
+          appear *
+            0.28) *
+        pulse *
+        (1 +
+          exit * 8);
+
+      const logoHeight =
+        logoWidth *
+        (logo.naturalHeight /
+          logo.naturalWidth);
+
+      context.save();
+
+      context.globalAlpha =
+        appear *
+        (1 - exit);
+
+      context.filter =
+        `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
+
+      context.drawImage(
+        logo,
+        width / 2 -
+          logoWidth / 2 +
+          shake,
+        height / 2 -
+          logoHeight / 2 -
+          height *
+            0.06,
+        logoWidth,
+        logoHeight
+      );
+
+      context.restore();
+
+      const textAlpha =
+        clamp(
+          (elapsed -
+            520) /
+            420
+        ) *
+        (1 - exit);
+
+      if (
+        textAlpha <= 0
+      ) {
+        return;
+      }
+
+      context.save();
+
+      context.globalAlpha =
+        textAlpha;
+
+      context.textAlign =
+        "center";
+
+      context.fillStyle =
+        "#fff";
+
+      context.shadowColor =
+        "rgba(255,90,0,0.95)";
+
+      context.shadowBlur =
+        18;
+
+      const isMobileIntro =
+        width < 620;
+
+      const mainTextSize =
+        isMobileIntro
+          ? Math.min(
+              34,
+              Math.max(
+                22,
+                width *
+                  0.062
+              )
+            )
+          : Math.min(
+              82,
+              Math.max(
+                40,
+                width *
+                  0.055
+              )
+            );
+
+      const subTextSize =
+        isMobileIntro
+          ? Math.min(
+              36,
+              Math.max(
+                24,
+                width *
+                  0.074
+              )
+            )
+          : Math.min(
+              44,
+              Math.max(
+                23,
+                width *
+                  0.031
+              )
+            );
+
+      context.font =
+        `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
+
+      context.fillText(
+        "NO RULES. JUST RIDE.",
+        width / 2,
+        height *
+          0.68
+      );
+
+      context.fillStyle =
+        "#ff5a00";
+
+      context.font =
+        `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
+
+      if (
+        isMobileIntro
+      ) {
+        context.fillText(
+          "BRISE TES CHAINES,",
+          width / 2,
+          height *
+            0.738
+        );
+
+        context.fillText(
+          "LIBERE-TOI !",
+          width / 2,
+          height *
+            0.79
+        );
+      } else {
+        context.fillText(
+          "BRISE TES CHAINES, LIBERE-TOI !",
+          width / 2,
+          height *
+            0.76
+        );
+      }
+
+      context.restore();
+    };
+
+  const draw = (
+    time
   ) => {
-    const appear =
-      easeBoth(
-        elapsed / 620
-      );
-
-    const exit =
-      easeIn(
-        (elapsed - 2760) /
-          620
-      );
-
-    if (
-      appear <= 0 ||
-      !logo.complete
-    ) {
-      return;
-    }
-
-    const shake =
-      elapsed < 1100
-        ? Math.sin(
-            elapsed * 0.095
-          ) *
-          8 *
-          (1 -
-            elapsed /
-              1200)
-        : 0;
-
-    const pulse =
-      1 +
-      Math.sin(
-        elapsed * 0.006
-      ) *
-        0.018;
-
-    const logoWidth =
-      Math.min(
-        width * 0.7,
-        880
-      ) *
-      (0.72 +
-        appear * 0.28) *
-      pulse *
-      (1 + exit * 8);
-
-    const logoHeight =
-      logoWidth *
-      (logo.naturalHeight /
-        logo.naturalWidth);
-
-    context.save();
-
-    context.globalAlpha =
-      appear *
-      (1 - exit);
-
-    context.filter =
-      `drop-shadow(0 0 ${24 + appear * 34}px rgba(255,90,0,0.95))`;
-
-    context.drawImage(
-      logo,
-      width / 2 -
-        logoWidth / 2 +
-        shake,
-      height / 2 -
-        logoHeight / 2 -
-        height * 0.06,
-      logoWidth,
-      logoHeight
-    );
-
-    context.restore();
-
-    const textAlpha =
-      clamp(
-        (elapsed - 520) /
-          420
-      ) *
-      (1 - exit);
-
-    if (textAlpha <= 0) return;
-
-    context.save();
-
-    context.globalAlpha =
-      textAlpha;
-
-    context.textAlign =
-      "center";
-
-    context.fillStyle =
-      "#fff";
-
-    context.shadowColor =
-      "rgba(255,90,0,0.95)";
-
-    context.shadowBlur =
-      18;
-
-    const isMobileIntro =
-      width < 620;
-
-    const mainTextSize =
-      isMobileIntro
-        ? Math.min(
-            34,
-            Math.max(
-              22,
-              width * 0.062
-            )
-          )
-        : Math.min(
-            82,
-            Math.max(
-              40,
-              width * 0.055
-            )
-          );
-
-    const subTextSize =
-      isMobileIntro
-        ? Math.min(
-            36,
-            Math.max(
-              24,
-              width * 0.074
-            )
-          )
-        : Math.min(
-            44,
-            Math.max(
-              23,
-              width * 0.031
-            )
-          );
-
-    context.font =
-      `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
-
-    context.fillText(
-      "NO RULES. JUST RIDE.",
-      width / 2,
-      height * 0.68
-    );
-
-    context.fillStyle =
-      "#ff5a00";
-
-    context.font =
-      `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
-
-    if (isMobileIntro) {
-      context.fillText(
-        "BRISE TES CHAINES,",
-        width / 2,
-        height * 0.738
-      );
-
-      context.fillText(
-        "LIBERE-TOI !",
-        width / 2,
-        height * 0.79
-      );
-    } else {
-      context.fillText(
-        "BRISE TES CHAINES, LIBERE-TOI !",
-        width / 2,
-        height * 0.76
-      );
-    }
-
-    context.restore();
-  };
-
-  const draw = (time) => {
     if (!startedAt) {
       startedAt = time;
     }
 
     const elapsed =
-      time - startedAt;
+      time -
+      startedAt;
 
     context.clearRect(
       0,
@@ -1904,12 +2757,18 @@ function bindCinematicIntroCanvas(intro) {
       height
     );
 
-    drawSmoke(elapsed);
+    drawSmoke(
+      elapsed
+    );
+
     drawLogoAndText(
       elapsed
     );
 
-    if (elapsed < duration) {
+    if (
+      elapsed <
+      duration
+    ) {
       frameId =
         requestAnimationFrame(
           draw
@@ -1956,8 +2815,7 @@ function bindCinematicIntroCanvas(intro) {
 
 
 /* =========================================================
-   INTRODUCTION TMRR
-   MODIFICATION : LE CONCOURS N'AFFICHE JAMAIS L'INTRO
+   INTRO TMRR — VERSION FINALE
    ========================================================= */
 
 function bindSiteIntro() {
@@ -1966,6 +2824,10 @@ function bindSiteIntro() {
       ".site-intro"
     );
 
+  /*
+   * S'il n'y a pas d'intro sur cette page,
+   * on signale simplement qu'elle est terminée.
+   */
   if (!intro) {
     window.dispatchEvent(
       new Event(
@@ -1976,47 +2838,68 @@ function bindSiteIntro() {
     return;
   }
 
-  const finishIntro = () => {
-    intro.classList.add(
-      "is-finished"
-    );
+  const finishIntro =
+    () => {
+      intro.classList.add(
+        "is-finished"
+      );
 
-    document.body.classList.remove(
-      "intro-active"
-    );
+      intro.style.display =
+        "none";
 
-    window.dispatchEvent(
-      new Event(
-        "tmrr:intro-finished"
-      )
-    );
-  };
+      document.body.classList.remove(
+        "intro-active"
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "tmrr:intro-finished"
+        )
+      );
+    };
 
   /*
    * IMPORTANT :
-   * Le concours ne doit JAMAIS afficher l'introduction.
-   *
-   * On vérifie :
-   * - #concours dans l'URL
-   * - concours dans le chemin
-   * - concours dans le titre
+   * Si l'URL contient #concours,
+   * l'intro est supprimée AVANT
+   * d'être lancée.
    */
-  const isConcours =
+  const hash =
     window.location.hash
-      .toLowerCase()
-      .includes("concours") ||
-    window.location.pathname
-      .toLowerCase()
-      .includes("concours") ||
-    document.title
-      .toLowerCase()
-      .includes("concours");
+      .toLowerCase();
+
+  const isConcours =
+    hash === "#concours" ||
+    hash.startsWith(
+      "#concours-"
+    );
 
   if (isConcours) {
     finishIntro();
+
+    window.requestAnimationFrame(
+      () => {
+        const target =
+          document.getElementById(
+            "concours"
+          );
+
+        if (target) {
+          target.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+          });
+        }
+      }
+    );
+
     return;
   }
 
+  /*
+   * Accueil normal :
+   * l'intro fonctionne comme avant.
+   */
   document.body.classList.add(
     "intro-active"
   );
@@ -2041,15 +2924,16 @@ function bindSiteIntro() {
 
 
 /* =========================================================
-   NAVIGATION
-   MODIFICATION : CLIC SUR JEUX CONCOURS = INTRO SUPPRIMÉE
+   NAVIGATION — CONCOURS DIRECT
    ========================================================= */
 
 nav?.addEventListener(
   "click",
   (event) => {
     const link =
-      event.target.closest("a");
+      event.target.closest(
+        "a"
+      );
 
     if (!link) return;
 
@@ -2063,8 +2947,9 @@ nav?.addEventListener(
     );
 
     const href =
-      link.getAttribute("href") ||
-      "";
+      link.getAttribute(
+        "href"
+      ) || "";
 
     const text =
       link.textContent
@@ -2075,7 +2960,9 @@ nav?.addEventListener(
     const isConcours =
       href
         .toLowerCase()
-        .includes("concours") ||
+        .includes(
+          "concours"
+        ) ||
       text.includes(
         "jeux concours"
       ) ||
@@ -2083,30 +2970,81 @@ nav?.addEventListener(
         "concours tmrr"
       );
 
-    if (isConcours) {
-      const intro =
-        document.querySelector(
-          ".site-intro"
-        );
-
-      /*
-       * Suppression immédiate de l'introduction.
-       * Ainsi le clic vers #concours ne peut pas
-       * laisser l'animation apparaître.
-       */
-      if (intro) {
-        intro.classList.add(
-          "is-finished"
-        );
-
-        document.body.classList.remove(
-          "intro-active"
-        );
-      }
+    if (!isConcours) {
+      return;
     }
+
+    /*
+     * BLOQUE complètement la navigation.
+     * Pas de rechargement de la page.
+     */
+    event.preventDefault();
+    event.stopPropagation();
+
+    /*
+     * Supprime immédiatement l'intro.
+     */
+    const intro =
+      document.querySelector(
+        ".site-intro"
+      );
+
+    if (intro) {
+      intro.classList.add(
+        "is-finished"
+      );
+
+      intro.style.display =
+        "none";
+    }
+
+    document.body.classList.remove(
+      "intro-active"
+    );
+
+    /*
+     * Change l'adresse sans
+     * provoquer de rechargement.
+     */
+    if (
+      window.history &&
+      window.history.pushState
+    ) {
+      window.history.pushState(
+        null,
+        "",
+        "#concours"
+      );
+    } else {
+      window.location.hash =
+        "concours";
+    }
+
+    /*
+     * Va directement au concours.
+     */
+    window.requestAnimationFrame(
+      () => {
+        const concours =
+          document.getElementById(
+            "concours"
+          );
+
+        if (concours) {
+          concours.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      }
+    );
   }
 );
 
+
+/* =========================================================
+   REVEAL
+   ========================================================= */
 
 const revealObserver =
   new IntersectionObserver(
@@ -2133,13 +3071,20 @@ const revealObserver =
   );
 
 document
-  .querySelectorAll(".reveal")
-  .forEach((element) =>
-    revealObserver.observe(
-      element
-    )
+  .querySelectorAll(
+    ".reveal"
+  )
+  .forEach(
+    (element) =>
+      revealObserver.observe(
+        element
+      )
   );
 
+
+/* =========================================================
+   COMPTE A REBOURS
+   ========================================================= */
 
 const countdown =
   document.querySelector(
@@ -2149,8 +3094,8 @@ const countdown =
 if (countdown) {
   const deadline =
     new Date(
-      countdown.dataset.deadline ||
-        ""
+      countdown.dataset
+        .deadline || ""
     ).getTime();
 
   const parts = {
@@ -2158,68 +3103,80 @@ if (countdown) {
       countdown.querySelector(
         "[data-days]"
       ),
+
     hours:
       countdown.querySelector(
         "[data-hours]"
       ),
+
     minutes:
       countdown.querySelector(
         "[data-minutes]"
       ),
+
     seconds:
       countdown.querySelector(
         "[data-seconds]"
       )
   };
 
-  const pad = (value) =>
-    String(value).padStart(
-      2,
-      "0"
-    );
-
-  const updateCountdown = () => {
-    const diff =
-      Math.max(
-        0,
-        deadline - Date.now()
+  const pad =
+    (value) =>
+      String(
+        value
+      ).padStart(
+        2,
+        "0"
       );
 
-    const days =
-      Math.floor(
-        diff / 86400000
-      );
+  const updateCountdown =
+    () => {
+      const diff =
+        Math.max(
+          0,
+          deadline -
+            Date.now()
+        );
 
-    const hours =
-      Math.floor(
-        (diff % 86400000) /
-          3600000
-      );
+      const days =
+        Math.floor(
+          diff /
+            86400000
+        );
 
-    const minutes =
-      Math.floor(
-        (diff % 3600000) /
-          60000
-      );
+      const hours =
+        Math.floor(
+          (diff %
+            86400000) /
+            3600000
+        );
 
-    const seconds =
-      Math.floor(
-        (diff % 60000) /
-          1000
-      );
+      const minutes =
+        Math.floor(
+          (diff %
+            3600000) /
+            60000
+        );
 
-    parts.days.textContent =
-      pad(days);
+      const seconds =
+        Math.floor(
+          (diff %
+            60000) /
+            1000
+        );
 
-    parts.hours.textContent =
-      pad(hours);
+      parts.days.textContent =
+        pad(days);
 
-    parts.minutes.textContent =
-      pad(minutes);
+      parts.hours.textContent =
+        pad(hours);
 
-    parts.seconds.textContent =
-      pad(seconds);
-  };
+      parts.minutes.textContent =
+        pad(minutes);
+
+      parts.seconds.textContent =
+        pad(seconds);
+    };
 
   updateCountdown();
 
@@ -2229,6 +3186,10 @@ if (countdown) {
   );
 }
 
+
+/* =========================================================
+   MOTO
+   ========================================================= */
 
 const bikeFrames = [
   "assets/bike/grand-jeu-1.png",
@@ -2261,8 +3222,13 @@ const bikeStage =
 let bikeIndex = 0;
 let bikeAuto = true;
 
-function setBikeFrame(index) {
-  if (!bikeImage || !bikeSlider) {
+function setBikeFrame(
+  index
+) {
+  if (
+    !bikeImage ||
+    !bikeSlider
+  ) {
     return;
   }
 
@@ -2276,10 +3242,14 @@ function setBikeFrame(index) {
   );
 
   bikeImage.src =
-    bikeFrames[bikeIndex];
+    bikeFrames[
+      bikeIndex
+    ];
 
   bikeSlider.value =
-    String(bikeIndex);
+    String(
+      bikeIndex
+    );
 
   window.setTimeout(
     () =>
@@ -2297,7 +3267,8 @@ document
   ?.addEventListener(
     "click",
     () => {
-      bikeAuto = false;
+      bikeAuto =
+        false;
 
       if (bikePlay) {
         bikePlay.textContent =
@@ -2305,7 +3276,8 @@ document
       }
 
       setBikeFrame(
-        bikeIndex - 1
+        bikeIndex -
+          1
       );
     }
   );
@@ -2317,7 +3289,8 @@ document
   ?.addEventListener(
     "click",
     () => {
-      bikeAuto = false;
+      bikeAuto =
+        false;
 
       if (bikePlay) {
         bikePlay.textContent =
@@ -2325,7 +3298,8 @@ document
       }
 
       setBikeFrame(
-        bikeIndex + 1
+        bikeIndex +
+          1
       );
     }
   );
@@ -2333,7 +3307,8 @@ document
 bikeSlider?.addEventListener(
   "input",
   () => {
-    bikeAuto = false;
+    bikeAuto =
+      false;
 
     if (bikePlay) {
       bikePlay.textContent =
@@ -2351,7 +3326,8 @@ bikeSlider?.addEventListener(
 bikePlay?.addEventListener(
   "click",
   () => {
-    bikeAuto = !bikeAuto;
+    bikeAuto =
+      !bikeAuto;
 
     bikePlay.textContent =
       bikeAuto
@@ -2379,7 +3355,8 @@ function startBikeAutoplay() {
     () => {
       if (bikeAuto) {
         setBikeFrame(
-          bikeIndex + 1
+          bikeIndex +
+            1
         );
       }
     },
@@ -2428,41 +3405,53 @@ if (
 }
 
 
+/* =========================================================
+   BOUTONS MAGNETIQUES
+   ========================================================= */
+
 document
   .querySelectorAll(
     ".magnetic"
   )
-  .forEach((button) => {
-    button.addEventListener(
-      "mousemove",
-      (event) => {
-        const rect =
-          button.getBoundingClientRect();
+  .forEach(
+    (button) => {
+      button.addEventListener(
+        "mousemove",
+        (event) => {
+          const rect =
+            button.getBoundingClientRect();
 
-        const x =
-          event.clientX -
-          rect.left -
-          rect.width / 2;
+          const x =
+            event.clientX -
+            rect.left -
+            rect.width /
+              2;
 
-        const y =
-          event.clientY -
-          rect.top -
-          rect.height / 2;
+          const y =
+            event.clientY -
+            rect.top -
+            rect.height /
+              2;
 
-        button.style.transform =
-          `translate(${x * 0.08}px, ${y * 0.14}px)`;
-      }
-    );
+          button.style.transform =
+            `translate(${x * 0.08}px, ${y * 0.14}px)`;
+        }
+      );
 
-    button.addEventListener(
-      "mouseleave",
-      () => {
-        button.style.transform =
-          "";
-      }
-    );
-  });
+      button.addEventListener(
+        "mouseleave",
+        () => {
+          button.style.transform =
+            "";
+        }
+      );
+    }
+  );
 
+
+/* =========================================================
+   ETINCELLES
+   ========================================================= */
 
 const canvas =
   document.querySelector(
@@ -2470,7 +3459,9 @@ const canvas =
   );
 
 const ctx =
-  canvas?.getContext("2d");
+  canvas?.getContext(
+    "2d"
+  );
 
 let sparks = [];
 let width = 0;
@@ -2483,7 +3474,8 @@ function resizeCanvas() {
 
   const ratio =
     Math.min(
-      window.devicePixelRatio || 1,
+      window.devicePixelRatio ||
+        1,
       2
     );
 
@@ -2608,18 +3600,22 @@ function drawSparks() {
       ctx.ellipse(
         spark.x,
         spark.y,
-        spark.size * 0.55,
-        spark.size * 2.2,
+        spark.size *
+          0.55,
+        spark.size *
+          2.2,
         -0.65,
         0,
-        Math.PI * 2
+        Math.PI *
+          2
       );
 
       ctx.fill();
     }
   );
 
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha =
+    1;
 
   requestAnimationFrame(
     drawSparks
@@ -2627,37 +3623,56 @@ function drawSparks() {
 }
 
 
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+
 bindProductButtons();
 bindGiftCardForm();
+
 renderCartPage();
 renderPaymentPage();
 clearCartAfterStripeReturn();
+
 bindCollectionCarousel();
 bindReviewCarousel();
 bindRandomPackImage();
+
 bindDeferredVideos();
 bindSiteIntro();
+
 bindAccountPage();
 bindHeroVideoSound();
+
 updateCartCount();
 
+
+/* =========================================================
+   HOTSPOT COLLECTION
+   ========================================================= */
 
 document
   .querySelectorAll(
     ".hero-hotspot-collection"
   )
-  .forEach((link) => {
-    link.addEventListener(
-      "click",
-      (event) => {
-        event.preventDefault();
+  .forEach(
+    (link) => {
+      link.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
 
-        window.location.href =
-          "tshirts.html";
-      }
-    );
-  });
+          window.location.href =
+            "tshirts.html";
+        }
+      );
+    }
+  );
 
+
+/* =========================================================
+   DEMARRAGE ETINCELLES
+   ========================================================= */
 
 function startSparkCanvas() {
   if (
