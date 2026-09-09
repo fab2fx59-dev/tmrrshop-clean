@@ -897,8 +897,13 @@ function bindSiteIntro() {
 
   document.body.classList.add("intro-active");
 
+  // Pas d'animation lorsqu'on arrive sur le concours
+  const isConcours =
+    window.location.hash === "#concours" ||
+    window.location.pathname.includes("concours") ||
+    document.title.toLowerCase().includes("concours");
 
-  if (window.location.hash) {
+  if (isConcours) {
     finishIntro();
     return;
   }
