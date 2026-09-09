@@ -925,12 +925,24 @@ menuButton?.addEventListener("click", (event) => {
 });
 
 nav?.addEventListener("click", (event) => {
-  if (event.target instanceof HTMLAnchorElement) {
-    document.body.classList.remove("menu-open");
-    menuButton?.setAttribute("aria-expanded", "false");
+  if (!(event.target instanceof HTMLAnchorElement)) return;
+
+  document.body.classList.remove("menu-open");
+  menuButton?.setAttribute("aria-expanded", "false");
+
+  // Si on clique sur "Jeux concours TMRR",
+  // on supprime immédiatement l'introduction animée.
+  const href = event.target.getAttribute("href") || "";
+
+  if (href.includes("#concours")) {
+    const intro = document.querySelector(".site-intro");
+
+    if (intro) {
+      intro.classList.add("is-finished");
+      document.body.classList.remove("intro-active");
+    }
   }
 });
-
 const revealObserver = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
