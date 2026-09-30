@@ -830,21 +830,16 @@ function bindCinematicIntroCanvas(intro) {
     context.shadowColor = "rgba(255,90,0,0.95)";
     context.shadowBlur = 18;
     const isMobileIntro = width < 620;
-    const mainTextSize = isMobileIntro
-      ? Math.min(34, Math.max(22, width * 0.062))
-      : Math.min(82, Math.max(40, width * 0.055));
     const subTextSize = isMobileIntro
       ? Math.min(36, Math.max(24, width * 0.074))
       : Math.min(44, Math.max(23, width * 0.031));
-    context.font = `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
-    context.fillText("NO RULES. JUST RIDE.", width / 2, height * 0.68);
     context.fillStyle = "#ff5a00";
     context.font = `800 ${subTextSize}px Impact, Arial Black, sans-serif`;
     if (isMobileIntro) {
-      context.fillText("BRISE TES CHAINES,", width / 2, height * 0.738);
-      context.fillText("LIBERE-TOI !", width / 2, height * 0.79);
+      context.fillText("BRISE TES CHAINES,", width / 2, height * 0.68);
+      context.fillText("LIBERE-TOI !", width / 2, height * 0.735);
     } else {
-      context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.76);
+      context.fillText("BRISE TES CHAINES, LIBERE-TOI !", width / 2, height * 0.68);
     }
     context.restore();
   };
