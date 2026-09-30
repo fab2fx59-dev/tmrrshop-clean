@@ -2874,25 +2874,6 @@ function bindCinematicIntroCanvas(
       const isMobileIntro =
         width < 620;
 
-      const mainTextSize =
-        isMobileIntro
-          ? Math.min(
-              34,
-              Math.max(
-                22,
-                width *
-                  0.062
-              )
-            )
-          : Math.min(
-              82,
-              Math.max(
-                40,
-                width *
-                  0.055
-              )
-            );
-
       const subTextSize =
         isMobileIntro
           ? Math.min(
@@ -2912,16 +2893,6 @@ function bindCinematicIntroCanvas(
               )
             );
 
-      context.font =
-        `900 ${mainTextSize}px Impact, Arial Black, sans-serif`;
-
-      context.fillText(
-        "NO RULES. JUST RIDE.",
-        width / 2,
-        height *
-          0.68
-      );
-
       context.fillStyle =
         "#ff5a00";
 
@@ -2935,21 +2906,21 @@ function bindCinematicIntroCanvas(
           "BRISE TES CHAINES,",
           width / 2,
           height *
-            0.738
+            0.68
         );
 
         context.fillText(
           "LIBERE-TOI !",
           width / 2,
           height *
-            0.79
+            0.735
         );
       } else {
         context.fillText(
           "BRISE TES CHAINES, LIBERE-TOI !",
           width / 2,
           height *
-            0.76
+            0.68
         );
       }
 
