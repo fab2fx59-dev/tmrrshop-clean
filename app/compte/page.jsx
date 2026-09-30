@@ -40,7 +40,7 @@ function Header() {
         </button>
         <nav className="nav" aria-label="Navigation principale">
           <a href="/">Accueil</a>
-          <a href="/#concours">Jeu concours TMRR</a>
+          <a href="/notre-histoire.html">Notre Histoire</a>
           <a href="/casquettes">Casquettes</a>
           <a href="/tshirts">T-shirts</a>
           <a href="/hoodies">Sweats à capuches</a>
