@@ -832,7 +832,7 @@ body.menu-open {
   position: relative;
   width: min(94vw, 1360px);
   margin: 0 auto;
-  aspect-ratio: 1672 / 830;
+  aspect-ratio: 2662 / 1080;
   overflow: hidden;
   background: #050505;
   border-bottom: 1px solid rgba(255, 90, 0, 0.24);
@@ -856,7 +856,7 @@ body.menu-open {
 }
 
 .hero-video {
-  object-fit: cover;
+  object-fit: contain;
   cursor: pointer;
 }
 
@@ -5181,7 +5181,7 @@ body.intro-active {
 
   .hero-art {
     width: 100%;
-    aspect-ratio: 83 / 40;
+    aspect-ratio: 2662 / 1080;
     max-height: none;
     min-height: 0;
   }
