@@ -1850,20 +1850,6 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
-.pack-choice-overview {
-  max-width: 1668px;
-  margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid rgba(255, 90, 0, 0.32);
-  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.54);
-}
-
-.pack-choice-overview img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .pack-choice-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1885,7 +1871,26 @@ h3 {
 }
 
 .pack-choice-card-art {
-  display: none;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background-color: #050505;
+  background-image: url("/assets/campaign/packs-tmrr-2026.webp");
+  background-repeat: no-repeat;
+  background-size: 300% auto;
+  background-position-y: 45%;
+}
+
+.pack-choice-card-art--one {
+  background-position-x: 0%;
+}
+
+.pack-choice-card-art--two {
+  background-position-x: 50%;
+}
+
+.pack-choice-card-art--three {
+  background-position-x: 100%;
 }
 
 .pack-choice-card-controls {
@@ -1983,38 +1988,11 @@ h3 {
     padding: 1.1rem 0.75rem 1.5rem;
   }
 
-  .pack-choice-overview {
-    display: none;
-  }
-
   .pack-choice-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.1rem;
     max-width: 520px;
     padding-top: 0;
-  }
-
-  .pack-choice-card-art {
-    display: block;
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    background-color: #050505;
-    background-image: url("/assets/campaign/packs-tmrr-2026.webp");
-    background-repeat: no-repeat;
-    background-size: 300% auto;
-    background-position-y: 45%;
-  }
-
-  .pack-choice-card-art--one {
-    background-position-x: 0%;
-  }
-
-  .pack-choice-card-art--two {
-    background-position-x: 50%;
-  }
-
-  .pack-choice-card-art--three {
-    background-position-x: 100%;
   }
 
   .pack-choice-card-controls {
