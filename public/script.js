@@ -247,18 +247,21 @@ function bindProductButtons() {
     pack1: {
       name: "Pack 1 - Tee-shirt TMRR 2026",
       price: 24.9,
+      shirtCount: 1,
       participations: 1,
       includesCap: false
     },
     pack2: {
       name: "Pack 2 - Tee-shirt + casquette",
       price: 34.9,
+      shirtCount: 1,
       participations: 2,
       includesCap: true
     },
     pack3: {
       name: "Pack 3 - 2 tee-shirts + casquette",
       price: 49.9,
+      shirtCount: 2,
       participations: 4,
       includesCap: true
     }
@@ -280,7 +283,8 @@ function bindProductButtons() {
       event.preventDefault();
       if (!form.reportValidity()) return;
 
-      const sizes = sizeFields.map((field) => field.value);
+      const selectedSize = sizeFields[0].value;
+      const sizes = Array(offer.shirtCount).fill(selectedSize);
       const shirtOptions = sizes.map((size, index) =>
         sizes.length > 1 ? `Tee-shirt ${index + 1} taille ${size}` : `Tee-shirt taille ${size}`
       );

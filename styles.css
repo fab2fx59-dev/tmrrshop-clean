@@ -1971,9 +1971,9 @@ h3 {
 }
 
 .pack-choice-button:disabled {
-  border-color: #4c4c4c;
-  background: #363636;
-  color: #a9a9a9;
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #080808;
   cursor: not-allowed;
 }
 
