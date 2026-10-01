@@ -149,6 +149,7 @@ function playDecorativeVideo(video) {
 function bindDeferredVideos() {
   const heroVideo = document.querySelector("[data-hero-video]");
   const navVideo = document.querySelector(".nav-video");
+  const contestBannerVideo = document.querySelector("[data-contest-banner]");
 
   const loadHero = () => {
     if (!heroVideo) return;
@@ -160,9 +161,29 @@ function bindDeferredVideos() {
     runWhenIdle(() => playDecorativeVideo(navVideo), 2600);
   };
 
+  const observeContestBanner = () => {
+    if (!contestBannerVideo) return;
+    if (!("IntersectionObserver" in window)) {
+      playDecorativeVideo(contestBannerVideo);
+      return;
+    }
+
+    const bannerObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          playDecorativeVideo(contestBannerVideo);
+        } else {
+          contestBannerVideo.pause();
+        }
+      });
+    }, { rootMargin: "160px 0px" });
+    bannerObserver.observe(contestBannerVideo);
+  };
+
   window.addEventListener("tmrr:intro-finished", loadHero, { once: true });
   window.addEventListener("load", () => window.setTimeout(loadHero, 4800), { once: true });
   window.addEventListener("load", loadNav, { once: true });
+  observeContestBanner();
   if (!document.querySelector(".site-intro")) {
     loadHero();
   }
