@@ -4550,6 +4550,10 @@ body.intro-active {
     radial-gradient(circle at 50% 50%, #151515 0, #050505 42%, #000 100%);
 }
 
+.cinematic-video-intro.has-canvas-intro .intro-fallback {
+  visibility: hidden;
+}
+
 .intro-fallback-smoke {
   position: absolute;
   inset: -20%;

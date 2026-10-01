@@ -815,6 +815,7 @@ function bindCinematicIntroCanvas(intro) {
   if (!canvas) return false;
   const context = canvas.getContext("2d");
   if (!context) return false;
+  intro.classList.add("has-canvas-intro");
 
   const logo = new Image();
   logo.src = intro.querySelector(".intro-canvas-logo")?.getAttribute("src") || "assets/brand/logo-dragon-white.png";
@@ -884,7 +885,7 @@ function bindCinematicIntroCanvas(intro) {
     context.drawImage(logo, width / 2 - logoWidth / 2 + shake, height / 2 - logoHeight / 2 - height * 0.06, logoWidth, logoHeight);
     context.restore();
 
-    const textAlpha = clamp((elapsed - 520) / 420) * (1 - exit);
+    const textAlpha = appear * (1 - exit);
     if (textAlpha <= 0) return;
     context.save();
     context.globalAlpha = textAlpha;
