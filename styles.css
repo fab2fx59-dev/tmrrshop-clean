@@ -1850,8 +1850,7 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
-.pack-choice-frame {
-  position: relative;
+.pack-choice-overview {
   max-width: 1668px;
   margin: 0 auto;
   overflow: hidden;
@@ -1859,123 +1858,123 @@ h3 {
   box-shadow: 0 32px 90px rgba(0, 0, 0, 0.54);
 }
 
-.pack-choice-mobile-frame {
-  display: none;
-}
-
-.pack-choice-frame img {
+.pack-choice-overview img {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.pack-choice-hotspots,
-.pack-choice-mobile-hotspots {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
+.pack-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  max-width: 1668px;
+  margin: 0 auto;
+  padding-top: 1.25rem;
 }
 
-.pack-select {
-  position: absolute;
-  display: block;
-}
-
-.pack-select span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+.pack-choice-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  margin: 0;
+  border: 1px solid rgba(255, 90, 0, 0.34);
+  background: linear-gradient(160deg, rgba(255, 90, 0, 0.08), transparent 40%), #0a0a0a;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.42);
 }
 
-.pack-select select {
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  appearance: none;
-  border: 1px solid rgba(245, 241, 232, 0.24);
-  border-radius: 4px;
-  background:
-    linear-gradient(45deg, transparent 50%, var(--white) 50%) calc(100% - 16px) 50% / 7px 7px no-repeat,
-    linear-gradient(135deg, var(--white) 50%, transparent 50%) calc(100% - 10px) 50% / 7px 7px no-repeat,
-    rgba(5, 5, 5, 0.78);
+.pack-choice-card-art {
+  display: none;
+}
+
+.pack-choice-card-controls {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 0.85rem;
+  padding: clamp(1rem, 1.8vw, 1.5rem);
+}
+
+.pack-choice-card h3 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0;
   color: var(--white);
   font-family: var(--font-display);
-  font-size: clamp(0.78rem, 1.25vw, 1.2rem);
-  letter-spacing: 0;
-  padding: 0 2rem 0 1rem;
+  font-size: clamp(1.15rem, 1.7vw, 1.6rem);
   text-transform: uppercase;
-  opacity: 1;
 }
 
-.pack-select select option {
+.pack-choice-card h3 span {
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+.pack-choice-description {
+  margin: -0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.pack-choice-size {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--white);
+  font-weight: 800;
+}
+
+.pack-choice-size select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(245, 241, 232, 0.28);
+  border-radius: 4px;
+  background: #050505;
+  color: var(--white);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pack-choice-size select option {
   background: #0b0b0b;
   color: var(--white);
 }
 
-.pack-select:focus-within,
+.pack-choice-size:focus-within,
 .pack-choice-button:focus-visible {
   outline: 2px solid var(--orange);
   outline-offset: 4px;
 }
 
 .pack-choice-button {
-  position: absolute;
-  border: 0;
-  background: transparent;
-  color: transparent;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--orange);
+  border-radius: 4px;
+  background: var(--orange);
+  color: #080808;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
-.pack-choice-button:hover {
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 24px rgba(255, 90, 0, 0.6);
+.pack-choice-button:hover:not(:disabled) {
+  background: #ff7a24;
+  box-shadow: 0 0 24px rgba(255, 90, 0, 0.38);
 }
 
-.pack-choice-mobile {
-  display: none;
-}
-
-.pack-one-size {
-  left: 10.9%;
-  top: 76.4%;
-  width: 13.2%;
-  height: 6.4%;
-}
-
-.pack-one-model {
-  left: 32%;
-  top: 76.4%;
-  width: 13.2%;
-  height: 6.4%;
-}
-
-.pack-one-button {
-  left: 5.8%;
-  top: 85.9%;
-  width: 40.7%;
-  height: 7.8%;
-}
-
-.pack-two-size {
-  left: 57.9%;
-  top: 76.4%;
-  width: 13.2%;
-  height: 6.4%;
-}
-
-.pack-two-model {
-  left: 79.1%;
-  top: 76.4%;
-  width: 13.2%;
-  height: 6.4%;
-}
-
-.pack-two-button {
-  left: 53%;
-  top: 85.9%;
-  width: 40.8%;
-  height: 7.8%;
+.pack-choice-button:disabled {
+  border-color: #4c4c4c;
+  background: #363636;
+  color: #a9a9a9;
+  cursor: not-allowed;
 }
 
 @media (max-width: 980px) {
@@ -1984,86 +1983,47 @@ h3 {
     padding: 1.1rem 0.75rem 1.5rem;
   }
 
-  .pack-choice-desktop-frame {
+  .pack-choice-overview {
     display: none;
   }
 
-  .pack-choice-frame {
-    overflow: hidden;
-    max-width: 430px;
-    border-color: rgba(255, 90, 0, 0.26);
-    background: #070707;
+  .pack-choice-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+    max-width: 520px;
+    padding-top: 0;
   }
 
-  .pack-choice-mobile-frame {
+  .pack-choice-card-art {
     display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background-color: #050505;
+    background-image: url("/assets/campaign/packs-tmrr-2026.webp");
+    background-repeat: no-repeat;
+    background-size: 300% auto;
+    background-position-y: 45%;
   }
 
-  .pack-mobile-one-region,
-  .pack-mobile-two-region {
-    z-index: 1;
+  .pack-choice-card-art--one {
+    background-position-x: 0%;
   }
 
-  .pack-mobile-one-region {
-    left: 5.4%;
-    top: 8.3%;
-    width: 89.2%;
-    height: 41.5%;
+  .pack-choice-card-art--two {
+    background-position-x: 50%;
   }
 
-  .pack-mobile-two-region {
-    left: 5.4%;
-    top: 53.3%;
-    width: 89.2%;
-    height: 43.7%;
+  .pack-choice-card-art--three {
+    background-position-x: 100%;
   }
 
-  .pack-choice-mobile-hotspots .pack-select,
-  .pack-choice-mobile-hotspots .pack-mobile-one-button,
-  .pack-choice-mobile-hotspots .pack-mobile-two-button {
-    z-index: 2;
+  .pack-choice-card-controls {
+    gap: 0.75rem;
+    padding: 1rem;
   }
 
-  .pack-mobile-one-size {
-    left: 19.4%;
-    top: 41%;
-    width: 26.3%;
-    height: 3.6%;
-  }
-
-  .pack-mobile-one-model {
-    left: 61.2%;
-    top: 41%;
-    width: 26.3%;
-    height: 3.6%;
-  }
-
-  .pack-mobile-one-button {
-    left: 9.3%;
-    top: 45.9%;
-    width: 81.4%;
-    height: 4.3%;
-  }
-
-  .pack-mobile-two-size {
-    left: 19.4%;
-    top: 86.3%;
-    width: 26.3%;
-    height: 3.6%;
-  }
-
-  .pack-mobile-two-model {
-    left: 61.2%;
-    top: 86.3%;
-    width: 26.3%;
-    height: 3.6%;
-  }
-
-  .pack-mobile-two-button {
-    left: 9.3%;
-    top: 91.2%;
-    width: 81.4%;
-    height: 4.3%;
+  .pack-choice-card h3 {
+    font-size: 1.35rem;
   }
 
   .mobile-pack-card {

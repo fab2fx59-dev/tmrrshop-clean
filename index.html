@@ -76,107 +76,91 @@
         </div>
       </section>
 
-      <section class="pack-choice-section" id="packs" aria-label="Choisis ton pack">
-        <div class="pack-choice-frame pack-choice-desktop-frame reveal">
-          <img class="pack-choice-desktop-image" src="assets/campaign/packs-horizontal.webp?v=20260716" alt="Pack 1 t-shirt concours et Pack 2 Ticket Rebel" decoding="async">
-          <form class="pack-choice-hotspots" data-pack-selector>
-            <label class="pack-select pack-one-size">
-              <span>Taille pack 1</span>
-              <select data-pack-size="pack1" aria-label="Taille du pack 1">
-                <option selected>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-                <option>3XL</option>
-              </select>
-            </label>
-            <label class="pack-select pack-one-model">
-              <span>Modèle pack 1</span>
-              <select data-pack-model="pack1" aria-label="Modèle du pack 1">
-                <option selected>Homme</option>
-                <option>Femme</option>
-              </select>
-            </label>
-            <button class="pack-choice-button pack-one-button" type="button" data-pack-choice="pack1">
-              Choisir le pack 1
-            </button>
-
-            <label class="pack-select pack-two-size">
-              <span>Taille pack 2</span>
-              <select data-pack-size="pack2" aria-label="Taille du pack 2">
-                <option selected>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-                <option>3XL</option>
-              </select>
-            </label>
-            <label class="pack-select pack-two-model">
-              <span>Modèle pack 2</span>
-              <select data-pack-model="pack2" aria-label="Modèle du pack 2">
-                <option selected>Homme</option>
-                <option>Femme</option>
-              </select>
-            </label>
-            <button class="pack-choice-button pack-two-button" type="button" data-pack-choice="pack2">
-              Choisir le pack 2
-            </button>
-          </form>
+      <section class="pack-choice-section" id="packs" aria-label="Choisis ton pack TMRR">
+        <div class="pack-choice-overview reveal">
+          <img
+            src="assets/campaign/packs-tmrr-2026.webp"
+            alt="Nouveaux packs TMRR 2026 : Pack 1, tee-shirt et une participation à 24,90 euros ; Pack 2, tee-shirt et casquette avec deux participations à 34,90 euros ; Pack 3, deux tee-shirts et une casquette avec quatre participations à 49,90 euros."
+            width="3000"
+            height="1500"
+            loading="lazy"
+            decoding="async">
         </div>
-        <div class="pack-choice-frame pack-choice-mobile-frame reveal">
-          <img class="pack-choice-mobile-image" src="assets/campaign/packs-vertical.webp?v=20260716" alt="Pack 1 t-shirt concours et Pack 2 Ticket Rebel" decoding="async">
-          <form class="pack-choice-mobile-hotspots" data-pack-selector>
-            <button class="pack-choice-button pack-mobile-one-region" type="button" data-pack-choice="pack1">
-              Choisir le pack 1
-            </button>
-            <button class="pack-choice-button pack-mobile-two-region" type="button" data-pack-choice="pack2">
-              Choisir le pack 2
-            </button>
-            <label class="pack-select pack-mobile-one-size">
-              <span>Taille pack 1</span>
-              <select data-pack-size="pack1" aria-label="Taille du pack 1 mobile">
-                <option selected>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-                <option>3XL</option>
-              </select>
-            </label>
-            <label class="pack-select pack-mobile-one-model">
-              <span>Modèle pack 1</span>
-              <select data-pack-model="pack1" aria-label="Modèle du pack 1 mobile">
-                <option selected>Homme</option>
-                <option>Femme</option>
-              </select>
-            </label>
-            <button class="pack-choice-button pack-mobile-one-button" type="button" data-pack-choice="pack1">
-              Choisir le pack 1
-            </button>
 
-            <label class="pack-select pack-mobile-two-size">
-              <span>Taille pack 2</span>
-              <select data-pack-size="pack2" aria-label="Taille du pack 2 mobile">
-                <option selected>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-                <option>3XL</option>
-              </select>
-            </label>
-            <label class="pack-select pack-mobile-two-model">
-              <span>Modèle pack 2</span>
-              <select data-pack-model="pack2" aria-label="Modèle du pack 2 mobile">
-                <option selected>Homme</option>
-                <option>Femme</option>
-              </select>
-            </label>
-            <button class="pack-choice-button pack-mobile-two-button" type="button" data-pack-choice="pack2">
-              Choisir le pack 2
-            </button>
+        <div class="pack-choice-grid">
+          <form class="pack-choice-card" data-pack-card="pack1">
+            <div class="pack-choice-card-art pack-choice-card-art--one" aria-hidden="true"></div>
+            <div class="pack-choice-card-controls">
+              <h3>Pack 1 <span>24,90&nbsp;€</span></h3>
+              <p class="pack-choice-description">1 tee-shirt TMRR · 1 participation</p>
+              <label class="pack-choice-size">
+                Taille du tee-shirt
+                <select name="size" data-pack-size="pack1" aria-label="Taille du tee-shirt du Pack 1" required>
+                  <option value="" selected disabled>Choisir une taille</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="3XL">3XL</option>
+                </select>
+              </label>
+              <button class="pack-choice-button" type="submit" data-pack-choice="pack1" disabled>Choisis ce pack</button>
+            </div>
+          </form>
+
+          <form class="pack-choice-card" data-pack-card="pack2">
+            <div class="pack-choice-card-art pack-choice-card-art--two" aria-hidden="true"></div>
+            <div class="pack-choice-card-controls">
+              <h3>Pack 2 <span>34,90&nbsp;€</span></h3>
+              <p class="pack-choice-description">1 tee-shirt + 1 casquette · 2 participations</p>
+              <label class="pack-choice-size">
+                Taille du tee-shirt
+                <select name="size" data-pack-size="pack2" aria-label="Taille du tee-shirt du Pack 2" required>
+                  <option value="" selected disabled>Choisir une taille</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="3XL">3XL</option>
+                </select>
+              </label>
+              <button class="pack-choice-button" type="submit" data-pack-choice="pack2" disabled>Choisis ce pack</button>
+            </div>
+          </form>
+
+          <form class="pack-choice-card" data-pack-card="pack3">
+            <div class="pack-choice-card-art pack-choice-card-art--three" aria-hidden="true"></div>
+            <div class="pack-choice-card-controls">
+              <h3>Pack 3 <span>49,90&nbsp;€</span></h3>
+              <p class="pack-choice-description">2 tee-shirts + 1 casquette · 4 participations</p>
+              <label class="pack-choice-size">
+                Taille du tee-shirt 1
+                <select name="size1" data-pack-size="pack3-shirt1" aria-label="Taille du premier tee-shirt du Pack 3" required>
+                  <option value="" selected disabled>Choisir une taille</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="3XL">3XL</option>
+                </select>
+              </label>
+              <label class="pack-choice-size">
+                Taille du tee-shirt 2
+                <select name="size2" data-pack-size="pack3-shirt2" aria-label="Taille du deuxième tee-shirt du Pack 3" required>
+                  <option value="" selected disabled>Choisir une taille</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="3XL">3XL</option>
+                </select>
+              </label>
+              <button class="pack-choice-button" type="submit" data-pack-choice="pack3" disabled>Choisis ce pack</button>
+            </div>
           </form>
         </div>
       </section>

@@ -243,25 +243,63 @@ function bindProductButtons() {
     });
   });
 
-  document.querySelectorAll("[data-pack-choice]").forEach((button) => {
-    button.addEventListener("click", (event) => {
+  const packOffers = {
+    pack1: {
+      name: "Pack 1 - Tee-shirt TMRR 2026",
+      price: 24.9,
+      participations: 1,
+      includesCap: false
+    },
+    pack2: {
+      name: "Pack 2 - Tee-shirt + casquette",
+      price: 34.9,
+      participations: 2,
+      includesCap: true
+    },
+    pack3: {
+      name: "Pack 3 - 2 tee-shirts + casquette",
+      price: 49.9,
+      participations: 4,
+      includesCap: true
+    }
+  };
+
+  document.querySelectorAll("[data-pack-card]").forEach((form) => {
+    const packKey = form.dataset.packCard;
+    const offer = packOffers[packKey];
+    const sizeFields = [...form.querySelectorAll("[data-pack-size]")];
+    const submitButton = form.querySelector("[data-pack-choice]");
+    if (!offer || !sizeFields.length || !submitButton) return;
+
+    const updateSubmitState = () => {
+      submitButton.disabled = sizeFields.some((field) => !field.value);
+    };
+
+    form.addEventListener("change", updateSubmitState);
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
-      const pack = button.dataset.packChoice || "pack1";
-      const scope = button.closest(".mobile-pack-controls") || button.closest("[data-pack-selector]") || document;
-      const model = scope.querySelector(`[data-pack-model="${pack}"]`)?.value || "Homme";
-      const size = scope.querySelector(`[data-pack-size="${pack}"]`)?.value || "M";
-      const isPackTwo = pack === "pack2";
+      if (!form.reportValidity()) return;
+
+      const sizes = sizeFields.map((field) => field.value);
+      const shirtOptions = sizes.map((size, index) =>
+        sizes.length > 1 ? `Tee-shirt ${index + 1} taille ${size}` : `Tee-shirt taille ${size}`
+      );
+      const options = [
+        ...shirtOptions,
+        offer.includesCap ? "Casquette TMRR" : null,
+        `${offer.participations} participation${offer.participations > 1 ? "s" : ""}`
+      ].filter(Boolean).join(" · ");
+
       addToCart({
-        id: `${pack}-${model}-${size}`.toLowerCase().replace(/\s+/g, "-"),
-        name: isPackTwo ? "Pack 2 - Ticket Rebel" : "Pack 1 - T-shirt concours",
-        price: isPackTwo ? 39.9 : 25.9,
-        image: "assets/campaign/packs-horizontal.png",
+        id: `${packKey}-${sizes.join("-")}`.toLowerCase().replace(/\s+/g, "-"),
+        name: offer.name,
+        price: offer.price,
+        image: "assets/campaign/packs-tmrr-2026.webp",
         quantity: 1,
-        options: isPackTwo
-          ? `T-shirt concours modele ${model} taille ${size} - Casquette TMRR - 2 participations`
-          : `T-shirt concours modele ${model} taille ${size} - 1 participation`
+        options
       });
     });
+    updateSubmitState();
   });
 
   document.querySelectorAll("[data-club-plan]").forEach((button) => {
